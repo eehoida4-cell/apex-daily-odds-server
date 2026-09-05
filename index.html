@@ -60,22 +60,6 @@
             font-size: 14px;
         }
 
-        .ticket-card {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border: 1px solid var(--accent-green);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .ticket-card .price {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--accent-green);
-            margin: 10px 0;
-        }
-
         .form-group {
             margin-bottom: 16px;
         }
@@ -113,6 +97,7 @@
             border-radius: 8px;
             cursor: pointer;
             transition: opacity 0.2s;
+            margin-top: 10px;
         }
 
         .btn-submit:hover {
@@ -146,16 +131,20 @@
     <div class="container">
         <div class="header">
             <h1>Apex Daily Odds</h1>
-            <p>Instant Ticket Access Portal</p>
-        </div>
-
-        <div class="ticket-card">
-            <h3>2+ Daily Rollover Ticket</h3>
-            <div class="price">₦2,000</div>
-            <p style="color: #94a3b8; font-size: 13px;">Guaranteed safe selection • Direct booking code release</p>
+            <p>Payment Verification Portal</p>
         </div>
 
         <form id="paymentForm">
+            <div class="form-group">
+                <label for="planSelect">Select Subscription Plan</label>
+                <select id="planSelect" required>
+                    <option value="2+ Daily Rollover (₦2,000)">2+ Daily Rollover — ₦2,000</option>
+                    <option value="VIP Daily Plan (₦5,000)">VIP Daily Plan — ₦5,000</option>
+                    <option value="VIP Weekly Pass (₦15,000)">VIP Weekly Pass — ₦15,000</option>
+                    <option value="VIP Monthly Pass (₦40,000)">VIP Monthly Pass — ₦40,000</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="fullName">Full Name</label>
                 <input type="text" id="fullName" placeholder="Enter your full name" required>
@@ -178,7 +167,6 @@
     </div>
 
     <script>
-        // Automatic dynamic backend URL detection
         const BACKEND_URL = window.location.origin + '/api/checkout';
 
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
@@ -191,7 +179,7 @@
                 name: document.getElementById('fullName').value,
                 telegram: document.getElementById('telegramUser').value,
                 reference: document.getElementById('paymentRef').value,
-                amount: '2000'
+                amount: document.getElementById('planSelect').value
             };
 
             submitBtn.disabled = true;
@@ -209,7 +197,7 @@
 
                 if (result.success) {
                     statusBox.className = "status-msg status-success";
-                    statusBox.innerText = "Payment submitted! Admin notified on Telegram. Your booking code will be sent shortly.";
+                    statusBox.innerText = "Payment submitted! Admin notified on Telegram. Your booking code will be released shortly.";
                     statusBox.style.display = "block";
                     document.getElementById('paymentForm').reset();
                 } else {
