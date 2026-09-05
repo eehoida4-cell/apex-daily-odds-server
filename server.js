@@ -1,82 +1,72 @@
 const express = require('express');
 const axios = require('axios');
+const path = require('path');
+
 const app = express();
-
 app.use(express.json());
-
-// Enable CORS for frontend website communication
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+app.use(express.static(__dirname));
 
 const BOT_TOKEN = '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
 const ADMIN_CHAT_ID = '8863246341';
+const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-// UPDATE YOUR DAILY SPORTYBET BOOKING CODES HERE
-const VIP_BOOKING_CODE = "BC_DAILY_998"; 
-const ROLLOVER_BOOKING_CODE = "BC_ROLLOVER_331";
+// Serve the frontend page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-// 1. Endpoint triggered when customer submits email on website
+// Endpoint to receive payment notification from frontend
 app.post('/api/checkout', async (req, res) => {
-    const { email, plan, price } = req.body;
+    const { name, telegram, reference, amount } = req.body;
 
-    const messageText = `🚨 *NEW PAYMENT CLAIM*\n\n📌 *Plan:* ${plan} (${price})\n📧 *Customer Email:* \`${email}\`\n\nCheck Moniepoint app. Once confirmed, tap below:`;
+    const text = `🚨 *NEW PAYMENT CLAIM* 🚨\n\n` +
+                 `👤 *Name:* ${name}\n` +
+                 `📱 *Contact:* ${telegram}\n` +
+                 `💰 *Amount:* ₦${amount}\n` +
+                 `🧾 *Ref:* \`${reference}\``;
+
+    const keyboard = {
+        inline_keyboard: [
+            [
+                { text: "✅ Release Booking Code", callback_data: `release_${telegram}` }
+            ]
+        ]
+    };
 
     try {
-        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        await axios.post(`${TELEGRAM_API}/sendMessage`, {
             chat_id: ADMIN_CHAT_ID,
-            text: messageText,
+            text: text,
             parse_mode: 'Markdown',
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        { 
-                            text: "✅ CONFIRM & RELEASE CODE", 
-                            callback_data: `confirm_${plan.replace(/\s+/g, '-')}_${email}` 
-                        }
-                    ]
-                ]
-            }
+            reply_markup: keyboard
         });
-
-        res.json({ success: true });
+        res.status(200).json({ success: true, message: 'Notification sent to admin' });
     } catch (error) {
-        console.error('Error sending alert:', error.response?.data || error.message);
-        res.status(500).json({ error: "Failed to alert admin" });
+        console.error('Telegram API error:', error.response ? error.response.data : error.message);
+        res.status(500).json({ success: false, message: 'Failed to notify admin' });
     }
 });
 
-// 2. Telegram Webhook Endpoint (Listens for your button taps inside Telegram)
+// Telegram Webhook Handler for Inline Buttons
 app.post('/telegram-webhook', async (req, res) => {
-    const body = req.body;
+    const { callback_query } = req.body;
 
-    if (body.callback_query) {
-        const query = body.callback_query;
-        const buttonData = query.data; 
+    if (callback_query) {
+        const callbackId = callback_query.id;
+        const data = callback_query.data;
 
-        if (buttonData.startsWith('confirm_')) {
-            const parts = buttonData.split('_');
-            const rawPlan = parts[1].replace(/-/g, ' ');
-            const customerEmail = parts[2];
+        if (data.startsWith('release_')) {
+            const userContact = data.replace('release_', '');
 
-            // Select appropriate booking code
-            let activeCode = rawPlan.includes('Rollover') ? ROLLOVER_BOOKING_CODE : VIP_BOOKING_CODE;
-
-            // Edit Admin Message to show confirmed status
-            await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
-                chat_id: ADMIN_CHAT_ID,
-                message_id: query.message.message_id,
-                text: `✅ *PAYMENT CONFIRMED*\n\n📌 *Plan:* ${rawPlan}\n📧 *Customer:* \`${customerEmail}\`\n🎟 *Code Released:* \`${activeCode}\``,
-                parse_mode: 'Markdown'
+            await axios.post(`${TELEGRAM_API}/answerCallbackQuery`, {
+                callback_query_id: callbackId,
+                text: "Code dispatch confirmation recorded!",
+                show_alert: true
             });
 
-            // Pop-up response in Telegram app
-            await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery`, {
-                callback_query_id: query.id,
-                text: `Confirmed! Booking Code: ${activeCode}`,
-                show_alert: true
+            await axios.post(`${TELEGRAM_API}/sendMessage`, {
+                chat_id: ADMIN_CHAT_ID,
+                text: `✅ Action complete for ${userContact}. Send the ticket booking code directly to them now.`
             });
         }
     }
@@ -85,4 +75,6 @@ app.post('/telegram-webhook', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Apex Odds Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
