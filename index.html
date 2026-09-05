@@ -3,146 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Daily Odds - Payment Verification</title>
+    <title>Apex Daily Odds | High-Yield SportyBet Predictions</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #151c2c;
-            --accent-green: #00ff88;
-            --accent-gold: #ffb700;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: #2a3447;
+            --bg-obsidian: #0b0c10;
+            --bg-card: #151821;
+            --gold-primary: #ffb703;
+            --gold-glow: rgba(255, 183, 3, 0.25);
+            --text-main: #f0f2f5;
+            --text-muted: #8a90a2;
+            --font-heading: 'Syne', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --border-color: rgba(255, 255, 255, 0.08);
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-obsidian);
             color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            padding-bottom: 3rem;
+        }
+
+        /* Header Navigation */
+        .site-header {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 1.25rem 5%;
+            border-bottom: 1px solid rgba(255, 183, 3, 0.1);
+            background: rgba(11, 12, 16, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        .brand-name {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
         }
 
-        .header {
+        .brand-name span {
+            color: var(--gold-primary);
+        }
+
+        /* Hero Banner */
+        .hero {
             text-align: center;
-            margin-bottom: 24px;
+            padding: 3rem 1rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .header h1 {
-            color: var(--accent-gold);
-            font-size: 24px;
+        .hero-subtext {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Section Header */
+        .section-title {
+            text-align: center;
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
         }
 
-        .header p {
-            color: var(--text-muted);
-            font-size: 14px;
+        /* Pricing Grid */
+        .pricing-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
 
-        .ticket-card {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border: 1px solid var(--accent-gold);
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
+            padding: 2rem 1.5rem;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(255, 183, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+            position: relative;
         }
 
-        .ticket-card h3 {
-            color: var(--accent-gold);
-            font-size: 18px;
-            margin-bottom: 6px;
+        .pricing-card:hover {
+            border-color: var(--gold-primary);
+            transform: translateY(-4px);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 25px var(--gold-glow);
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold-primary);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
-        .ticket-card p {
+        .tier-name {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gold-primary);
+            margin-bottom: 1rem;
+        }
+
+        .tier-price span {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .tier-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: left;
+        }
+
+        .tier-features li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tier-features li::before {
+            content: "✓";
+            color: var(--gold-primary);
+            font-weight: bold;
+        }
+
+        .btn-pay {
+            background: var(--gold-primary);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-pay:hover {
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gold-primary);
+            box-shadow: 0 0 30px var(--gold-glow);
+            border-radius: 16px;
+            max-width: 440px;
+            width: 100%;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .modal-selected-tier {
+            color: var(--gold-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 4px;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 1rem;
+            text-align: left;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
+            font-size: 0.8rem;
             color: var(--text-muted);
+            margin-bottom: 0.4rem;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
-            padding: 12px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            background: var(--bg-obsidian);
+            border: 1px solid rgba(255, 183, 3, 0.3);
             border-radius: 8px;
-            color: var(--text-main);
-            font-size: 15px;
+            color: #fff;
+            font-size: 0.9rem;
             outline: none;
         }
 
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--accent-gold);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--accent-gold);
-            color: #000;
-            font-weight: bold;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            margin-top: 10px;
-        }
-
-        .btn-submit:hover {
-            opacity: 0.9;
+        .form-group input:focus {
+            border-color: var(--gold-primary);
         }
 
         .status-msg {
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
+            margin-top: 1rem;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
             text-align: center;
             display: none;
         }
 
         .status-success {
-            background-color: rgba(0, 255, 136, 0.1);
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid #00ff88;
         }
 
         .status-error {
-            background-color: rgba(255, 0, 0, 0.1);
+            background: rgba(255, 0, 0, 0.1);
             color: #ff4d4d;
             border: 1px solid #ff4d4d;
         }
@@ -150,55 +300,130 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h1>Apex Daily Odds</h1>
-            <p>Instant Ticket Access Portal</p>
+    <header class="site-header">
+        <span class="brand-name">APEX <span>DAILY ODDS</span></span>
+    </header>
+
+    <section class="hero">
+        <p class="hero-subtext">No guesswork. Daily disciplined rollover runs, high-odds VIP tickets, and instant booking code unlocks.</p>
+    </section>
+
+    <section class="pricing-section">
+        <h2 class="section-title">CHOOSE YOUR SUBSCRIPTION TIER</h2>
+
+        <div class="pricing-grid">
+            
+            <!-- Card 1 -->
+            <div class="pricing-card">
+                <div>
+                    <div class="tier-name">1-Week Rollover</div>
+                    <div class="tier-price">₦2,500 <span>/ week</span></div>
+                    <ul class="tier-features">
+                        <li>Safe 1.50 - 2.00 Daily Odds</li>
+                        <li>7 Days Continuous Access</li>
+                        <li>Instant SportyBet Codes</li>
+                    </ul>
+                </div>
+                <button class="btn-pay" onclick="openPaymentModal('1-Week Rollover', '₦2,500')">Unlock Access</button>
+            </div>
+
+            <!-- Card 2 (Featured) -->
+            <div class="pricing-card featured">
+                <div class="badge-popular">MOST POPULAR</div>
+                <div>
+                    <div class="tier-name">Daily VIP Ticket</div>
+                    <div class="tier-price">₦1,500 <span>/ 24 hrs</span></div>
+                    <ul class="tier-features">
+                        <li>High-Value 5+ Odds Ticket</li>
+                        <li>Instant Code Unlock</li>
+                        <li>Direct Telegram Support</li>
+                    </ul>
+                </div>
+                <button class="btn-pay" onclick="openPaymentModal('Daily VIP Ticket', '₦1,500')">Unlock Access</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="pricing-card">
+                <div>
+                    <div class="tier-name">1-Week VIP</div>
+                    <div class="tier-price">₦5,000 <span>/ week</span></div>
+                    <ul class="tier-features">
+                        <li>Daily 5+ to 10+ Odds</li>
+                        <li>7 Days Full VIP Access</li>
+                        <li>Priority Code Drops</li>
+                    </ul>
+                </div>
+                <button class="btn-pay" onclick="openPaymentModal('1-Week VIP', '₦5,000')">Unlock Access</button>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="pricing-card">
+                <div>
+                    <div class="tier-name">3-Week Rollover</div>
+                    <div class="tier-price">₦6,000 <span>/ 21 days</span></div>
+                    <ul class="tier-features">
+                        <li>21 Days Consistent Rollover</li>
+                        <li>Maximum Profit Strategy</li>
+                        <li>Full Channel Access</li>
+                    </ul>
+                </div>
+                <button class="btn-pay" onclick="openPaymentModal('3-Week Rollover', '₦6,000')">Unlock Access</button>
+            </div>
+
         </div>
+    </section>
 
-        <div class="ticket-card">
-            <h3>VIP & Rollover Access</h3>
-            <p>Select your tier below • Direct booking code release</p>
+    <!-- Payment Verification Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-card">
+            <button class="close-btn" onclick="closePaymentModal()">&times;</button>
+            
+            <div class="modal-header">
+                <div class="modal-title">Payment Verification</div>
+                <div class="modal-selected-tier" id="modalTierInfo">Tier - Price</div>
+            </div>
+
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telegramUser">Telegram Username / Phone</label>
+                    <input type="text" id="telegramUser" placeholder="@username or 080..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentRef">Payment Reference / Transaction ID</label>
+                    <input type="text" id="paymentRef" placeholder="Paste bank transfer reference code" required>
+                </div>
+
+                <button type="submit" class="btn-pay" id="submitBtn">Submit Verification</button>
+            </form>
+
+            <div id="statusBox" class="status-msg"></div>
         </div>
-
-        <form id="paymentForm">
-            <div class="form-group">
-                <label for="planSelect">Choose Subscription Plan</label>
-                <select id="planSelect" required>
-                    <option value="2+ Daily Rollover (₦2,000)">2+ Daily Rollover — ₦2,000</option>
-                    <option value="VIP Daily Plan (₦5,000)">VIP Daily Plan — ₦5,000</option>
-                    <option value="VIP Weekly Pass (₦15,000)">VIP Weekly Pass — ₦15,000</option>
-                    <option value="VIP Monthly Pass (₦40,000)">VIP Monthly Pass — ₦40,000</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" placeholder="Enter your full name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="telegramUser">Telegram Username / Phone</label>
-                <input type="text" id="telegramUser" placeholder="@username or 080..." required>
-            </div>
-
-            <div class="form-group">
-                <label for="paymentRef">Payment Reference / Transaction ID</label>
-                <input type="text" id="paymentRef" placeholder="Paste bank transfer reference code" required>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">Submit Payment Verification</button>
-        </form>
-
-        <div id="statusBox" class="status-msg"></div>
     </div>
 
     <script>
         const BACKEND_URL = window.location.origin + '/api/checkout';
+        let currentSelectedPlan = '';
 
-        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+        function openPaymentModal(planName, price) {
+            currentSelectedPlan = `${planName} (${price})`;
+            document.getElementById('modalTierInfo').innerText = currentSelectedPlan;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.getElementById('statusBox').style.display = 'none';
+        }
+
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitBtn');
             const statusBox = document.getElementById('statusBox');
 
@@ -206,11 +431,11 @@
                 name: document.getElementById('fullName').value,
                 telegram: document.getElementById('telegramUser').value,
                 reference: document.getElementById('paymentRef').value,
-                amount: document.getElementById('planSelect').value
+                amount: currentSelectedPlan
             };
 
             submitBtn.disabled = true;
-            submitBtn.innerText = "Processing Notification...";
+            submitBtn.innerText = "Sending Notification...";
             statusBox.style.display = "none";
 
             try {
@@ -224,21 +449,27 @@
 
                 if (result.success) {
                     statusBox.className = "status-msg status-success";
-                    statusBox.innerText = "Payment submitted! Admin notified on Telegram. Your booking code will be sent shortly.";
+                    statusBox.innerText = "Verification sent! Admin notified on Telegram.";
                     statusBox.style.display = "block";
-                    document.getElementById('paymentForm').reset();
+                    document.getElementById('checkoutForm').reset();
+                    setTimeout(closePaymentModal, 2500);
                 } else {
-                    throw new Error(result.message || "Failed to submit request.");
+                    throw new Error(result.message || "Submission failed.");
                 }
             } catch (err) {
                 statusBox.className = "status-msg status-error";
-                statusBox.innerText = "Error sending payment details. Please try again or contact support.";
+                statusBox.innerText = "Error sending verification. Please try again.";
                 statusBox.style.display = "block";
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Payment Verification";
+                submitBtn.innerText = "Submit Verification";
             }
         });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target === modal) closePaymentModal();
+        };
     </script>
 </body>
 </html>
