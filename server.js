@@ -10,12 +10,13 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
 const BOT_USERNAME = '@ApexTicketMaster_bot';
 
-// In-memory store to map Telegram message IDs to pending orders
+// In-memory store to map Telegram message IDs to customer chat IDs
 const activeOrders = {};
 
 // 2. CHECKOUT ENDPOINT (Web Form -> Admin Telegram Alert)
 app.post('/api/checkout', async (req, res) => {
-    const { name, telegram, reference, amount } = req.body;
+    // Front-end passes customerChatId or telegram numeric ID
+    const { name, telegram, reference, amount, customerChatId } = req.body;
 
     const messageText = `⚡ *NEW PAYMENT SUBMISSION* ⚡\n\n` +
         `👤 *Name:* ${name}\n` +
@@ -41,11 +42,14 @@ app.post('/api/checkout', async (req, res) => {
 
         if (data.ok) {
             const sentMessageId = data.result.message_id;
+            
+            // Store customer info using their chat ID or username fallback
             activeOrders[sentMessageId] = {
-                customerTelegram: telegram.replace('@', '').trim(),
+                customerTarget: customerChatId || telegram.replace('@', '').trim(),
+                customerTelegram: telegram,
                 plan: amount
             };
-            console.log(`[ORDER CREATED] Message ID #${sentMessageId} assigned to customer @${telegram}`);
+            console.log(`[ORDER CREATED] Message ID #${sentMessageId} linked to ${telegram}`);
         } else {
             console.error('[TELEGRAM API REJECTED]', data);
         }
@@ -57,7 +61,7 @@ app.post('/api/checkout', async (req, res) => {
     }
 });
 
-// 3. TELEGRAM WEBHOOK (Admin Reply -> Code Release Handling)
+// 3. TELEGRAM WEBHOOK (Admin Reply -> Directly DM Booking Code to Customer)
 app.post('/api/telegram-webhook', async (req, res) => {
     const update = req.body;
 
@@ -68,20 +72,47 @@ app.post('/api/telegram-webhook', async (req, res) => {
         const order = activeOrders[replyToId];
 
         if (order) {
-            const customerHandle = order.customerTelegram;
+            const target = order.customerTarget;
 
             try {
-                // Send confirmation receipt back to Admin via @ApexTicketMaster_bot
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                // A. Direct Message the Booking Code to the Customer's DM
+                const customerMsgResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        chat_id: ADMIN_CHAT_ID,
-                        reply_to_message_id: update.message.message_id,
-                        text: `✅ *CODE RELEASED BY ${BOT_USERNAME}*\n\n🎟 *Booking Code:* \`${codeTypedByAdmin}\`\n👤 *Customer:* @${customerHandle}\n\n_Logged and processed via ${BOT_USERNAME}._`,
+                        chat_id: target,
+                        text: `🎉 *PAYMENT VERIFIED!*\n\nHere is your Booking Code: \`${codeTypedByAdmin}\`\n\nWelcome to *Apex Daily Odds VIP*!`,
                         parse_mode: 'Markdown'
                     })
                 });
+
+                const customerMsgData = await customerMsgResponse.json();
+
+                // B. Notify Admin whether DM delivery succeeded
+                if (customerMsgData.ok) {
+                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: ADMIN_CHAT_ID,
+                            reply_to_message_id: update.message.message_id,
+                            text: `✅ *Code Delivered!* Sent \`${codeTypedByAdmin}\` directly to customer DM (${order.customerTelegram}).`,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                } else {
+                    // Fallback alert if user hasn't clicked /start on @ApexTicketMaster_bot
+                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: ADMIN_CHAT_ID,
+                            reply_to_message_id: update.message.message_id,
+                            text: `⚠️ *DM Failed!* Customer (${order.customerTelegram}) must tap *Start* on ${BOT_USERNAME} first.\n\nCode to share manually: \`${codeTypedByAdmin}\``,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                }
 
                 delete activeOrders[replyToId];
             } catch (err) {
