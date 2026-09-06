@@ -6,8 +6,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 // 1. CONFIGURATION
-// Replace 'YOUR_BOT_TOKEN_HERE' with your actual token string from @BotFather
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
 const BOT_USERNAME = '@ApexTicketMaster_bot';
 
