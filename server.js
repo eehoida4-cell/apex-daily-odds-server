@@ -1,80 +1,75 @@
 const express = require('express');
-const axios = require('axios');
-const path = require('path');
+const cors = require('cors');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Telegram Credentials
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '8863246341';
+
+// Middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static('.')); 
 
-const BOT_TOKEN = '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
-const ADMIN_CHAT_ID = '8863246341';
-const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
-
-// Serve the frontend page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Endpoint to receive payment notification from frontend
+// Verification Endpoint
 app.post('/api/checkout', async (req, res) => {
-    const { name, telegram, reference, amount } = req.body;
-
-    const text = `🚨 *NEW PAYMENT CLAIM* 🚨\n\n` +
-                 `👤 *Name:* ${name}\n` +
-                 `📱 *Contact:* ${telegram}\n` +
-                 `💰 *Amount:* ₦${amount}\n` +
-                 `🧾 *Ref:* \`${reference}\``;
-
-    const keyboard = {
-        inline_keyboard: [
-            [
-                { text: "✅ Release Booking Code", callback_data: `release_${telegram}` }
-            ]
-        ]
-    };
-
     try {
-        await axios.post(`${TELEGRAM_API}/sendMessage`, {
-            chat_id: ADMIN_CHAT_ID,
-            text: text,
-            parse_mode: 'Markdown',
-            reply_markup: keyboard
-        });
-        res.status(200).json({ success: true, message: 'Notification sent to admin' });
-    } catch (error) {
-        console.error('Telegram API error:', error.response ? error.response.data : error.message);
-        res.status(500).json({ success: false, message: 'Failed to notify admin' });
-    }
-});
+        const { name, telegram, reference, amount } = req.body;
 
-// Telegram Webhook Handler for Inline Buttons
-app.post('/telegram-webhook', async (req, res) => {
-    const { callback_query } = req.body;
-
-    if (callback_query) {
-        const callbackId = callback_query.id;
-        const data = callback_query.data;
-
-        if (data.startsWith('release_')) {
-            const userContact = data.replace('release_', '');
-
-            await axios.post(`${TELEGRAM_API}/answerCallbackQuery`, {
-                callback_query_id: callbackId,
-                text: "Code dispatch confirmation recorded!",
-                show_alert: true
-            });
-
-            await axios.post(`${TELEGRAM_API}/sendMessage`, {
-                chat_id: ADMIN_CHAT_ID,
-                text: `✅ Action complete for ${userContact}. Send the ticket booking code directly to them now.`
+        if (!name || !telegram || !reference) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'All fields are required.' 
             });
         }
-    }
 
-    res.sendStatus(200);
+        // Format message for Telegram Admin
+        const textMessage = 
+`🚨 *NEW PAYMENT VERIFICATION* 🚨\n\n` +
+`👤 *Name:* ${name}\n` +
+`📱 *Telegram:* ${telegram}\n` +
+`💳 *Reference:* \`${reference}\`\n` +
+`💰 *Selected Tier:* ${amount || 'Not Specified'}\n\n` +
+`⏳ *Status:* Pending Admin Approval`;
+
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
+        const telegramResponse = await fetch(telegramUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: textMessage,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        const telegramResult = await telegramResponse.json();
+
+        if (!telegramResult.ok) {
+            console.error('Telegram API Error:', telegramResult);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Failed to notify admin via Telegram.' 
+            });
+        }
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Verification submitted successfully.' 
+        });
+
+    } catch (error) {
+        console.error('Server Processing Error:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error processing verification.' 
+        });
+    }
 });
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
