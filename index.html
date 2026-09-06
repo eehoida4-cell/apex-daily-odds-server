@@ -450,69 +450,100 @@
     </div>
 
     <script>
-        const BACKEND_URL = window.location.origin + '/api/checkout';
-        let currentSelectedPlan = '';
+    const BACKEND_URL = window.location.origin + '/api/checkout';
+    let currentSelectedPlan = '';
 
-        function openPaymentModal(planName, price) {
-            currentSelectedPlan = `${planName} (${price})`;
-            document.getElementById('modalTierInfo').innerText = currentSelectedPlan;
-            document.getElementById('paymentModal').style.display = 'flex';
+    function openPaymentModal(planName, price) {
+        currentSelectedPlan = `${planName} (${price})`;
+        document.getElementById('modalTierInfo').innerText = currentSelectedPlan;
+        const modal = document.getElementById('paymentModal');
+        modal.style.display = 'flex';
+        // Prevent background scrolling on mobile when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePaymentModal() {
+        const modal = document.getElementById('paymentModal');
+        modal.style.display = 'none';
+        document.getElementById('statusBox').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    async function handleSubmission(e) {
+        if (e) e.preventDefault();
+
+        const submitBtn = document.getElementById('submitBtn');
+        const statusBox = document.getElementById('statusBox');
+
+        const fullName = document.getElementById('fullName').value.trim();
+        const telegramUser = document.getElementById('telegramUser').value.trim();
+        const paymentRef = document.getElementById('paymentRef').value.trim();
+
+        if (!fullName || !telegramUser || !paymentRef) {
+            statusBox.className = "status-msg status-error";
+            statusBox.innerText = "Please fill in all fields.";
+            statusBox.style.display = "block";
+            return;
         }
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').style.display = 'none';
-            document.getElementById('statusBox').style.display = 'none';
-        }
-
-        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('submitBtn');
-            const statusBox = document.getElementById('statusBox');
-
-            const payload = {
-                name: document.getElementById('fullName').value,
-                telegram: document.getElementById('telegramUser').value,
-                reference: document.getElementById('paymentRef').value,
-                amount: currentSelectedPlan
-            };
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Sending Notification...";
-            statusBox.style.display = "none";
-
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    statusBox.className = "status-msg status-success";
-                    statusBox.innerText = "Verification sent! Admin notified on Telegram.";
-                    statusBox.style.display = "block";
-                    document.getElementById('checkoutForm').reset();
-                    setTimeout(closePaymentModal, 2500);
-                } else {
-                    throw new Error(result.message || "Submission failed.");
-                }
-            } catch (err) {
-                statusBox.className = "status-msg status-error";
-                statusBox.innerText = "Error sending verification. Please try again.";
-                statusBox.style.display = "block";
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Verification";
-            }
-        });
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('paymentModal');
-            if (event.target === modal) closePaymentModal();
+        const payload = {
+            name: fullName,
+            telegram: telegramUser,
+            reference: paymentRef,
+            amount: currentSelectedPlan
         };
-    </script>
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sending Notification...";
+        statusBox.style.display = "none";
+
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                statusBox.className = "status-msg status-success";
+                statusBox.innerText = "Verification sent! Admin notified on Telegram.";
+                statusBox.style.display = "block";
+                document.getElementById('checkoutForm').reset();
+                setTimeout(closePaymentModal, 2500);
+            } else {
+                throw new Error(result.message || "Submission failed.");
+            }
+        } catch (err) {
+            statusBox.className = "status-msg status-error";
+            statusBox.innerText = "Error sending verification. Please check network and try again.";
+            statusBox.style.display = "block";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Verification";
+        }
+    }
+
+    // Attach event listeners for both form submit and mobile button tap
+    const form = document.getElementById('checkoutForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', handleSubmission);
+    submitBtn.addEventListener('touchend', function(e) {
+        if (form.checkValidity()) {
+            e.preventDefault();
+            handleSubmission();
+        }
+    });
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('paymentModal');
+        if (event.target === modal) closePaymentModal();
+    };
+</script>
 </body>
 </html>
