@@ -31,7 +31,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            padding: 30px 20px 50px 20px;
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(255, 183, 3, 0.08) 0%, transparent 50%),
                 radial-gradient(circle at 50% 100%, rgba(17, 21, 30, 0.8) 0%, transparent 100%);
@@ -43,7 +43,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
         }
 
         .brand-logo {
@@ -58,23 +58,92 @@
             text-transform: uppercase;
         }
 
+        /* Hero Section Styling */
+        .hero-container {
+            text-align: center;
+            max-width: 900px;
+            margin-bottom: 50px;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: rgba(255, 183, 3, 0.1);
+            border: 1px solid rgba(255, 183, 3, 0.4);
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.8rem;
+            line-height: 1.2;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .hero-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--accent-gold);
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .hero-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 650px;
+            margin: 0 auto 35px auto;
+        }
+
+        .section-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        /* Pricing Grid */
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             width: 100%;
             max-width: 1200px;
+            margin-bottom: 60px;
         }
 
         @media (max-width: 1024px) {
             .pricing-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .hero-title {
+                font-size: 2.1rem;
+            }
         }
 
         @media (max-width: 600px) {
             .pricing-grid {
                 grid-template-columns: 1fr;
+            }
+            .hero-title {
+                font-size: 1.6rem;
             }
         }
 
@@ -283,6 +352,52 @@
             color: #ff5252;
             border: 1px solid #ff5252;
         }
+
+        /* Footer Styling */
+        footer {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 40px;
+            margin-top: auto;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .footer-slogan {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .footer-handle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .footer-handle a {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-disclaimer {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -293,6 +408,19 @@
         </div>
     </header>
 
+    <!-- Hero Header Banner Section -->
+    <div class="hero-container">
+        <div class="tag-pill">DATA-DRIVEN SPORTYBET PREDICTIONS</div>
+        <h1 class="hero-title">MAXIMIZE YOUR WINNING EDGE.</h1>
+        <div class="hero-subtitle">"ZERO GREED. MAXIMUM CASHOUT."</div>
+        <p class="hero-description">
+            No guesswork. Daily disciplined rollover runs, high-odds VIP tickets, and instant booking code unlocks.
+        </p>
+    </div>
+
+    <div class="section-heading">CHOOSE YOUR SUBSCRIPTION TIER</div>
+
+    <!-- Pricing Grid (Original Code Tiers Retained) -->
     <div class="pricing-grid">
         <!-- VIP Daily -->
         <div class="card">
@@ -411,6 +539,16 @@
         </div>
     </div>
 
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-logo">APEX DAILY ODDS</div>
+        <div class="footer-slogan">ZERO GREED. MAXIMUM CASHOUT.</div>
+        <div class="footer-handle">Official Channel: <a href="https://t.me/ApexDailyOddsHQ" target="_blank">@ApexDailyOddsHQ</a></div>
+        <div class="footer-disclaimer">
+            © 2026 Apex Daily Odds. Built for disciplined bettors. Please gamble responsibly (18+).
+        </div>
+    </footer>
+
     <script>
         const BACKEND_URL = window.location.origin + '/api/checkout';
         let currentSelectedPlan = '';
@@ -457,7 +595,7 @@
 
                 if (response.ok && result.success) {
                     statusBox.className = "status-msg status-success";
-                    statusBox.innerHTML = "Verification sent! <br><br>👉 <a href='https://t.me/YOUR_BOT_USERNAME' target='_blank' style='color:#ffb703; font-weight:bold;'>Click Here to Start Our Telegram Bot</a> to receive your booking code DM once approved.";
+                    statusBox.innerHTML = "Verification sent! <br><br>👉 <a href='https://t.me/ApexTicketMaster_bot' target='_blank' style='color:#ffb703; font-weight:bold;'>Click Here to Start Our Telegram Bot (@ApexTicketMaster_bot)</a> to receive your booking code DM once approved.";
                     statusBox.style.display = "block";
                     document.getElementById('checkoutForm').reset();
                 } else {
