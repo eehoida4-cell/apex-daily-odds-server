@@ -5,14 +5,16 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Replace with your actual Telegram Bot Token and your personal Admin Chat ID
+// 1. CONFIGURATION
+// Replace 'YOUR_BOT_TOKEN_HERE' with your actual token string from @BotFather
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
-const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || 'YOUR_ADMIN_CHAT_ID_HERE';
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
+const BOT_USERNAME = '@ApexTicketMaster_bot';
 
-// Memory store to link Telegram message IDs to customer handles
+// In-memory store to map Telegram message IDs to pending orders
 const activeOrders = {};
 
-// Handle Checkout Form Submission from Website
+// 2. CHECKOUT ENDPOINT (Web Form -> Admin Telegram Alert)
 app.post('/api/checkout', async (req, res) => {
     const { name, telegram, reference, amount } = req.body;
 
@@ -39,63 +41,52 @@ app.post('/api/checkout', async (req, res) => {
         const data = await response.json();
 
         if (data.ok) {
-            // Save the message ID so we know which customer you are replying to later
             const sentMessageId = data.result.message_id;
             activeOrders[sentMessageId] = {
                 customerTelegram: telegram.replace('@', '').trim(),
                 plan: amount
             };
+            console.log(`[ORDER CREATED] Message ID #${sentMessageId} assigned to customer @${telegram}`);
+        } else {
+            console.error('[TELEGRAM API REJECTED]', data);
         }
 
         res.status(200).json({ success: true, message: 'Submitted successfully!' });
     } catch (err) {
-        console.error('Telegram Error:', err);
+        console.error('[SERVER ERROR]', err);
         res.status(500).json({ success: false, message: 'Failed to notify admin.' });
     }
 });
 
-// Telegram Webhook to catch your replies with booking codes
+// 3. TELEGRAM WEBHOOK (Admin Reply -> Code Release Handling)
 app.post('/api/telegram-webhook', async (req, res) => {
     const update = req.body;
 
-    // Check if the update is a message reply from you (the Admin)
     if (update.message && update.message.reply_to_message) {
         const replyToId = update.message.reply_to_message.message_id;
         const codeTypedByAdmin = update.message.text.trim();
 
-        // Check if this reply matches an active customer order
         const order = activeOrders[replyToId];
 
         if (order) {
-            const customerChatId = order.customerTelegram;
+            const customerHandle = order.customerTelegram;
 
             try {
-                // Send the booking code to the customer's Telegram DM
-                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: `@${customerChatId}`,
-                        text: `🎉 *PAYMENT VERIFIED!*\n\nHere is your Booking Code: \`${codeTypedByAdmin}\`\n\nWelcome to *Apex Daily Odds VIP*!`,
-                        parse_mode: 'Markdown'
-                    })
-                });
-
-                // Confirm to Admin that code was sent
+                // Send confirmation receipt back to Admin via @ApexTicketMaster_bot
                 await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         chat_id: ADMIN_CHAT_ID,
                         reply_to_message_id: update.message.message_id,
-                        text: `✅ Code \`${codeTypedByAdmin}\` sent successfully to @${customerChatId}!`,
+                        text: `✅ *CODE RELEASED BY ${BOT_USERNAME}*\n\n🎟 *Booking Code:* \`${codeTypedByAdmin}\`\n👤 *Customer:* @${customerHandle}\n\n_Logged and processed via ${BOT_USERNAME}._`,
                         parse_mode: 'Markdown'
                     })
                 });
 
                 delete activeOrders[replyToId];
             } catch (err) {
-                console.error('Error forwarding code:', err);
+                console.error('[WEBHOOK ERROR]', err);
             }
         }
     }
@@ -103,9 +94,11 @@ app.post('/api/telegram-webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
+// 4. SPA / STATIC CATCH-ALL ROUTE
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// 5. SERVER INITIALIZATION
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Apex Daily Odds Server (${BOT_USERNAME}) running on port ${PORT}`));
