@@ -5,12 +5,10 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 
-// Telegram Credentials
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '8863246341';
 
 const server = http.createServer((req, res) => {
-    // Enable CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -20,15 +18,16 @@ const server = http.createServer((req, res) => {
         return res.end();
     }
 
-    // Serve index.html at root
+    // Serve index.html explicitly on root or any GET request for main page
     if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
-        const filePath = path.join(__dirname, 'index.html');
-        fs.readFile(filePath, (err, content) => {
+        const filePath = path.resolve(__dirname, 'index.html');
+        
+        fs.readFile(filePath, 'utf8', (err, content) => {
             if (err) {
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end('index.html not found');
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Server Error: Unable to read index.html file.');
             } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 res.end(content);
             }
         });
@@ -97,17 +96,9 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Serve static files if requested
-    const staticFilePath = path.join(__dirname, req.url);
-    fs.readFile(staticFilePath, (err, content) => {
-        if (err) {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end('Not Found');
-        } else {
-            res.writeHead(200);
-            res.end(content);
-        }
-    });
+    // Default 404 handler for missing routes
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('404 Not Found');
 });
 
 server.listen(PORT, () => {
