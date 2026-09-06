@@ -457,10 +457,9 @@
 
                 if (response.ok && result.success) {
                     statusBox.className = "status-msg status-success";
-                    statusBox.innerText = "Verification sent! Check your Telegram.";
+                    statusBox.innerHTML = "Verification sent! <br><br>👉 <a href='https://t.me/YOUR_BOT_USERNAME' target='_blank' style='color:#ffb703; font-weight:bold;'>Click Here to Start Our Telegram Bot</a> to receive your booking code DM once approved.";
                     statusBox.style.display = "block";
                     document.getElementById('checkoutForm').reset();
-                    setTimeout(closePaymentModal, 2500);
                 } else {
                     throw new Error(result.message || "Submission failed.");
                 }
