@@ -1,106 +1,111 @@
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
+const express = require('express');
 const path = require('path');
+const app = express();
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
+
+// Replace with your actual Telegram Bot Token and your personal Admin Chat ID
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || 'YOUR_ADMIN_CHAT_ID_HERE';
+
+// Memory store to link Telegram message IDs to customer handles
+const activeOrders = {};
+
+// Handle Checkout Form Submission from Website
+app.post('/api/checkout', async (req, res) => {
+    const { name, telegram, reference, amount } = req.body;
+
+    const messageText = `⚡ *NEW PAYMENT SUBMISSION* ⚡\n\n` +
+        `👤 *Name:* ${name}\n` +
+        `📱 *Telegram:* ${telegram}\n` +
+        `💳 *Plan:* ${amount}\n` +
+        `🧾 *Ref:* \`${reference}\`\n\n` +
+        `👉 *To send code:* Reply directly to this message with the booking code!`;
+
+    const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    try {
+        const response = await fetch(telegramApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: ADMIN_CHAT_ID,
+                text: messageText,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+            // Save the message ID so we know which customer you are replying to later
+            const sentMessageId = data.result.message_id;
+            activeOrders[sentMessageId] = {
+                customerTelegram: telegram.replace('@', '').trim(),
+                plan: amount
+            };
+        }
+
+        res.status(200).json({ success: true, message: 'Submitted successfully!' });
+    } catch (err) {
+        console.error('Telegram Error:', err);
+        res.status(500).json({ success: false, message: 'Failed to notify admin.' });
+    }
+});
+
+// Telegram Webhook to catch your replies with booking codes
+app.post('/api/telegram-webhook', async (req, res) => {
+    const update = req.body;
+
+    // Check if the update is a message reply from you (the Admin)
+    if (update.message && update.message.reply_to_message) {
+        const replyToId = update.message.reply_to_message.message_id;
+        const codeTypedByAdmin = update.message.text.trim();
+
+        // Check if this reply matches an active customer order
+        const order = activeOrders[replyToId];
+
+        if (order) {
+            const customerChatId = order.customerTelegram;
+
+            try {
+                // Send the booking code to the customer's Telegram DM
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: `@${customerChatId}`,
+                        text: `🎉 *PAYMENT VERIFIED!*\n\nHere is your Booking Code: \`${codeTypedByAdmin}\`\n\nWelcome to *Apex Daily Odds VIP*!`,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                // Confirm to Admin that code was sent
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: ADMIN_CHAT_ID,
+                        reply_to_message_id: update.message.message_id,
+                        text: `✅ Code \`${codeTypedByAdmin}\` sent successfully to @${customerChatId}!`,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                delete activeOrders[replyToId];
+            } catch (err) {
+                console.error('Error forwarding code:', err);
+            }
+        }
+    }
+
+    res.sendStatus(200);
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
-
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '8863246341';
-
-const server = http.createServer((req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        return res.end();
-    }
-
-    // Serve index.html explicitly on root or any GET request for main page
-    if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
-        const filePath = path.resolve(__dirname, 'index.html');
-        
-        fs.readFile(filePath, 'utf8', (err, content) => {
-            if (err) {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Server Error: Unable to read index.html file.');
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-                res.end(content);
-            }
-        });
-        return;
-    }
-
-    // Payment Checkout Endpoint
-    if (req.method === 'POST' && req.url === '/api/checkout') {
-        let body = '';
-        req.on('data', chunk => { body += chunk.toString(); });
-        req.on('end', () => {
-            try {
-                const { name, telegram, reference, amount } = JSON.parse(body || '{}');
-
-                if (!name || !telegram || !reference) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    return res.end(JSON.stringify({ success: false, message: 'All fields required.' }));
-                }
-
-                const textMessage = 
-`🚨 *NEW PAYMENT VERIFICATION* 🚨\n\n` +
-`👤 *Name:* ${name}\n` +
-`📱 *Telegram:* ${telegram}\n` +
-`💳 *Reference:* \`${reference}\`\n` +
-`💰 *Selected Tier:* ${amount || 'Not Specified'}\n\n` +
-`⏳ *Status:* Pending Admin Approval`;
-
-                const postData = JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: textMessage,
-                    parse_mode: 'Markdown'
-                });
-
-                const options = {
-                    hostname: 'api.telegram.org',
-                    path: `/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Content-Length': Buffer.byteLength(postData)
-                    }
-                };
-
-                const telegramReq = https.request(options, (telegramRes) => {
-                    let telegramData = '';
-                    telegramRes.on('data', chunk => { telegramData += chunk; });
-                    telegramRes.on('end', () => {
-                        res.writeHead(200, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ success: true, message: 'Verification submitted.' }));
-                    });
-                });
-
-                telegramReq.on('error', (e) => {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: false, message: 'Telegram error.' }));
-                });
-
-                telegramReq.write(postData);
-                telegramReq.end();
-
-            } catch (err) {
-                res.writeHead(500, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: false, message: 'Server error.' }));
-            }
-        });
-        return;
-    }
-
-    // Default 404 handler for missing routes
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('404 Not Found');
-});
-
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
