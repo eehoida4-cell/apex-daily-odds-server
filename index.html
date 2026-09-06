@@ -3,85 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Daily Odds - VIP Verification</title>
+    <title>APEX DAILY ODDS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0b0e14;
-            --card-bg: #151a23;
-            --accent-green: #00e676;
+            --bg-color: #080a0f;
+            --card-bg: #11151e;
+            --accent-gold: #ffb703;
+            --accent-gold-hover: #ffa000;
             --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: #232a36;
-            --error-red: #ff5252;
+            --text-muted: #8e9bb0;
+            --border-color: #1e2638;
+            --glow-gold: rgba(255, 183, 3, 0.35);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 183, 3, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(17, 21, 30, 0.8) 0%, transparent 100%);
         }
 
-        /* Hero / Landing Page Layout */
-        .landing-container {
-            text-align: center;
-            max-width: 600px;
+        header {
             width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        @media (max-width: 1024px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card.popular {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 25px var(--glow-gold);
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        .tier-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tier-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        .landing-title {
-            font-size: 2rem;
-            color: var(--accent-green);
-            margin-bottom: 10px;
-        }
-
-        .landing-subtitle {
+        .tier-price span {
+            font-size: 0.75rem;
             color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+
+        .features-list {
+            list-style: none;
             margin-bottom: 30px;
-            font-size: 1rem;
+            flex-grow: 1;
         }
 
-        .plan-cards {
+        .features-list li {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
             display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
 
-        .plan-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 260px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .plan-name {
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .plan-price {
-            font-size: 1.5rem;
-            color: var(--accent-green);
+        .features-list li::before {
+            content: "✓";
+            color: var(--accent-gold);
             font-weight: bold;
-            margin-bottom: 16px;
+        }
+
+        .btn-unlock {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            text-align: center;
+        }
+
+        .btn-unlock:hover {
+            background: var(--accent-gold-hover);
+            box-shadow: 0 0 15px var(--glow-gold);
         }
 
         /* Modal Structure */
@@ -92,8 +189,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -101,13 +198,13 @@
 
         .modal-card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 450px;
-            padding: 24px;
+            border: 1px solid var(--accent-gold);
+            border-radius: 14px;
+            width: 90%;
+            max-width: 440px;
+            padding: 28px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 0 30px var(--glow-gold);
         }
 
         .close-btn {
@@ -117,28 +214,28 @@
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
         }
 
         .modal-title {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-            color: var(--accent-green);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 6px;
         }
 
-        .tier-badge {
-            background: rgba(0, 230, 118, 0.1);
-            color: var(--accent-green);
+        .tier-badge-modal {
+            background: rgba(255, 183, 3, 0.1);
+            color: var(--accent-gold);
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             display: inline-block;
             margin-bottom: 20px;
-            border: 1px solid rgba(0, 230, 118, 0.2);
+            border: 1px solid rgba(255, 183, 3, 0.3);
         }
 
-        /* Form Layout */
         .form-group {
             margin-bottom: 16px;
             text-align: left;
@@ -146,7 +243,7 @@
 
         .form-group label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             margin-bottom: 6px;
         }
@@ -160,78 +257,127 @@
             color: var(--text-main);
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         .form-group input:focus {
-            border-color: var(--accent-green);
+            border-color: var(--accent-gold);
         }
 
-        .btn-pay {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent-green);
-            color: #000;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: opacity 0.2s;
-        }
-
-        .btn-pay:hover {
-            opacity: 0.9;
-        }
-
-        .btn-pay:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Dynamic Status Alert */
         .status-msg {
             display: none;
             padding: 12px;
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             margin-top: 16px;
             text-align: center;
         }
 
         .status-success {
-            background: rgba(0, 230, 118, 0.15);
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
+            background: rgba(255, 183, 3, 0.15);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
         }
 
         .status-error {
             background: rgba(255, 82, 82, 0.15);
-            color: var(--error-red);
-            border: 1px solid var(--error-red);
+            color: #ff5252;
+            border: 1px solid #ff5252;
         }
     </style>
 </head>
 <body>
 
-    <!-- Main Landing Page Banner -->
-    <div class="landing-container">
-        <h1 class="landing-title">Apex Daily Odds VIP</h1>
-        <p class="landing-subtitle">Select your VIP Tier below to verify payment & gain immediate access.</p>
-        
-        <div class="plan-cards">
-            <div class="plan-card">
-                <div class="plan-name">Daily Rollover</div>
-                <div class="plan-price">₦2,000</div>
-                <button class="btn-pay" onclick="openPaymentModal('Daily Rollover', '₦2,000')">Join Daily VIP</button>
-            </div>
+    <header>
+        <div class="brand-logo">
+            APEX DAILY ODDS
+        </div>
+    </header>
 
-            <div class="plan-card">
-                <div class="plan-name">Weekly VIP Pass</div>
-                <div class="plan-price">₦10,000</div>
-                <button class="btn-pay" onclick="openPaymentModal('Weekly VIP Pass', '₦10,000')">Join Weekly VIP</button>
-            </div>
+    <div class="pricing-grid">
+        <!-- VIP Daily -->
+        <div class="card">
+            <h3 class="tier-title">VIP Daily</h3>
+            <div class="tier-price">₦2,000 <span>/ 24 hrs</span></div>
+            <ul class="features-list">
+                <li>High-Value VIP Ticket</li>
+                <li>Instant Code Release</li>
+                <li>Direct Telegram Support</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('VIP Daily', '₦2,000')">Unlock Access</button>
+        </div>
+
+        <!-- VIP Weekly -->
+        <div class="card">
+            <h3 class="tier-title">VIP Weekly</h3>
+            <div class="tier-price">₦9,000 <span>/ 7 days</span></div>
+            <ul class="features-list">
+                <li>7 Days Full VIP Access</li>
+                <li>Daily High-Odds Tickets</li>
+                <li>Priority Code Drops</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('VIP Weekly', '₦9,000')">Unlock Access</button>
+        </div>
+
+        <!-- VIP Monthly -->
+        <div class="card">
+            <h3 class="tier-title">VIP Monthly</h3>
+            <div class="tier-price">₦20,000 <span>/ month</span></div>
+            <ul class="features-list">
+                <li>30 Days Continuous VIP</li>
+                <li>Maximum Odds Strategy</li>
+                <li>Full VIP Channel Access</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('VIP Monthly', '₦20,000')">Unlock Access</button>
+        </div>
+
+        <!-- Rollover 1-Week -->
+        <div class="card">
+            <h3 class="tier-title">Rollover 1-Week</h3>
+            <div class="tier-price">₦3,000 <span>/ 7 days</span></div>
+            <ul class="features-list">
+                <li>Safe Daily Rollover Odds</li>
+                <li>7 Days Consistent Runs</li>
+                <li>Instant SportyBet Codes</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Week', '₦3,000')">Unlock Access</button>
+        </div>
+
+        <!-- Rollover 1-Month -->
+        <div class="card">
+            <h3 class="tier-title">Rollover 1-Month</h3>
+            <div class="tier-price">₦10,000 <span>/ month</span></div>
+            <ul class="features-list">
+                <li>30 Days Rollover Access</li>
+                <li>Disciplined Profit Plan</li>
+                <li>Full Rollover Channel</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Month', '₦10,000')">Unlock Access</button>
+        </div>
+
+        <!-- Rollover + VIP (1-Week) -->
+        <div class="card">
+            <h3 class="tier-title">Rollover + VIP (1-Week)</h3>
+            <div class="tier-price">₦20,000 <span>/ 7 days</span></div>
+            <ul class="features-list">
+                <li>Full VIP + Rollover Access</li>
+                <li>7 Days Both Channels</li>
+                <li>Combined Ticket Strategy</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('Rollover + VIP (1-Week)', '₦20,000')">Unlock Access</button>
+        </div>
+
+        <!-- Rollover + VIP (1-Month) -->
+        <div class="card popular">
+            <div class="badge-popular">BEST SALE • 2% OFF</div>
+            <h3 class="tier-title">Rollover + VIP (1-Month)</h3>
+            <div class="tier-price">₦50,000 <span>/ month</span></div>
+            <ul class="features-list">
+                <li>Ultimate All-Access Pass</li>
+                <li>30 Days Full VIP & Rollover</li>
+                <li>Priority VIP Drops & Support</li>
+                <li>Best Value Savings</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('Rollover + VIP (1-Month)', '₦50,000')">Unlock Access</button>
         </div>
     </div>
 
@@ -240,25 +386,25 @@
         <div class="modal-card">
             <button class="close-btn" onclick="closePaymentModal()">&times;</button>
             <h2 class="modal-title">Verify Payment</h2>
-            <div class="tier-badge" id="modalTierInfo">Selected Plan: --</div>
+            <div class="tier-badge-modal" id="modalTierInfo">Selected Plan: --</div>
 
             <form id="checkoutForm">
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" name="name" placeholder="Enter your full name" autocomplete="name" required>
+                    <input type="text" id="fullName" name="name" placeholder="Enter your full name" required>
                 </div>
 
                 <div class="form-group">
                     <label for="telegramUser">Telegram Username or Phone</label>
-                    <input type="text" id="telegramUser" name="telegram" placeholder="@username or 080..." autocapitalize="none" required>
+                    <input type="text" id="telegramUser" name="telegram" placeholder="@username or 080..." required>
                 </div>
 
                 <div class="form-group">
                     <label for="paymentRef">Payment Reference / Transaction ID</label>
-                    <input type="text" id="paymentRef" name="reference" placeholder="Paste bank transfer reference code" autocapitalize="characters" required>
+                    <input type="text" id="paymentRef" name="reference" placeholder="Paste bank transfer reference code" required>
                 </div>
 
-                <button type="submit" class="btn-pay" id="submitBtn">Submit Verification</button>
+                <button type="submit" class="btn-unlock" id="submitBtn">Submit Verification</button>
             </form>
 
             <div id="statusBox" class="status-msg"></div>
@@ -272,16 +418,12 @@
         function openPaymentModal(planName, price) {
             currentSelectedPlan = `${planName} (${price})`;
             document.getElementById('modalTierInfo').innerText = currentSelectedPlan;
-            const modal = document.getElementById('paymentModal');
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            document.getElementById('paymentModal').style.display = 'flex';
         }
 
         function closePaymentModal() {
-            const modal = document.getElementById('paymentModal');
-            modal.style.display = 'none';
+            document.getElementById('paymentModal').style.display = 'none';
             document.getElementById('statusBox').style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
 
         async function handleSubmission(e) {
@@ -294,13 +436,6 @@
             const telegramUser = document.getElementById('telegramUser').value.trim();
             const paymentRef = document.getElementById('paymentRef').value.trim();
 
-            if (!fullName || !telegramUser || !paymentRef) {
-                statusBox.className = "status-msg status-error";
-                statusBox.innerText = "Please fill in all required fields.";
-                statusBox.style.display = "block";
-                return;
-            }
-
             const payload = {
                 name: fullName,
                 telegram: telegramUser,
@@ -309,16 +444,12 @@
             };
 
             submitBtn.disabled = true;
-            submitBtn.innerText = "Sending Verification...";
-            statusBox.style.display = "none";
+            submitBtn.innerText = "Sending...";
 
             try {
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
@@ -326,7 +457,7 @@
 
                 if (response.ok && result.success) {
                     statusBox.className = "status-msg status-success";
-                    statusBox.innerText = "Verification sent! Admin notified on Telegram.";
+                    statusBox.innerText = "Verification sent! Check your Telegram.";
                     statusBox.style.display = "block";
                     document.getElementById('checkoutForm').reset();
                     setTimeout(closePaymentModal, 2500);
@@ -335,7 +466,7 @@
                 }
             } catch (err) {
                 statusBox.className = "status-msg status-error";
-                statusBox.innerText = err.message || "Error sending verification. Check connection.";
+                statusBox.innerText = "Error sending verification. Check connection.";
                 statusBox.style.display = "block";
             } finally {
                 submitBtn.disabled = false;
@@ -344,11 +475,6 @@
         }
 
         document.getElementById('checkoutForm').addEventListener('submit', handleSubmission);
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('paymentModal');
-            if (event.target === modal) closePaymentModal();
-        };
     </script>
 </body>
 </html>
