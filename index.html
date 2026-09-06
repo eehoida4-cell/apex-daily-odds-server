@@ -408,7 +408,6 @@
         </div>
     </header>
 
-    <!-- Hero Header Banner Section -->
     <div class="hero-container">
         <div class="tag-pill">DATA-DRIVEN SPORTYBET PREDICTIONS</div>
         <h1 class="hero-title">MAXIMIZE YOUR WINNING EDGE.</h1>
@@ -420,9 +419,7 @@
 
     <div class="section-heading">CHOOSE YOUR SUBSCRIPTION TIER</div>
 
-    <!-- Pricing Grid (Original Code Tiers Retained) -->
     <div class="pricing-grid">
-        <!-- VIP Daily -->
         <div class="card">
             <h3 class="tier-title">VIP Daily</h3>
             <div class="tier-price">₦2,000 <span>/ 24 hrs</span></div>
@@ -434,7 +431,6 @@
             <button class="btn-unlock" onclick="openPaymentModal('VIP Daily', '₦2,000')">Unlock Access</button>
         </div>
 
-        <!-- VIP Weekly -->
         <div class="card">
             <h3 class="tier-title">VIP Weekly</h3>
             <div class="tier-price">₦9,000 <span>/ 7 days</span></div>
@@ -446,7 +442,6 @@
             <button class="btn-unlock" onclick="openPaymentModal('VIP Weekly', '₦9,000')">Unlock Access</button>
         </div>
 
-        <!-- VIP Monthly -->
         <div class="card">
             <h3 class="tier-title">VIP Monthly</h3>
             <div class="tier-price">₦20,000 <span>/ month</span></div>
@@ -458,7 +453,6 @@
             <button class="btn-unlock" onclick="openPaymentModal('VIP Monthly', '₦20,000')">Unlock Access</button>
         </div>
 
-        <!-- Rollover 1-Week -->
         <div class="card">
             <h3 class="tier-title">Rollover 1-Week</h3>
             <div class="tier-price">₦3,000 <span>/ 7 days</span></div>
@@ -470,7 +464,6 @@
             <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Week', '₦3,000')">Unlock Access</button>
         </div>
 
-        <!-- Rollover 1-Month -->
         <div class="card">
             <h3 class="tier-title">Rollover 1-Month</h3>
             <div class="tier-price">₦10,000 <span>/ month</span></div>
@@ -482,7 +475,6 @@
             <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Month', '₦10,000')">Unlock Access</button>
         </div>
 
-        <!-- Rollover + VIP (1-Week) -->
         <div class="card">
             <h3 class="tier-title">Rollover + VIP (1-Week)</h3>
             <div class="tier-price">₦20,000 <span>/ 7 days</span></div>
@@ -494,7 +486,6 @@
             <button class="btn-unlock" onclick="openPaymentModal('Rollover + VIP (1-Week)', '₦20,000')">Unlock Access</button>
         </div>
 
-        <!-- Rollover + VIP (1-Month) -->
         <div class="card popular">
             <div class="badge-popular">BEST SALE • 2% OFF</div>
             <h3 class="tier-title">Rollover + VIP (1-Month)</h3>
@@ -509,7 +500,6 @@
         </div>
     </div>
 
-    <!-- Verification Modal -->
     <div class="modal-overlay" id="paymentModal">
         <div class="modal-card">
             <button class="close-btn" onclick="closePaymentModal()">&times;</button>
@@ -539,7 +529,6 @@
         </div>
     </div>
 
-    <!-- Footer Section -->
     <footer>
         <div class="footer-logo">APEX DAILY ODDS</div>
         <div class="footer-slogan">ZERO GREED. MAXIMUM CASHOUT.</div>
@@ -550,12 +539,17 @@
     </footer>
 
     <script>
-        const BACKEND_URL = window.location.origin + '/api/checkout';
+        // BACKEND ENDPOINT CONFIGURATION
+        // Automatically adapts whether running locally (localhost:3000) or deployed live on Render/Vercel
+        const BACKEND_URL = window.location.origin.includes('localhost') 
+            ? 'http://localhost:3000/api/checkout' 
+            : '/api/checkout';
+
         let currentSelectedPlan = '';
 
         function openPaymentModal(planName, price) {
             currentSelectedPlan = `${planName} (${price})`;
-            document.getElementById('modalTierInfo').innerText = currentSelectedPlan;
+            document.getElementById('modalTierInfo').innerText = `Selected Plan: ${currentSelectedPlan}`;
             document.getElementById('paymentModal').style.display = 'flex';
         }
 
@@ -603,7 +597,7 @@
                 }
             } catch (err) {
                 statusBox.className = "status-msg status-error";
-                statusBox.innerText = "Error sending verification. Check connection.";
+                statusBox.innerText = "Error sending verification. Check backend server connection.";
                 statusBox.style.display = "block";
             } finally {
                 submitBtn.disabled = false;
