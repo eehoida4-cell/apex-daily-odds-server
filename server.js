@@ -9,6 +9,13 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
 const BOT_USERNAME = 'ApexTicketMaster_bot';
 
+// Define Bank Account Details for Display/Verification
+const BANK_DETAILS = {
+    bankName: process.env.BANK_NAME || "Moniepoint MFB",
+    accountNumber: process.env.ACCOUNT_NUMBER || "1234567890",
+    accountName: process.env.ACCOUNT_NAME || "Apex Daily Odds"
+};
+
 const activeOrders = {}; // Maps messageId -> order info
 const pendingApprovalState = {}; // Stores admin waiting state
 const pendingCodesByUsername = {}; // Maps lowercase username -> { bookingCode, plan }
@@ -44,7 +51,8 @@ app.post('/api/checkout', async (req, res) => {
         `📱 *Telegram:* @${formattedUsername}\n` +
         `💳 *Plan:* ${amount}\n` +
         `🧾 *Ref:* \`${reference}\`\n\n` +
-        `👇 *Review payment and select an action below:*`;
+        `🏦 *Account:* ${BANK_DETAILS.bankName} - ${BANK_DETAILS.accountNumber} (${BANK_DETAILS.accountName})\n\n` +
+        `👇 *Verify transaction in your bank app, then select an action below:*`;
 
     try {
         const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
