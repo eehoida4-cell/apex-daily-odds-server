@@ -305,6 +305,62 @@
             border: 1px solid rgba(255, 183, 3, 0.3);
         }
 
+        /* Bank Account Details Box Styling */
+        .bank-details-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .bank-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bank-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .bank-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .bank-val-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bank-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-family: monospace;
+        }
+
+        .copy-btn {
+            background: rgba(255, 183, 3, 0.15);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
         .form-group {
             margin-bottom: 16px;
             text-align: left;
@@ -506,6 +562,28 @@
             <h2 class="modal-title">Verify Payment</h2>
             <div class="tier-badge-modal" id="modalTierInfo">Selected Plan: --</div>
 
+            <!-- Bank Account Details Section -->
+            <div class="bank-details-box">
+                <div class="bank-row">
+                    <span class="bank-label">Bank Name:</span>
+                    <span class="bank-value" style="font-family: inherit;">OPay</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account No:</span>
+                    <div class="bank-val-container">
+                        <span class="bank-value" id="accNumber">8123456789</span>
+                        <button class="copy-btn" onclick="copyText('accNumber', this)">Copy</button>
+                    </div>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Name:</span>
+                    <div class="bank-val-container">
+                        <span class="bank-value" id="accName" style="font-family: inherit; font-size: 0.85rem;">APEX DAILY ODDS</span>
+                        <button class="copy-btn" onclick="copyText('accName', this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
             <form id="checkoutForm">
                 <div class="form-group">
                     <label for="fullName">Full Name</label>
@@ -513,8 +591,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="telegramUser">Telegram Username</label>
-                    <input type="text" id="telegramUser" name="telegram" placeholder="@username (e.g. @john_doe)" required pattern="^@?[a-zA-Z0-9_]{5,32}$" title="Please enter a valid Telegram username starting with @">
+                    <label for="telegramUser">Telegram Handle / Username</label>
+                    <input type="text" id="telegramUser" name="telegram" placeholder="@yourhandle" required>
                 </div>
 
                 <div class="form-group">
@@ -545,15 +623,6 @@
 
         let currentSelectedPlan = '';
 
-        // Auto-format Telegram Username input field
-        const telegramInput = document.getElementById('telegramUser');
-        telegramInput.addEventListener('input', (e) => {
-            let val = e.target.value.trim();
-            if (val.length > 0 && !val.startsWith('@')) {
-                e.target.value = '@' + val;
-            }
-        });
-
         function openPaymentModal(planName, price) {
             currentSelectedPlan = `${planName} (${price})`;
             document.getElementById('modalTierInfo').innerText = `Selected Plan: ${currentSelectedPlan}`;
@@ -563,6 +632,23 @@
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
             document.getElementById('statusBox').style.display = 'none';
+        }
+
+        // Copy text helper function
+        function copyText(elementId, btnElement) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = 'Copied!';
+                btnElement.style.background = 'var(--accent-gold)';
+                btnElement.style.color = '#000';
+                
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.style.background = 'rgba(255, 183, 3, 0.15)';
+                    btnElement.style.color = 'var(--accent-gold)';
+                }, 1500);
+            });
         }
 
         async function handleSubmission(e) {
