@@ -9,18 +9,18 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
 const BOT_USERNAME = 'ApexTicketMaster_bot';
 
-// Define Bank Account Details for Display/Verification
+// Bank Account Details
 const BANK_DETAILS = {
     bankName: process.env.BANK_NAME || "Moniepoint MFB",
     accountNumber: process.env.ACCOUNT_NUMBER || "1234567890",
     accountName: process.env.ACCOUNT_NAME || "Apex Daily Odds"
 };
 
-const activeOrders = {}; // Maps messageId -> order info
-const pendingApprovalState = {}; // Stores admin waiting state
+const activeOrders = {}; // Maps original notification messageId -> order info
+const pendingPromptToOrder = {}; // Maps prompt messageId -> order info
 const pendingCodesByUsername = {}; // Maps lowercase username -> { bookingCode, plan }
 
-// Helper function to generate custom messaging by plan type
+// Helper function for delivery messages
 function buildDeliveryMessage(planName, bookingCode) {
     const cleanPlan = (planName || '').toLowerCase();
 
@@ -33,7 +33,6 @@ function buildDeliveryMessage(planName, bookingCode) {
                `Here is your **Apex Daily Odds Combo** Booking Code: \`${bookingCode}\`\n\n` +
                `Your multi-ticket combinations are locked and loaded. Best of luck today! 🏆`;
     } else {
-        // Default to VIP
         return `🎉 *PAYMENT VERIFIED & APPROVED!*\n\n` +
                `Here is your VIP Booking Code: \`${bookingCode}\`\n\n` +
                `Welcome to *Apex Daily Odds VIP*! 🚀`;
@@ -43,7 +42,6 @@ function buildDeliveryMessage(planName, bookingCode) {
 // 1. CHECKOUT ENDPOINT
 app.post('/api/checkout', async (req, res) => {
     const { name, telegram, reference, amount, customerChatId } = req.body;
-
     const formattedUsername = telegram.trim().replace('@', '').toLowerCase();
 
     const messageText = `⚡ *NEW PAYMENT SUBMISSION* ⚡\n\n` +
@@ -95,7 +93,6 @@ app.post('/api/checkout', async (req, res) => {
 // 2. TELEGRAM WEBHOOK ENDPOINT
 app.post('/api/telegram-webhook', async (req, res) => {
     res.sendStatus(200);
-
     const update = req.body;
 
     // A. Handle Incoming Messages from Customers
@@ -103,12 +100,10 @@ app.post('/api/telegram-webhook', async (req, res) => {
         const chatId = update.message.chat.id;
         const userUsername = (update.message.from.username || '').toLowerCase();
 
-        // Check if there is an approved booking code pending for this customer's username
         if (userUsername && pendingCodesByUsername[userUsername]) {
             const { bookingCode, plan } = pendingCodesByUsername[userUsername];
             const deliveryText = buildDeliveryMessage(plan, bookingCode);
 
-            // Send custom booking code message
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -119,7 +114,6 @@ app.post('/api/telegram-webhook', async (req, res) => {
                 })
             });
 
-            // Notify admin that delivery completed
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -163,11 +157,10 @@ app.post('/api/telegram-webhook', async (req, res) => {
         }).catch(err => console.error(err));
 
         if (action.startsWith('approve_')) {
-            pendingApprovalState[ADMIN_CHAT_ID] = { messageId, order };
             const usernameStr = order ? `@${order.username}` : 'the customer';
             const planStr = order ? order.plan : 'Order';
 
-            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            const promptRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -177,6 +170,13 @@ app.post('/api/telegram-webhook', async (req, res) => {
                     parse_mode: 'Markdown'
                 })
             });
+
+            const promptData = await promptRes.json();
+            if (promptData.ok && order) {
+                // Link prompt message ID to this order and clean up activeOrders
+                pendingPromptToOrder[promptData.result.message_id] = order;
+                delete activeOrders[messageId];
+            }
         } else if (action.startsWith('reject_')) {
             delete activeOrders[messageId];
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -194,72 +194,70 @@ app.post('/api/telegram-webhook', async (req, res) => {
 
     // C. Handle Admin Replying with Booking Code
     if (update.message && update.message.text && update.message.reply_to_message && update.message.chat.id.toString() === ADMIN_CHAT_ID) {
-        const adminState = pendingApprovalState[ADMIN_CHAT_ID];
+        const repliedMessageId = update.message.reply_to_message.message_id;
+        const order = pendingPromptToOrder[repliedMessageId];
 
-        if (adminState) {
+        if (order) {
             const codeTypedByAdmin = update.message.text.trim();
-            const order = adminState.order;
-            const username = order ? order.username : null;
-            const plan = order ? order.plan : 'VIP';
+            const username = order.username;
+            const plan = order.plan || 'VIP';
 
-            if (username) {
-                pendingCodesByUsername[username] = { bookingCode: codeTypedByAdmin, plan: plan };
+            pendingCodesByUsername[username] = { bookingCode: codeTypedByAdmin, plan: plan };
 
-                // Auto-cleanup stored code after 24 hours if unclaimed
-                setTimeout(() => {
-                    if (pendingCodesByUsername[username]) {
+            // Auto-cleanup after 24 hours if unclaimed
+            setTimeout(() => {
+                if (pendingCodesByUsername[username]) {
+                    delete pendingCodesByUsername[username];
+                }
+            }, 24 * 60 * 60 * 1000);
+
+            let directSent = false;
+
+            if (order.customerTarget) {
+                try {
+                    const deliveryText = buildDeliveryMessage(plan, codeTypedByAdmin);
+                    const sendRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: order.customerTarget,
+                            text: deliveryText,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                    const sendData = await sendRes.json();
+                    if (sendData.ok) {
+                        directSent = true;
                         delete pendingCodesByUsername[username];
                     }
-                }, 24 * 60 * 60 * 1000);
-
-                let directSent = false;
-                if (order.customerTarget) {
-                    try {
-                        const deliveryText = buildDeliveryMessage(plan, codeTypedByAdmin);
-                        const sendRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                chat_id: order.customerTarget,
-                                text: deliveryText,
-                                parse_mode: 'Markdown'
-                            })
-                        });
-                        const sendData = await sendRes.json();
-                        if (sendData.ok) {
-                            directSent = true;
-                            delete pendingCodesByUsername[username];
-                        }
-                    } catch (e) {
-                        console.error(e);
-                    }
+                } catch (e) {
+                    console.error(e);
                 }
-
-                if (directSent) {
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: ADMIN_CHAT_ID,
-                            text: `🚀 *DIRECTLY DELIVERED!* (${plan}) Code \`${codeTypedByAdmin}\` sent to @${username}.`,
-                            parse_mode: 'Markdown'
-                        })
-                    });
-                } else {
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: ADMIN_CHAT_ID,
-                            text: `💾 *CODE STORED FOR @${username}!* (${plan})\n\nWhen @${username} messages @${BOT_USERNAME}, the bot will send code: \`${codeTypedByAdmin}\`.`,
-                            parse_mode: 'Markdown'
-                        })
-                    });
-                }
-
-                delete activeOrders[adminState.messageId];
-                delete pendingApprovalState[ADMIN_CHAT_ID];
             }
+
+            if (directSent) {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: ADMIN_CHAT_ID,
+                        text: `🚀 *DIRECTLY DELIVERED!* (${plan}) Code \`${codeTypedByAdmin}\` sent to @${username}.`,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            } else {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: ADMIN_CHAT_ID,
+                        text: `💾 *CODE STORED FOR @${username}!* (${plan})\n\nWhen @${username} messages @${BOT_USERNAME}, the bot will send code: \`${codeTypedByAdmin}\`.`,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            }
+
+            delete pendingPromptToOrder[repliedMessageId];
         }
     }
 });
