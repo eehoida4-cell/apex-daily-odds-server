@@ -55,6 +55,14 @@ async function sendTelegram(endpoint, payload) {
     }
 }
 
+// Health Verification Route for Webhook
+app.get('/telegram-webhook', (req, res) => {
+    res.status(200).send('Telegram Webhook Route is Active and Online!');
+});
+app.get('/api/telegram-webhook', (req, res) => {
+    res.status(200).send('Telegram Webhook Route is Active and Online!');
+});
+
 // 1. CHECKOUT ROUTE
 app.post('/api/checkout', async (req, res) => {
     try {
