@@ -26,17 +26,17 @@ function buildDeliveryMessage(planName, bookingCode) {
     const cleanPlan = String(planName || '').toLowerCase();
 
     if (cleanPlan.includes('rollover')) {
-        return "🔥 *ROLLOVER PAYMENT VERIFIED!*\n\n" +
-               "Here is your **Apex Daily Odds Rollover** Booking Code: `" + bookingCode + "`\n\n" +
+        return "🔥 ROLLOVER PAYMENT VERIFIED!\n\n" +
+               "Here is your Apex Daily Odds Rollover Booking Code: " + bookingCode + "\n\n" +
                "Stick to the strategy, manage your stake, and let's build the streak! 🚀";
     } else if (cleanPlan.includes('combo')) {
-        return "💥 *COMBO PACK PAYMENT VERIFIED!*\n\n" +
-               "Here is your **Apex Daily Odds Combo** Booking Code: `" + bookingCode + "`\n\n" +
+        return "💥 COMBO PACK PAYMENT VERIFIED!\n\n" +
+               "Here is your Apex Daily Odds Combo Booking Code: " + bookingCode + "\n\n" +
                "Your multi-ticket combinations are locked and loaded. Best of luck today! 🏆";
     } else {
-        return "🎉 *PAYMENT VERIFIED & APPROVED!*\n\n" +
-               "Here is your VIP Booking Code: `" + bookingCode + "`\n\n" +
-               "Welcome to *Apex Daily Odds VIP*! 🚀";
+        return "🎉 PAYMENT VERIFIED & APPROVED!\n\n" +
+               "Here is your VIP Booking Code: " + bookingCode + "\n\n" +
+               "Welcome to Apex Daily Odds VIP! 🚀";
     }
 }
 
@@ -48,9 +48,13 @@ async function sendTelegram(endpoint, payload) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        return await response.json();
+        const resJson = await response.json();
+        if (!resJson.ok) {
+            console.error(`Telegram API Error on [${endpoint}]:`, resJson);
+        }
+        return resJson;
     } catch (err) {
-        console.error("Telegram API Error:", err);
+        console.error("Telegram Network Error:", err);
         return { ok: false };
     }
 }
@@ -74,18 +78,17 @@ app.post('/api/checkout', async (req, res) => {
         const approveData = ("app:" + formattedUsername + ":" + plan + ":" + targetChat).slice(0, 64);
         const rejectData = ("rej:" + formattedUsername).slice(0, 64);
 
-        const messageText = "⚡ *NEW PAYMENT SUBMISSION* ⚡\n\n" +
-            "👤 *Name:* " + (name || 'N/A') + "\n" +
-            "📱 *Telegram:* @" + formattedUsername + "\n" +
-            "💳 *Plan:* " + plan + "\n" +
-            "🧾 *Ref:* `" + (reference || 'N/A') + "`\n\n" +
-            "🏦 *Account:* " + BANK_DETAILS.bankName + " - " + BANK_DETAILS.accountNumber + " (" + BANK_DETAILS.accountName + ")\n\n" +
-            "👇 *Verify transaction in your bank app, then select an action below:*";
+        const messageText = "⚡ NEW PAYMENT SUBMISSION ⚡\n\n" +
+            "👤 Name: " + (name || 'N/A') + "\n" +
+            "📱 Telegram: @" + formattedUsername + "\n" +
+            "💳 Plan: " + plan + "\n" +
+            "🧾 Ref: " + (reference || 'N/A') + "\n\n" +
+            "🏦 Account: " + BANK_DETAILS.bankName + " - " + BANK_DETAILS.accountNumber + " (" + BANK_DETAILS.accountName + ")\n\n" +
+            "👇 Verify transaction in your bank app, then select an action below:";
 
         const data = await sendTelegram('sendMessage', {
-            chat_id: ADMIN_CHAT_ID,
+            chat_id: String(ADMIN_CHAT_ID).trim(),
             text: messageText,
-            parse_mode: 'Markdown',
             reply_markup: {
                 inline_keyboard: [
                     [
@@ -120,6 +123,7 @@ const handleWebhook = async (req, res) => {
             const callback = update.callback_query;
             const actionData = callback.data || '';
 
+            // Answer callback pop-up banner
             await sendTelegram('answerCallbackQuery', {
                 callback_query_id: callback.id,
                 text: actionData.startsWith('app:') ? 'Payment Approved!' : 'Payment Rejected!'
@@ -131,11 +135,10 @@ const handleWebhook = async (req, res) => {
                 const plan = parts[2] || 'VIP';
                 const customerTarget = parts[3] || null;
 
+                // Send admin prompt
                 const promptRes = await sendTelegram('sendMessage', {
-                    chat_id: ADMIN_CHAT_ID,
-                    reply_to_message_id: callback.message.message_id,
-                    text: "✅ *PAYMENT APPROVED (" + plan + ")!*\n\n👉 *Reply directly to THIS message with the Booking Code* for @" + username + ".",
-                    parse_mode: 'Markdown'
+                    chat_id: String(ADMIN_CHAT_ID).trim(),
+                    text: "✅ PAYMENT APPROVED (" + plan + ")!\n\n👉 Reply directly to THIS message with the Booking Code for @" + username + "."
                 });
 
                 if (promptRes && promptRes.ok) {
@@ -147,10 +150,8 @@ const handleWebhook = async (req, res) => {
                 }
             } else if (actionData.startsWith('rej:')) {
                 await sendTelegram('sendMessage', {
-                    chat_id: ADMIN_CHAT_ID,
-                    reply_to_message_id: callback.message.message_id,
-                    text: "❌ *PAYMENT REJECTED!* Transaction cancelled.",
-                    parse_mode: 'Markdown'
+                    chat_id: String(ADMIN_CHAT_ID).trim(),
+                    text: "❌ PAYMENT REJECTED! Transaction cancelled."
                 });
             }
             return;
@@ -180,8 +181,7 @@ const handleWebhook = async (req, res) => {
                     const deliveryText = buildDeliveryMessage(plan, codeTypedByAdmin);
                     const sendRes = await sendTelegram('sendMessage', {
                         chat_id: order.customerTarget,
-                        text: deliveryText,
-                        parse_mode: 'Markdown'
+                        text: deliveryText
                     });
                     if (sendRes && sendRes.ok) {
                         directSent = true;
@@ -191,15 +191,13 @@ const handleWebhook = async (req, res) => {
 
                 if (directSent) {
                     await sendTelegram('sendMessage', {
-                        chat_id: ADMIN_CHAT_ID,
-                        text: "🚀 *DIRECTLY DELIVERED!* (" + plan + ") Code `" + codeTypedByAdmin + "` sent to @" + username + ".",
-                        parse_mode: 'Markdown'
+                        chat_id: String(ADMIN_CHAT_ID).trim(),
+                        text: "🚀 DIRECTLY DELIVERED! (" + plan + ") Code " + codeTypedByAdmin + " sent to @" + username + "."
                     });
                 } else {
                     await sendTelegram('sendMessage', {
-                        chat_id: ADMIN_CHAT_ID,
-                        text: "💾 *CODE STORED FOR @" + username + "!* (" + plan + ")\n\nWhen @" + username + " messages @" + BOT_USERNAME + ", the bot will automatically send them their booking code: `" + codeTypedByAdmin + "`.",
-                        parse_mode: 'Markdown'
+                        chat_id: String(ADMIN_CHAT_ID).trim(),
+                        text: "💾 CODE STORED FOR @" + username + "! (" + plan + ")\n\nWhen @" + username + " messages @" + BOT_USERNAME + ", the bot will automatically send them their booking code: " + codeTypedByAdmin + "."
                     });
                 }
 
@@ -219,22 +217,19 @@ const handleWebhook = async (req, res) => {
 
                 await sendTelegram('sendMessage', {
                     chat_id: chatId,
-                    text: deliveryText,
-                    parse_mode: 'Markdown'
+                    text: deliveryText
                 });
 
                 await sendTelegram('sendMessage', {
-                    chat_id: ADMIN_CHAT_ID,
-                    text: "🚀 *DELIVERED!* Code `" + bookingCode + "` claimed by @" + userUsername + ".",
-                    parse_mode: 'Markdown'
+                    chat_id: String(ADMIN_CHAT_ID).trim(),
+                    text: "🚀 DELIVERED! Code " + bookingCode + " claimed by @" + userUsername + "."
                 });
 
                 delete pendingCodesByUsername[userUsername];
             } else {
                 await sendTelegram('sendMessage', {
                     chat_id: chatId,
-                    text: "⏳ *Apex Daily Odds Verification*\n\nYour request is being processed. As soon as your payment is approved by admin, your booking code will be sent right here!",
-                    parse_mode: 'Markdown'
+                    text: "⏳ Apex Daily Odds Verification\n\nYour request is being processed. As soon as your payment is approved by admin, your booking code will be sent right here!"
                 });
             }
         }
