@@ -513,8 +513,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="telegramUser">Telegram Username or Phone</label>
-                    <input type="text" id="telegramUser" name="telegram" placeholder="@username or 080..." required>
+                    <label for="telegramUser">Telegram Username</label>
+                    <input type="text" id="telegramUser" name="telegram" placeholder="@username (e.g. @john_doe)" required pattern="^@?[a-zA-Z0-9_]{5,32}$" title="Please enter a valid Telegram username starting with @">
                 </div>
 
                 <div class="form-group">
@@ -539,13 +539,20 @@
     </footer>
 
     <script>
-        // BACKEND ENDPOINT CONFIGURATION
-        // Automatically adapts whether running locally (localhost:3000) or deployed live on Render/Vercel
         const BACKEND_URL = window.location.origin.includes('localhost') 
             ? 'http://localhost:3000/api/checkout' 
             : '/api/checkout';
 
         let currentSelectedPlan = '';
+
+        // Auto-format Telegram Username input field
+        const telegramInput = document.getElementById('telegramUser');
+        telegramInput.addEventListener('input', (e) => {
+            let val = e.target.value.trim();
+            if (val.length > 0 && !val.startsWith('@')) {
+                e.target.value = '@' + val;
+            }
+        });
 
         function openPaymentModal(planName, price) {
             currentSelectedPlan = `${planName} (${price})`;
