@@ -7,7 +7,7 @@ app.use(express.static(path.join(__dirname)));
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
-const BOT_USERNAME = '@ApexTicketMaster_bot';
+const BOT_USERNAME = 'ApexTicketMaster_bot';
 
 const activeOrders = {}; // Maps messageId -> order info
 const pendingApprovalState = {}; // Stores admin waiting state
@@ -197,6 +197,13 @@ app.post('/api/telegram-webhook', async (req, res) => {
             if (username) {
                 pendingCodesByUsername[username] = { bookingCode: codeTypedByAdmin, plan: plan };
 
+                // Auto-cleanup stored code after 24 hours if unclaimed
+                setTimeout(() => {
+                    if (pendingCodesByUsername[username]) {
+                        delete pendingCodesByUsername[username];
+                    }
+                }, 24 * 60 * 60 * 1000);
+
                 let directSent = false;
                 if (order.customerTarget) {
                     try {
@@ -236,7 +243,7 @@ app.post('/api/telegram-webhook', async (req, res) => {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             chat_id: ADMIN_CHAT_ID,
-                            text: `💾 *CODE STORED FOR @${username}!* (${plan})\n\nWhen @${username} messages ${BOT_USERNAME}, the bot will send code: \`${codeTypedByAdmin}\`.`,
+                            text: `💾 *CODE STORED FOR @${username}!* (${plan})\n\nWhen @${username} messages @${BOT_USERNAME}, the bot will send code: \`${codeTypedByAdmin}\`.`,
                             parse_mode: 'Markdown'
                         })
                     });
