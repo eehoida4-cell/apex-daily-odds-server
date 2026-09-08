@@ -186,6 +186,7 @@
             font-size: 1.1rem;
             color: var(--text-main);
             margin-bottom: 16px;
+            letter-spacing: 1px;
         }
 
         .winners-list {
@@ -370,11 +371,13 @@
             transform: translateY(120%);
             opacity: 0;
             transition: transform 0.4s ease, opacity 0.4s ease;
+            pointer-events: none;
         }
 
         .live-toast.show {
             transform: translateY(0);
             opacity: 1;
+            pointer-events: auto;
         }
 
         .toast-icon {
@@ -383,6 +386,7 @@
             background-color: var(--accent-green);
             border-radius: 50%;
             box-shadow: 0 0 8px var(--accent-green);
+            flex-shrink: 0;
         }
 
         .toast-text {
@@ -437,6 +441,11 @@
             color: var(--text-muted);
             font-size: 22px;
             cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
         }
 
         .modal-title {
@@ -546,6 +555,7 @@
             font-size: 0.85rem;
             margin-top: 16px;
             text-align: center;
+            line-height: 1.4;
         }
 
         .status-success {
@@ -770,10 +780,11 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="paymentModal">
+    <!-- Payment Verification Modal -->
+    <div class="modal-overlay" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-card">
-            <button class="close-btn" onclick="closePaymentModal()">&times;</button>
-            <h2 class="modal-title">Verify Payment</h2>
+            <button class="close-btn" onclick="closePaymentModal()" aria-label="Close modal">&times;</button>
+            <h2 class="modal-title" id="modalTitle">Verify Payment</h2>
             <div class="tier-badge-modal" id="modalTierInfo">Selected Plan: --</div>
 
             <div class="bank-details-box">
@@ -823,7 +834,7 @@
     <footer>
         <div class="footer-logo">APEX DAILY ODDS</div>
         <div class="footer-slogan">ZERO GREED. MAXIMUM CASHOUT.</div>
-        <div class="footer-handle">Official Channel: <a href="https://t.me/ApexDailyOddsHQ" target="_blank">@ApexDailyOddsHQ</a></div>
+        <div class="footer-handle">Official Channel: <a href="https://t.me/ApexDailyOddsHQ" target="_blank" rel="noopener">@ApexDailyOddsHQ</a></div>
         <div class="footer-disclaimer">
             © 2026 Apex Daily Odds. Built for disciplined bettors. Please gamble responsibly (18+).
         </div>
@@ -847,9 +858,29 @@
             document.getElementById('statusBox').style.display = 'none';
         }
 
-        function copyText(elementId, btnElement) {
+        // Close modal if user clicks outside of the modal card
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target === modal) {
+                closePaymentModal();
+            }
+        };
+
+        async function copyText(elementId, btnElement) {
             const textToCopy = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(textToCopy);
+                } else {
+                    // Fallback for older browsers or non-HTTPS connections
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+
                 const originalText = btnElement.innerText;
                 btnElement.innerText = 'Copied!';
                 btnElement.style.background = 'var(--accent-gold)';
@@ -860,7 +891,9 @@
                     btnElement.style.background = '';
                     btnElement.style.color = '';
                 }, 1500);
-            });
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
         }
 
         async function handleSubmission(e) {
@@ -870,8 +903,12 @@
             const statusBox = document.getElementById('statusBox');
 
             const fullName = document.getElementById('fullName').value.trim();
-            const telegramUser = document.getElementById('telegramUser').value.trim();
+            let telegramUser = document.getElementById('telegramUser').value.trim();
             const paymentRef = document.getElementById('paymentRef').value.trim();
+
+            if (telegramUser && !telegramUser.startsWith('@')) {
+                telegramUser = '@' + telegramUser;
+            }
 
             const payload = {
                 name: fullName,
@@ -902,7 +939,7 @@
                 }
             } catch (err) {
                 statusBox.className = "status-msg status-error";
-                statusBox.innerText = "Error sending verification. Check backend server connection.";
+                statusBox.innerText = err.message || "Error sending verification. Check backend server connection.";
                 statusBox.style.display = "block";
             } finally {
                 submitBtn.disabled = false;
@@ -918,8 +955,9 @@
 
         function showPaymentNotification() {
             const toast = document.getElementById('liveToast');
+            if (toast.classList.contains('show')) return; // Avoid overlapping runs
+
             const msg = document.getElementById('toastMsg');
-            
             const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
             const randomPlan = mockPlans[Math.floor(Math.random() * mockPlans.length)];
 
@@ -932,8 +970,7 @@
             }, 3500);
         }
 
-        // Trigger notification every 7 seconds
-        setInterval(showPaymentNotification, 7000);
+        setInterval(showPaymentNotification, 8000);
         setTimeout(showPaymentNotification, 2000);
     </script>
 </body>
