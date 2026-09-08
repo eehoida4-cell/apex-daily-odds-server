@@ -72,11 +72,9 @@ app.post('/api/checkout', async (req, res) => {
     try {
         const { name, telegram, reference, amount, customerChatId } = req.body;
         
-        // Sanitize and validate incoming username to prevent fallback placeholders
+        // Sanitize incoming username (accepts any text entered in the form)
         let rawTelegram = telegram ? String(telegram).trim().replace('@', '').toLowerCase() : '';
-        const formattedUsername = (rawTelegram && !rawTelegram.includes('cantbefound') && rawTelegram !== 'user') 
-            ? rawTelegram 
-            : 'NO_USERNAME_PROVIDED';
+        const formattedUsername = rawTelegram.length > 0 ? rawTelegram : 'NO_USERNAME_PROVIDED';
 
         const plan = amount || 'VIP';
         const targetChat = customerChatId || '';
