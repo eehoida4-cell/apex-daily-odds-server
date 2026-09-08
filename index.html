@@ -11,10 +11,12 @@
             --card-bg: #11151e;
             --accent-gold: #ffb703;
             --accent-gold-hover: #ffa000;
+            --accent-green: #00e676;
             --text-main: #ffffff;
             --text-muted: #8e9bb0;
             --border-color: #1e2638;
             --glow-gold: rgba(255, 183, 3, 0.35);
+            --glow-green: rgba(0, 230, 118, 0.25);
         }
 
         * {
@@ -62,7 +64,7 @@
         .hero-container {
             text-align: center;
             max-width: 900px;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .tag-pill {
@@ -105,9 +107,48 @@
             font-size: 0.95rem;
             line-height: 1.5;
             max-width: 650px;
-            margin: 0 auto 35px auto;
+            margin: 0 auto 20px auto;
         }
 
+        /* Stats Bar Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+        }
+
+        .stat-card .value.green {
+            color: var(--accent-green);
+        }
+
+        /* Section Headings */
         .section-heading {
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
@@ -117,6 +158,68 @@
             text-align: center;
             margin-bottom: 30px;
             text-transform: uppercase;
+        }
+
+        /* Winners Row Layout */
+        .middle-section-grid {
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 900px) {
+            .stats-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Recent Winners Feed */
+        .winners-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .winners-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 16px;
+        }
+
+        .winners-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .winner-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-color);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-gold);
+        }
+
+        .winner-info .user {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .winner-info .plan {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .winner-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            color: var(--accent-green);
+            font-size: 0.95rem;
         }
 
         /* Pricing Grid */
@@ -250,6 +353,55 @@
             box-shadow: 0 0 15px var(--glow-gold);
         }
 
+        /* Dynamic Live Payment Toast */
+        .live-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 0 20px var(--glow-green);
+            z-index: 999;
+            transform: translateY(120%);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .live-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .toast-text {
+            font-size: 0.82rem;
+            color: var(--text-main);
+        }
+
+        .toast-text span {
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .toast-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 2px;
+        }
+
         /* Modal Structure */
         .modal-overlay {
             display: none;
@@ -305,7 +457,6 @@
             border: 1px solid rgba(255, 183, 3, 0.3);
         }
 
-        /* Bank Account Details Box Styling */
         .bank-details-box {
             background: var(--bg-color);
             border: 1px solid var(--border-color);
@@ -409,7 +560,6 @@
             border: 1px solid #ff5252;
         }
 
-        /* Footer Styling */
         footer {
             width: 100%;
             max-width: 1200px;
@@ -473,18 +623,73 @@
         </p>
     </div>
 
+    <div class="stats-dashboard">
+        <div class="stat-card">
+            <div class="label">Win Rate</div>
+            <div class="value green">88.4%</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Total Revenue (This Month)</div>
+            <div class="value">₦14,850,000</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Active VIP Members</div>
+            <div class="value">1,240+</div>
+        </div>
+    </div>
+
+    <div class="middle-section-grid">
+        <div class="winners-card">
+            <div class="winners-title">RECENT WINNERS</div>
+            <div class="winners-list">
+                <div class="winner-item">
+                    <div class="winner-info">
+                        <div class="user">@Dave_P*** (Telegram)</div>
+                        <div class="plan">VIP Monthly • SportyBet</div>
+                    </div>
+                    <div class="winner-amount">+₦450,000</div>
+                </div>
+                <div class="winner-item">
+                    <div class="winner-info">
+                        <div class="user">0803***492 (WhatsApp)</div>
+                        <div class="plan">Rollover 1-Week</div>
+                    </div>
+                    <div class="winner-amount">+₦120,500</div>
+                </div>
+                <div class="winner-item">
+                    <div class="winner-info">
+                        <div class="user">@Emeka_VIP***</div>
+                        <div class="plan">Rollover + VIP</div>
+                    </div>
+                    <div class="winner-amount">+₦890,000</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="section-heading">CHOOSE YOUR SUBSCRIPTION TIER</div>
 
     <div class="pricing-grid">
         <div class="card">
+            <h3 class="tier-title">Rollover Daily</h3>
+            <div class="tier-price">₦2,000 <span>/ day</span></div>
+            <ul class="features-list">
+                <li>Daily Rollover Target</li>
+                <li>Low-Risk Odds Strategy</li>
+                <li>Instant Code Release</li>
+            </ul>
+            <button class="btn-unlock" onclick="openPaymentModal('Rollover Daily', '₦2,000')">Unlock Access</button>
+        </div>
+
+        <div class="card">
             <h3 class="tier-title">VIP Daily</h3>
-            <div class="tier-price">₦2,000 <span>/ 24 hrs</span></div>
+            <div class="tier-price">₦3,000 <span>/ 24 hrs</span></div>
             <ul class="features-list">
                 <li>High-Value VIP Ticket</li>
                 <li>Instant Code Release</li>
                 <li>Direct Telegram Support</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('VIP Daily', '₦2,000')">Unlock Access</button>
+            <button class="btn-unlock" onclick="openPaymentModal('VIP Daily', '₦3,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -511,13 +716,13 @@
 
         <div class="card">
             <h3 class="tier-title">Rollover 1-Week</h3>
-            <div class="tier-price">₦3,000 <span>/ 7 days</span></div>
+            <div class="tier-price">₦5,000 <span>/ 7 days</span></div>
             <ul class="features-list">
                 <li>Safe Daily Rollover Odds</li>
                 <li>7 Days Consistent Runs</li>
                 <li>Instant SportyBet Codes</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Week', '₦3,000')">Unlock Access</button>
+            <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Week', '₦5,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -556,13 +761,21 @@
         </div>
     </div>
 
+    <!-- Live Payment Notification Toast -->
+    <div class="live-toast" id="liveToast">
+        <div class="toast-icon"></div>
+        <div>
+            <div class="toast-text" id="toastMsg"><span>d***34</span> just paid for VIP Daily</div>
+            <span class="toast-time">Just now</span>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="paymentModal">
         <div class="modal-card">
             <button class="close-btn" onclick="closePaymentModal()">&times;</button>
             <h2 class="modal-title">Verify Payment</h2>
             <div class="tier-badge-modal" id="modalTierInfo">Selected Plan: --</div>
 
-            <!-- Updated Bank Account Details Section -->
             <div class="bank-details-box">
                 <div class="bank-row">
                     <span class="bank-label">Bank Name:</span>
@@ -634,7 +847,6 @@
             document.getElementById('statusBox').style.display = 'none';
         }
 
-        // Copy text helper function
         function copyText(elementId, btnElement) {
             const textToCopy = document.getElementById(elementId).innerText;
             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -645,8 +857,8 @@
                 
                 setTimeout(() => {
                     btnElement.innerText = originalText;
-                    btnElement.style.background = 'rgba(255, 183, 3, 0.15)';
-                    btnElement.style.color = 'var(--accent-gold)';
+                    btnElement.style.background = '';
+                    btnElement.style.color = '';
                 }, 1500);
             });
         }
@@ -699,6 +911,30 @@
         }
 
         document.getElementById('checkoutForm').addEventListener('submit', handleSubmission);
+
+        /* Dynamic Notification Toast Script */
+        const mockUsers = ['d***34', 'k***89', 'm***12', '0803***91', 'a***07', '0814***22', 'e***45', '0902***11'];
+        const mockPlans = ['VIP Daily', 'VIP Weekly', 'Rollover Daily', 'Rollover + VIP (1-Month)', 'VIP Monthly', 'Rollover 1-Week'];
+
+        function showPaymentNotification() {
+            const toast = document.getElementById('liveToast');
+            const msg = document.getElementById('toastMsg');
+            
+            const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
+            const randomPlan = mockPlans[Math.floor(Math.random() * mockPlans.length)];
+
+            msg.innerHTML = `<span>${randomUser}</span> just paid for ${randomPlan}`;
+            
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // Trigger notification every 7 seconds
+        setInterval(showPaymentNotification, 7000);
+        setTimeout(showPaymentNotification, 2000);
     </script>
 </body>
 </html>
