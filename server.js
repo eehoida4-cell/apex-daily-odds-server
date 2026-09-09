@@ -220,12 +220,21 @@ const handleWebhook = async (req, res) => {
             if (messageText.startsWith('/start get_free_ticket')) {
                 const todayFreeCode = "5A9BC2D"; // 👈 UPDATE THIS DAILY WITH YOUR FREE SPORTYBET CODE
 
+                const freeCodeMessage = 
+                    "☀️ GOOD DAY WINNER! TODAY'S FREE CODE ☀️\n\n" +
+                    "🎫 SportyBet Code: " + todayFreeCode + "\n" +
+                    "📈 Total Odds: 1.70\n\n" +
+                    "🎯 Recommended Stake: 10% - 20% of Bankroll\n" +
+                    "⏱ Kick-off: 3:00 PM WAT\n\n" +
+                    "──────────────────────────────\n" +
+                    "👑 TODAY'S VIP & ROLLOVER TICKETS ARE ALSO READY!\n" +
+                    "• VIP Target: 10.50+ Odds 💣\n" +
+                    "• Rollover Target: 1.85 Odds 🛡️\n\n" +
+                    "👉 Unlock your VIP access immediately on the website https://apex-daily-odds-server.onrender.com";
+
                 await sendTelegram('sendMessage', {
                     chat_id: chatId,
-                    text: "🔥 TODAY'S FREE BOOKING CODE 🔥\n\n" +
-                          "📌 Code: " + todayFreeCode + "\n" +
-                          "⚽ Bookie: SportyBet\n\n" +
-                          "Ready for high-odds VIP tickets or safe Rollover runs? Select a plan on our website to upgrade! 🚀"
+                    text: freeCodeMessage
                 });
                 return;
             }
