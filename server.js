@@ -72,7 +72,7 @@ app.post('/api/checkout', async (req, res) => {
     try {
         const { name, telegram, reference, amount, customerChatId } = req.body;
         
-        // Sanitize incoming username (accepts any text entered in the form)
+        // Sanitize incoming username
         let rawTelegram = telegram ? String(telegram).trim().replace('@', '').toLowerCase() : '';
         const formattedUsername = rawTelegram.length > 0 ? rawTelegram : 'NO_USERNAME_PROVIDED';
 
@@ -210,11 +210,27 @@ const handleWebhook = async (req, res) => {
             }
         }
 
-        // C. Handle Direct Customer Messages
+        // C. Handle Direct Customer Messages & Free Code Link
         if (update.message && update.message.text && String(update.message.chat.id) !== String(ADMIN_CHAT_ID)) {
             const chatId = update.message.chat.id;
+            const messageText = update.message.text.trim();
             const userUsername = update.message.from && update.message.from.username ? update.message.from.username.toLowerCase() : '';
 
+            // 1. User clicked "Get Free Code via Bot" button on website
+            if (messageText.startsWith('/start get_free_ticket')) {
+                const todayFreeCode = "5A9BC2D"; // 👈 UPDATE THIS DAILY WITH YOUR FREE SPORTYBET CODE
+
+                await sendTelegram('sendMessage', {
+                    chat_id: chatId,
+                    text: "🔥 TODAY'S FREE BOOKING CODE 🔥\n\n" +
+                          "📌 Code: " + todayFreeCode + "\n" +
+                          "⚽ Bookie: SportyBet\n\n" +
+                          "Ready for high-odds VIP tickets or safe Rollover runs? Select a plan on our website to upgrade! 🚀"
+                });
+                return;
+            }
+
+            // 2. User has a pending paid booking code from admin approval
             if (userUsername && pendingCodesByUsername[userUsername]) {
                 const { bookingCode, plan } = pendingCodesByUsername[userUsername];
                 const deliveryText = buildDeliveryMessage(plan, bookingCode);
@@ -231,6 +247,7 @@ const handleWebhook = async (req, res) => {
 
                 delete pendingCodesByUsername[userUsername];
             } else {
+                // 3. General message fallback
                 await sendTelegram('sendMessage', {
                     chat_id: chatId,
                     text: "⏳ Apex Daily Odds Verification\n\nYour request is being processed. As soon as your payment is approved by admin, your booking code will be sent right here!"
