@@ -12,11 +12,12 @@
             --accent-gold: #ffb703;
             --accent-gold-hover: #ffa000;
             --accent-green: #00e676;
+            --accent-green-hover: #00c853;
             --text-main: #ffffff;
             --text-muted: #8e9bb0;
             --border-color: #1e2638;
             --glow-gold: rgba(255, 183, 3, 0.35);
-            --glow-green: rgba(0, 230, 118, 0.25);
+            --glow-green: rgba(0, 230, 118, 0.35);
         }
 
         * {
@@ -33,10 +34,30 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 20px 50px 20px;
+            padding: 0 20px 50px 20px;
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(255, 183, 3, 0.08) 0%, transparent 50%),
                 radial-gradient(circle at 50% 100%, rgba(17, 21, 30, 0.8) 0%, transparent 100%);
+        }
+
+        /* Countdown Banner */
+        .urgency-banner {
+            width: 100%;
+            background: rgba(255, 183, 3, 0.12);
+            border-bottom: 1px solid var(--accent-gold);
+            color: var(--text-main);
+            text-align: center;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 30px;
+        }
+
+        .urgency-banner span {
+            color: var(--accent-gold);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
         }
 
         header {
@@ -60,7 +81,6 @@
             text-transform: uppercase;
         }
 
-        /* Hero Section Styling */
         .hero-container {
             text-align: center;
             max-width: 900px;
@@ -110,7 +130,6 @@
             margin: 0 auto 20px auto;
         }
 
-        /* Stats Bar Dashboard */
         .stats-dashboard {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -126,7 +145,6 @@
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            position: relative;
         }
 
         .stat-card .label {
@@ -148,32 +166,62 @@
             color: var(--accent-green);
         }
 
-        /* Section Headings */
-        .section-heading {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.4rem;
-            letter-spacing: 1.5px;
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        /* Winners Row Layout */
         .middle-section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
             width: 100%;
             max-width: 1200px;
             margin-bottom: 50px;
         }
 
         @media (max-width: 900px) {
-            .stats-dashboard {
+            .stats-dashboard, .middle-section-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Recent Winners Feed */
+        /* Today's VIP Odds Preview Box */
+        .odds-preview-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-gold);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 0 20px var(--glow-gold);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .preview-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .odds-stat-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-color);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .odds-stat-box .lbl {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .odds-stat-box .val {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
         .winners-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -223,10 +271,21 @@
             font-size: 0.95rem;
         }
 
+        .section-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
         /* Pricing Grid */
         .pricing-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             width: 100%;
             max-width: 1200px;
@@ -264,6 +323,27 @@
 
         .card:hover {
             transform: translateY(-4px);
+        }
+
+        .card.free-tier {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 20px var(--glow-green);
+        }
+
+        .badge-free {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
         }
 
         .card.popular {
@@ -307,6 +387,10 @@
             margin-bottom: 20px;
         }
 
+        .tier-price.green-price {
+            color: var(--accent-green);
+        }
+
         .tier-price span {
             font-size: 0.75rem;
             color: var(--text-muted);
@@ -335,6 +419,10 @@
             font-weight: bold;
         }
 
+        .free-tier .features-list li::before {
+            color: var(--accent-green);
+        }
+
         .btn-unlock {
             width: 100%;
             padding: 12px;
@@ -347,6 +435,8 @@
             cursor: pointer;
             transition: background 0.2s, box-shadow 0.2s;
             text-align: center;
+            text-decoration: none;
+            display: block;
         }
 
         .btn-unlock:hover {
@@ -354,7 +444,72 @@
             box-shadow: 0 0 15px var(--glow-gold);
         }
 
-        /* Dynamic Live Payment Toast */
+        .btn-unlock.btn-free {
+            background: var(--accent-green);
+        }
+
+        .btn-unlock.btn-free:hover {
+            background: var(--accent-green-hover);
+            box-shadow: 0 0 15px var(--glow-green);
+        }
+
+        /* FAQ Accordion Section */
+        .faq-container {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 60px;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 18px 20px;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+        }
+
+        .faq-item.active .faq-question::after {
+            content: '−';
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 20px;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding: 0 20px 18px 20px;
+        }
+
+        /* Toast */
         .live-toast {
             position: fixed;
             bottom: 20px;
@@ -618,6 +773,11 @@
 </head>
 <body>
 
+    <!-- Countdown Urgency Banner -->
+    <div class="urgency-banner">
+        🔥 TODAY'S VIP TICKET IS READY! CLOSING IN <span id="countdownTimer">01:45:20</span> — GET YOUR CODE NOW!
+    </div>
+
     <header>
         <div class="brand-logo">
             APEX DAILY ODDS
@@ -649,6 +809,26 @@
     </div>
 
     <div class="middle-section-grid">
+        <!-- Today's VIP Odds Preview -->
+        <div class="odds-preview-card">
+            <div>
+                <div class="preview-title">TODAY'S TICKET PREVIEW</div>
+                <div class="odds-stat-box">
+                    <span class="lbl">Rollover Odds Target:</span>
+                    <span class="val">1.65 - 2.10 Odds</span>
+                </div>
+                <div class="odds-stat-box">
+                    <span class="lbl">VIP Mega Odds Target:</span>
+                    <span class="val">8.50 - 15.00 Odds</span>
+                </div>
+                <div class="odds-stat-box">
+                    <span class="lbl">Supported Bookies:</span>
+                    <span class="val" style="color: var(--text-main);">SportyBet / 1xBet</span>
+                </div>
+            </div>
+            <a href="#pricing" class="btn-unlock" style="margin-top: 15px;">Unlock Today's Ticket</a>
+        </div>
+
         <div class="winners-card">
             <div class="winners-title">RECENT WINNERS</div>
             <div class="winners-list">
@@ -661,7 +841,7 @@
                 </div>
                 <div class="winner-item">
                     <div class="winner-info">
-                        <div class="user">0803***492 (WhatsApp)</div>
+                        <div class="user">0803***492 (Telegram)</div>
                         <div class="plan">Rollover 1-Week</div>
                     </div>
                     <div class="winner-amount">+₦120,500</div>
@@ -677,9 +857,24 @@
         </div>
     </div>
 
-    <div class="section-heading">CHOOSE YOUR SUBSCRIPTION TIER</div>
+    <div class="section-heading" id="pricing">CHOOSE YOUR SUBSCRIPTION TIER</div>
 
     <div class="pricing-grid">
+        <!-- 1. FREE CARD -->
+        <div class="card free-tier">
+            <div class="badge-free">FREE ACCESS</div>
+            <h3 class="tier-title">Daily Free Ticket</h3>
+            <div class="tier-price green-price">₦0 <span>/ forever</span></div>
+            <ul class="features-list">
+                <li>1 Free Ticket Daily (1.50 - 2.00 Odds)</li>
+                <li>Direct DM via Telegram Bot</li>
+                <li>Instant SportyBet Booking Code</li>
+                <li>No Subscription Required</li>
+            </ul>
+            <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" rel="noopener" class="btn-unlock btn-free">Get Free Code via Bot</a>
+        </div>
+
+        <!-- 2. PAID CARDS -->
         <div class="card">
             <h3 class="tier-title">Rollover Daily</h3>
             <div class="tier-price">₦2,000 <span>/ day</span></div>
@@ -771,7 +966,30 @@
         </div>
     </div>
 
-    <!-- Live Payment Notification Toast -->
+    <!-- FAQ Section -->
+    <div class="section-heading">FREQUENTLY ASKED QUESTIONS</div>
+    <div class="faq-container">
+        <div class="faq-item">
+            <button class="faq-question">How quickly will I receive my booking code after payment?</button>
+            <div class="faq-answer">
+                As soon as you submit your payment reference on this site, open our Telegram bot (@ApexTicketMaster_bot) and press START. Your reference is auto-verified within 1 to 5 minutes, and your code drops right in your DMs.
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">Which bookmakers are supported?</button>
+            <div class="faq-answer">
+                Our main booking codes are generated directly for SportyBet. However, we also provide selection details so you can convert them on 1xBet, Bet9ja, or MSport.
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">What is the win rate of the Rollover plan?</button>
+            <div class="faq-answer">
+                Our Rollover strategy focuses on low-risk, highly researched odds (1.50 - 2.10) designed for high-discipline staking. We maintain an average win rate of 88%+.
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Toast -->
     <div class="live-toast" id="liveToast">
         <div class="toast-icon"></div>
         <div>
@@ -780,7 +998,7 @@
         </div>
     </div>
 
-    <!-- Payment Verification Modal -->
+    <!-- Modal -->
     <div class="modal-overlay" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-card">
             <button class="close-btn" onclick="closePaymentModal()" aria-label="Close modal">&times;</button>
@@ -827,7 +1045,7 @@
                 <button type="submit" class="btn-unlock" id="submitBtn">Submit Verification</button>
             </form>
 
-            <div id="statusBox" class="status-msg"></div>
+            <div id="statusBox" class="status-msg" aria-live="polite"></div>
         </div>
     </div>
 
@@ -847,6 +1065,27 @@
 
         let currentSelectedPlan = '';
 
+        /* FAQ Toggle Logic */
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        /* Countdown Timer Script */
+        let timeInSeconds = 6320; // 1 hour 45 min countdown
+        setInterval(() => {
+            if (timeInSeconds > 0) {
+                timeInSeconds--;
+                const hours = Math.floor(timeInSeconds / 3600);
+                const minutes = Math.floor((timeInSeconds % 3600) / 60);
+                const seconds = timeInSeconds % 60;
+                document.getElementById('countdownTimer').innerText = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }, 1000);
+
         function openPaymentModal(planName, price) {
             currentSelectedPlan = `${planName} (${price})`;
             document.getElementById('modalTierInfo').innerText = `Selected Plan: ${currentSelectedPlan}`;
@@ -858,7 +1097,6 @@
             document.getElementById('statusBox').style.display = 'none';
         }
 
-        // Close modal if user clicks outside of the modal card
         window.onclick = function(event) {
             const modal = document.getElementById('paymentModal');
             if (event.target === modal) {
@@ -866,13 +1104,18 @@
             }
         };
 
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closePaymentModal();
+            }
+        });
+
         async function copyText(elementId, btnElement) {
             const textToCopy = document.getElementById(elementId).innerText;
             try {
                 if (navigator.clipboard && window.isSecureContext) {
                     await navigator.clipboard.writeText(textToCopy);
                 } else {
-                    // Fallback for older browsers or non-HTTPS connections
                     const textArea = document.createElement("textarea");
                     textArea.value = textToCopy;
                     document.body.appendChild(textArea);
@@ -953,25 +1196,24 @@
         const mockUsers = ['d***34', 'k***89', 'm***12', '0803***91', 'a***07', '0814***22', 'e***45', '0902***11'];
         const mockPlans = ['VIP Daily', 'VIP Weekly', 'Rollover Daily', 'Rollover + VIP (1-Month)', 'VIP Monthly', 'Rollover 1-Week'];
 
-        function showPaymentNotification() {
-            const toast = document.getElementById('liveToast');
-            if (toast.classList.contains('show')) return; // Avoid overlapping runs
-
-            const msg = document.getElementById('toastMsg');
-            const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
-            const randomPlan = mockPlans[Math.floor(Math.random() * mockPlans.length)];
-
-            msg.innerHTML = `<span>${randomUser}</span> just paid for ${randomPlan}`;
-            
-            toast.classList.add('show');
-
+        function schedulePaymentNotification() {
             setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
+                const toast = document.getElementById('liveToast');
+                const msg = document.getElementById('toastMsg');
+                const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
+                const randomPlan = mockPlans[Math.floor(Math.random() * mockPlans.length)];
+
+                msg.innerHTML = `<span>${randomUser}</span> just paid for ${randomPlan}`;
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    schedulePaymentNotification();
+                }, 3500);
+            }, 8000);
         }
 
-        setInterval(showPaymentNotification, 8000);
-        setTimeout(showPaymentNotification, 2000);
+        schedulePaymentNotification();
     </script>
 </body>
 </html>
