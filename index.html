@@ -40,23 +40,53 @@
                 radial-gradient(circle at 50% 100%, rgba(17, 21, 30, 0.8) 0%, transparent 100%);
         }
 
+        /* STICKY COUNTDOWN BANNER */
         .urgency-banner {
-            width: 100%;
-            background: rgba(255, 183, 3, 0.12);
-            border-bottom: 1px solid var(--accent-gold);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100vw;
+            background: #0f1420;
+            border-bottom: 2px solid var(--accent-gold);
             color: var(--text-main);
             text-align: center;
-            padding: 10px 15px;
-            font-size: 0.85rem;
+            padding: 12px 15px;
+            font-size: 0.9rem;
             font-weight: 600;
             letter-spacing: 0.5px;
-            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
-        .urgency-banner span {
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff5252;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #ff5252;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+
+        .countdown-digits {
             color: var(--accent-gold);
             font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
+            font-weight: 900;
+            font-size: 1.1rem;
+            background: rgba(255, 183, 3, 0.15);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 183, 3, 0.4);
+            letter-spacing: 1px;
         }
 
         header {
@@ -65,7 +95,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 30px;
+            margin: 30px 0;
         }
 
         .brand-logo {
@@ -767,9 +797,11 @@
 </head>
 <body>
 
-    <!-- Countdown Urgency Banner -->
+    <!-- Sticky Live Countdown Banner -->
     <div class="urgency-banner">
-        🔥 TODAY'S VIP TICKET IS READY! CLOSING IN <span id="countdownTimer">01:45:20</span> — GET YOUR CODE NOW!
+        <span class="pulse-dot"></span>
+        <span>TODAY'S VIP TICKET CLOSING IN:</span>
+        <span class="countdown-digits" id="countdownTimer">01:45:20</span>
     </div>
 
     <header>
@@ -803,7 +835,6 @@
     </div>
 
     <div class="middle-section-grid">
-        <!-- Today's VIP Odds Preview -->
         <div class="odds-preview-card">
             <div>
                 <div class="preview-title">TODAY'S TICKET PREVIEW</div>
@@ -854,7 +885,6 @@
     <div class="section-heading" id="pricing">CHOOSE YOUR SUBSCRIPTION TIER</div>
 
     <div class="pricing-grid">
-        <!-- 1. FREE CARD -->
         <div class="card free-tier">
             <div class="badge-free">FREE ACCESS</div>
             <h3 class="tier-title">Daily Free Ticket</h3>
@@ -868,7 +898,6 @@
             <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" rel="noopener" class="btn-unlock btn-free">Get Free Code via Bot</a>
         </div>
 
-        <!-- 2. PAID CARDS -->
         <div class="card">
             <h3 class="tier-title">Rollover Daily</h3>
             <div class="tier-price">₦2,000 <span>/ day</span></div>
@@ -960,7 +989,6 @@
         </div>
     </div>
 
-    <!-- FAQ Section -->
     <div class="section-heading">FREQUENTLY ASKED QUESTIONS</div>
     <div class="faq-container">
         <div class="faq-item">
@@ -983,7 +1011,6 @@
         </div>
     </div>
 
-    <!-- Live Toast -->
     <div class="live-toast" id="liveToast">
         <div class="toast-icon"></div>
         <div>
@@ -992,11 +1019,11 @@
         </div>
     </div>
 
-    <!-- Payment Modal -->
-    <div class="modal-overlay" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <!-- Payment Verification Modal -->
+    <div class="modal-overlay" id="paymentModal" role="dialog" aria-modal="true">
         <div class="modal-card">
-            <button class="close-btn" onclick="closePaymentModal()" aria-label="Close modal">&times;</button>
-            <h2 class="modal-title" id="modalTitle">Verify Payment</h2>
+            <button class="close-btn" onclick="closePaymentModal()">&times;</button>
+            <h2 class="modal-title">Verify Payment</h2>
             <div class="tier-badge-modal" id="modalTierInfo">Selected Plan: --</div>
 
             <div class="bank-details-box">
@@ -1044,7 +1071,33 @@
     </footer>
 
     <script>
-        // Modal Handling
+        // COUNTDOWN TIMER LOGIC
+        let totalSeconds = (1 * 3600) + (45 * 60) + 20; // 1 hour 45 min 20 sec
+
+        function updateTimerDisplay() {
+            const timerDisplay = document.getElementById('countdownTimer');
+            if (!timerDisplay) return;
+
+            if (totalSeconds <= 0) {
+                timerDisplay.innerText = "00:00:00";
+                return;
+            }
+
+            const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(totalSeconds % 60).padStart(2, '0');
+
+            timerDisplay.innerText = `${hrs}:${mins}:${secs}`;
+            totalSeconds--;
+        }
+
+        // Initialize timer immediately on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTimerDisplay();
+            setInterval(updateTimerDisplay, 1000);
+        });
+
+        // MODAL UNLOCK / LOCKING LOGIC
         function openPaymentModal(planName, price) {
             document.getElementById('modalTierInfo').innerText = `Selected Plan: ${planName} (${price})`;
             document.getElementById('paymentModal').style.display = 'flex';
@@ -1064,7 +1117,7 @@
             }
         };
 
-        // Copy Account Number
+        // BANK COPY LOGIC
         function copyAccountNo() {
             const accNum = document.getElementById('accountNo').innerText;
             navigator.clipboard.writeText(accNum).then(() => {
@@ -1074,7 +1127,7 @@
             });
         }
 
-        // Form Submit Simulation
+        // FORM VERIFICATION LOGIC
         function submitPayment(e) {
             e.preventDefault();
             const refInput = document.getElementById('txRef').value.trim();
@@ -1087,7 +1140,7 @@
             }
         }
 
-        // Accordion functionality for FAQ
+        // FAQ ACCORDION LOGIC
         document.querySelectorAll('.faq-question').forEach(button => {
             button.addEventListener('click', () => {
                 const faqItem = button.parentElement;
@@ -1095,21 +1148,7 @@
             });
         });
 
-        // Countdown Timer Simulation
-        let timeInSeconds = 1 * 3600 + 45 * 60 + 20;
-        const timerElement = document.getElementById('countdownTimer');
-
-        setInterval(() => {
-            if (timeInSeconds > 0) {
-                timeInSeconds--;
-                const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, '0');
-                const minutes = String(Math.floor((timeInSeconds % 3600) / 60)).padStart(2, '0');
-                const seconds = String(timeInSeconds % 60).padStart(2, '0');
-                timerElement.innerText = `${hours}:${minutes}:${seconds}`;
-            }
-        }, 1000);
-
-        // Live Toast Notifications Simulation
+        // LIVE PURCHASES POPUP
         const samplePurchases = [
             "<span>k***82</span> just unlocked Rollover Daily",
             "<span>0814***901</span> just unlocked VIP Weekly",
@@ -1120,6 +1159,7 @@
         const toastMsg = document.getElementById('toastMsg');
 
         function triggerToast() {
+            if (!toastElement || !toastMsg) return;
             const randomMsg = samplePurchases[Math.floor(Math.random() * samplePurchases.length)];
             toastMsg.innerHTML = randomMsg;
             toastElement.classList.add('show');
