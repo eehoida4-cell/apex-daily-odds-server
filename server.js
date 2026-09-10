@@ -218,14 +218,33 @@ const handleWebhook = async (req, res) => {
 
             // 1. User clicked "Get Free Code via Bot" button on website
             if (messageText.startsWith('/start get_free_ticket')) {
-                const todayFreeCode = "5A9BC2D"; // 👈 UPDATE THIS DAILY WITH YOUR FREE SPORTYBET CODE
+                // Precise WAT Time Check (UTC+1)
+                const now = new Date();
+                const currentWatHours = (now.getUTCHours() + 1) % 24;
+                const currentWatMinutes = now.getUTCMinutes();
+                
+                // 4:45 PM WAT is 16:45 WAT
+                const isAfterKickoff = currentWatHours > 16 || (currentWatHours === 16 && currentWatMinutes >= 45);
+
+                if (isAfterKickoff) {
+                    await sendTelegram('sendMessage', {
+                        chat_id: chatId,
+                        text: "🔒 TODAY'S FREE TICKET IS NOW LOCKED!\n\nThe matches for today's free code have already kicked off (4:45 PM WAT).\n\n👑 VIP & Rollover tickets are still active! Get yours now: https://apex-daily-odds-server.onrender.com"
+                    });
+                    return;
+                }
+
+                const sportyBetCode = "HE18VW";
 
                 const freeCodeMessage = 
                     "☀️ GOOD DAY WINNER! TODAY'S FREE CODE ☀️\n\n" +
-                    "🎫 SportyBet Code: " + todayFreeCode + "\n" +
-                    "📈 Total Odds: 1.70\n\n" +
+                    "🎫 SportyBet Nigeria Code: " + sportyBetCode + "\n" +
+                    "📈 Total Odds: 2.28\n\n" +
+                    "📋 SELECTIONS:\n" +
+                    "1️⃣ PSV Eindhoven vs Shakhtar D — Shakhtar D Over 0.5 (1.46)\n" +
+                    "2️⃣ Slavia Prague vs Lens — Both Teams to Score: Yes (1.56)\n\n" +
                     "🎯 Recommended Stake: 10% - 20% of Bankroll\n" +
-                    "⏱ Kick-off: 3:00 PM WAT\n\n" +
+                    "⏱ Kick-off: 4:45 PM WAT\n\n" +
                     "──────────────────────────────\n" +
                     "👑 TODAY'S VIP & ROLLOVER TICKETS ARE ALSO READY!\n" +
                     "• VIP Target: 10.50+ Odds 💣\n" +
