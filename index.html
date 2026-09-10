@@ -992,7 +992,7 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Payment Modal -->
     <div class="modal-overlay" id="paymentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-card">
             <button class="close-btn" onclick="closePaymentModal()" aria-label="Close modal">&times;</button>
@@ -1007,79 +1007,87 @@
                 <div class="bank-row">
                     <span class="bank-label">Account No:</span>
                     <div class="bank-val-container">
-                        <span class="bank-value" id="accNumber">9066989021</span>
-                        <button class="copy-btn" onclick="copyText('accNumber', this)">Copy</button>
+                        <span class="bank-value" id="accountNo">9012345678</span>
+                        <button class="copy-btn" onclick="copyAccountNo()">Copy</button>
                     </div>
                 </div>
                 <div class="bank-row">
                     <span class="bank-label">Account Name:</span>
-                    <div class="bank-val-container">
-                        <span class="bank-value" id="accName" style="font-family: inherit; font-size: 0.85rem;">Blessings Eboh</span>
-                        <button class="copy-btn" onclick="copyText('accName', this)">Copy</button>
-                    </div>
+                    <span class="bank-value" style="font-family: inherit;">Apex Daily Odds</span>
                 </div>
             </div>
 
-            <form id="paymentForm" onsubmit="handleFormSubmit(event)">
+            <form id="paymentForm" onsubmit="submitPayment(event)">
                 <div class="form-group">
-                    <label for="senderName">Sender Account Name</label>
-                    <input type="text" id="senderName" placeholder="e.g. John Doe" required>
+                    <label for="txRef">Transaction Reference / Sender Name</label>
+                    <input type="text" id="txRef" placeholder="e.g. Ref No or Sender Full Name" required>
                 </div>
-                <div class="form-group">
-                    <label for="txRef">Transaction Reference / Session ID</label>
-                    <input type="text" id="txRef" placeholder="e.g. 100028..." required>
-                </div>
-                <button type="submit" class="btn-unlock" style="margin-top: 10px;">Submit Verification</button>
+                <button type="submit" class="btn-unlock">Submit Verification</button>
             </form>
 
-            <div class="status-msg" id="statusMsg"></div>
+            <div class="status-msg status-success" id="statusSuccess">
+                ✓ Payment details submitted! Open <a href="https://t.me/ApexTicketMaster_bot" target="_blank" style="color: var(--accent-gold); font-weight:700;">@ApexTicketMaster_bot</a> on Telegram to receive your code.
+            </div>
+            <div class="status-msg status-error" id="statusError">
+                ❌ Submission failed. Please enter a valid reference and try again.
+            </div>
         </div>
     </div>
 
     <footer>
         <div class="footer-logo">APEX DAILY ODDS</div>
         <div class="footer-slogan">"ZERO GREED. MAXIMUM CASHOUT."</div>
-        <div class="footer-handle">Telegram Support: <a href="https://t.me/ApexTicketMaster_bot" target="_blank" rel="noopener">@ApexTicketMaster_bot</a></div>
-        <p class="footer-disclaimer">
-            Disclaimer: Sports betting involves financial risk. Please gamble responsibly and only stake what you can afford to lose.
-        </p>
+        <div class="footer-handle">Telegram Support: <a href="https://t.me/ApexTicketMaster_bot" target="_blank">@ApexTicketMaster_bot</a></div>
+        <div class="footer-disclaimer">
+            Disclaimer: Sports betting involves financial risk. Bet responsibly and only stake what you can afford to lose. Must be 18+ to participate.
+        </div>
     </footer>
 
     <script>
-        // Modal functions
+        // Modal Handling
         function openPaymentModal(planName, price) {
             document.getElementById('modalTierInfo').innerText = `Selected Plan: ${planName} (${price})`;
             document.getElementById('paymentModal').style.display = 'flex';
+            document.getElementById('statusSuccess').style.display = 'none';
+            document.getElementById('statusError').style.display = 'none';
+            document.getElementById('paymentForm').reset();
         }
 
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
-            document.getElementById('statusMsg').style.display = 'none';
-            document.getElementById('paymentForm').reset();
         }
 
-        // Copy functionality
-        function copyText(elementId, btnElement) {
-            const textToCopy = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const originalText = btnElement.innerText;
-                btnElement.innerText = 'Copied!';
-                setTimeout(() => {
-                    btnElement.innerText = originalText;
-                }, 1500);
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target === modal) {
+                closePaymentModal();
+            }
+        };
+
+        // Copy Account Number
+        function copyAccountNo() {
+            const accNum = document.getElementById('accountNo').innerText;
+            navigator.clipboard.writeText(accNum).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 2000);
             });
         }
 
-        // Form Submission Logic
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const statusMsg = document.getElementById('statusMsg');
-            statusMsg.className = 'status-msg status-success';
-            statusMsg.innerHTML = 'Verification Submitted!<br>Please open <a href="https://t.me/ApexTicketMaster_bot" target="_blank" style="color:var(--accent-gold);">@ApexTicketMaster_bot</a> on Telegram and click <strong>START</strong> to receive your code.';
-            statusMsg.style.display = 'block';
+        // Form Submit Simulation
+        function submitPayment(e) {
+            e.preventDefault();
+            const refInput = document.getElementById('txRef').value.trim();
+            if (refInput.length > 2) {
+                document.getElementById('statusSuccess').style.display = 'block';
+                document.getElementById('statusError').style.display = 'none';
+            } else {
+                document.getElementById('statusError').style.display = 'block';
+                document.getElementById('statusSuccess').style.display = 'none';
+            }
         }
 
-        // Accordion functionality
+        // Accordion functionality for FAQ
         document.querySelectorAll('.faq-question').forEach(button => {
             button.addEventListener('click', () => {
                 const faqItem = button.parentElement;
@@ -1087,51 +1095,40 @@
             });
         });
 
-        // Countdown Timer Logic
-        function startTimer(duration, display) {
-            let timer = duration, hours, minutes, seconds;
-            setInterval(function () {
-                hours = parseInt(timer / 3600, 10);
-                minutes = parseInt((timer % 3600) / 60, 10);
-                seconds = parseInt(timer % 60, 10);
-
-                hours = hours < 10 ? "0" + hours : hours;
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                display.textContent = hours + ":" + minutes + ":" + seconds;
-
-                if (--timer < 0) {
-                    timer = duration;
-                }
-            }, 1000);
-        }
-
-        window.onload = function () {
-            const countdownElement = document.getElementById('countdownTimer');
-            if (countdownElement) {
-                startTimer(6320, countdownElement);
-            }
-        };
-
-        // Live Toast Notifications
-        const toastUsers = ['k***91', 'm***04', 'a***88', 'e***12', 's***55'];
-        const toastPlans = ['VIP Daily', 'Rollover 1-Week', 'VIP Monthly', 'Rollover + VIP'];
+        // Countdown Timer Simulation
+        let timeInSeconds = 1 * 3600 + 45 * 60 + 20;
+        const timerElement = document.getElementById('countdownTimer');
 
         setInterval(() => {
-            const randomUser = toastUsers[Math.floor(Math.random() * toastUsers.length)];
-            const randomPlan = toastPlans[Math.floor(Math.random() * toastPlans.length)];
-            const toastElement = document.getElementById('liveToast');
-            const toastMsg = document.getElementById('toastMsg');
-
-            if (toastElement && toastMsg) {
-                toastMsg.innerHTML = `<span>${randomUser}</span> just paid for ${randomPlan}`;
-                toastElement.classList.add('show');
-                setTimeout(() => {
-                    toastElement.classList.remove('show');
-                }, 4000);
+            if (timeInSeconds > 0) {
+                timeInSeconds--;
+                const hours = String(Math.floor(timeInSeconds / 3600)).padStart(2, '0');
+                const minutes = String(Math.floor((timeInSeconds % 3600) / 60)).padStart(2, '0');
+                const seconds = String(timeInSeconds % 60).padStart(2, '0');
+                timerElement.innerText = `${hours}:${minutes}:${seconds}`;
             }
-        }, 12000);
+        }, 1000);
+
+        // Live Toast Notifications Simulation
+        const samplePurchases = [
+            "<span>k***82</span> just unlocked Rollover Daily",
+            "<span>0814***901</span> just unlocked VIP Weekly",
+            "<span>@Sam_O***</span> just unlocked Rollover + VIP (1-Month)",
+            "<span>0903***214</span> just unlocked VIP Daily"
+        ];
+        const toastElement = document.getElementById('liveToast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        function triggerToast() {
+            const randomMsg = samplePurchases[Math.floor(Math.random() * samplePurchases.length)];
+            toastMsg.innerHTML = randomMsg;
+            toastElement.classList.add('show');
+            setTimeout(() => {
+                toastElement.classList.remove('show');
+            }, 4000);
+        }
+
+        setInterval(triggerToast, 12000);
     </script>
 </body>
 </html>
