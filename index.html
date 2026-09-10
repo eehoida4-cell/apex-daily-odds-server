@@ -480,6 +480,14 @@
             box-shadow: 0 0 15px var(--glow-green);
         }
 
+        .btn-locked {
+            background: #222a38 !important;
+            color: #5d6b82 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            pointer-events: none !important;
+        }
+
         .faq-container {
             width: 100%;
             max-width: 900px;
@@ -743,12 +751,6 @@
             border: 1px solid var(--accent-gold);
         }
 
-        .status-error {
-            background: rgba(255, 82, 82, 0.15);
-            color: #ff5252;
-            border: 1px solid #ff5252;
-        }
-
         footer {
             width: 100%;
             max-width: 1200px;
@@ -797,11 +799,11 @@
 </head>
 <body>
 
-    <!-- Sticky Live Countdown Banner -->
-    <div class="urgency-banner">
-        <span class="pulse-dot"></span>
-        <span>TODAY'S VIP TICKET CLOSING IN:</span>
-        <span class="countdown-digits" id="countdownTimer">01:45:20</span>
+    <!-- Sticky Live VIP Countdown Banner -->
+    <div class="urgency-banner" id="bannerWrapper">
+        <span class="pulse-dot" id="bannerPulse"></span>
+        <span id="bannerText">TODAY'S VIP & FREE TICKET CLOSES IN:</span>
+        <span class="countdown-digits" id="countdownTimer">--:--:--</span>
     </div>
 
     <header>
@@ -847,11 +849,15 @@
                     <span class="val">8.50 - 15.00 Odds</span>
                 </div>
                 <div class="odds-stat-box">
-                    <span class="lbl">Supported Bookies:</span>
-                    <span class="val" style="color: var(--text-main);">SportyBet / 1xBet</span>
+                    <span class="lbl">Entry Cutoff Time:</span>
+                    <span class="val" style="color: var(--accent-gold);">4:45 PM DAILY</span>
+                </div>
+                <div class="odds-stat-box">
+                    <span class="lbl">VIP Code Status:</span>
+                    <span class="val" id="ticketStatusText" style="color: var(--accent-green);">OPEN NOW</span>
                 </div>
             </div>
-            <a href="#pricing" class="btn-unlock" style="margin-top: 15px;">Unlock Today's Ticket</a>
+            <a href="#pricing" class="btn-unlock" id="heroUnlockBtn" style="margin-top: 15px;">Unlock Today's Ticket</a>
         </div>
 
         <div class="winners-card">
@@ -895,7 +901,7 @@
                 <li>Instant SportyBet Booking Code</li>
                 <li>No Subscription Required</li>
             </ul>
-            <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" rel="noopener" class="btn-unlock btn-free">Get Free Code via Bot</a>
+            <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" rel="noopener" class="btn-unlock btn-free" id="btnFreeTicket">Get Free Code via Bot</a>
         </div>
 
         <div class="card">
@@ -906,7 +912,7 @@
                 <li>Low-Risk Odds Strategy</li>
                 <li>Instant Code Release</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('Rollover Daily', '₦2,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover Daily', '₦2,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -917,7 +923,7 @@
                 <li>Instant Code Release</li>
                 <li>Direct Telegram Support</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('VIP Daily', '₦3,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('VIP Daily', '₦3,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -928,7 +934,7 @@
                 <li>Daily High-Odds Tickets</li>
                 <li>Priority Code Drops</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('VIP Weekly', '₦9,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('VIP Weekly', '₦9,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -939,7 +945,7 @@
                 <li>Maximum Odds Strategy</li>
                 <li>Full VIP Channel Access</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('VIP Monthly', '₦20,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('VIP Monthly', '₦20,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -950,7 +956,7 @@
                 <li>7 Days Consistent Runs</li>
                 <li>Instant SportyBet Codes</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Week', '₦5,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover 1-Week', '₦5,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -961,7 +967,7 @@
                 <li>Disciplined Profit Plan</li>
                 <li>Full Rollover Channel</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('Rollover 1-Month', '₦10,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover 1-Month', '₦10,000')">Unlock Access</button>
         </div>
 
         <div class="card">
@@ -972,7 +978,7 @@
                 <li>7 Days Both Channels</li>
                 <li>Combined Ticket Strategy</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('Rollover + VIP (1-Week)', '₦20,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover + VIP (1-Week)', '₦20,000')">Unlock Access</button>
         </div>
 
         <div class="card popular">
@@ -985,7 +991,7 @@
                 <li>Priority VIP Drops & Support</li>
                 <li>Best Value Savings</li>
             </ul>
-            <button class="btn-unlock" onclick="openPaymentModal('Rollover + VIP (1-Month)', '₦50,000')">Unlock Access</button>
+            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover + VIP (1-Month)', '₦50,000')">Unlock Access</button>
         </div>
     </div>
 
@@ -1006,57 +1012,69 @@
         <div class="faq-item">
             <button class="faq-question">What is the win rate of the Rollover plan?</button>
             <div class="faq-answer">
-                Our Rollover strategy focuses on low-risk, highly researched odds (1.50 - 2.10) designed for high-discipline staking. We maintain an average win rate of 88%+.
+                Our Rollover strategy focuses on low-risk target odds (1.65 – 2.10) with an average historical win rate exceeding 88%, calculated over consistent monthly runs.
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">Can I upgrade my tier later?</button>
+            <div class="faq-answer">
+                Yes! You can upgrade from Daily or Weekly plans to Monthly or Combined tiers at any point by selecting the desired tier above.
             </div>
         </div>
     </div>
 
+    <!-- Live Toast Notification -->
     <div class="live-toast" id="liveToast">
         <div class="toast-icon"></div>
         <div>
-            <div class="toast-text" id="toastMsg"><span>d***34</span> just paid for VIP Daily</div>
+            <div class="toast-text"><span id="toastUser">@Kelechi_***</span> unlocked <span id="toastPlan">VIP Monthly</span></div>
             <span class="toast-time">Just now</span>
         </div>
     </div>
 
-    <!-- Payment Verification Modal -->
-    <div class="modal-overlay" id="paymentModal" role="dialog" aria-modal="true">
+    <!-- Modal Window for Manual Bank Transfer -->
+    <div class="modal-overlay" id="paymentModal">
         <div class="modal-card">
             <button class="close-btn" onclick="closePaymentModal()">&times;</button>
-            <h2 class="modal-title">Verify Payment</h2>
-            <div class="tier-badge-modal" id="modalTierInfo">Selected Plan: --</div>
-
+            <div class="modal-title">UNLOCK TICKET ACCESS</div>
+            <div class="tier-badge-modal" id="modalTierBadge">VIP Daily - ₦3,000</div>
+            
             <div class="bank-details-box">
                 <div class="bank-row">
-                    <span class="bank-label">Bank Name:</span>
-                    <span class="bank-value" style="font-family: inherit;">PalmPay</span>
-                </div>
-                <div class="bank-row">
-                    <span class="bank-label">Account No:</span>
+                    <span class="bank-label">Bank Name</span>
                     <div class="bank-val-container">
-                        <span class="bank-value" id="accountNo">9012345678</span>
-                        <button class="copy-btn" onclick="copyAccountNo()">Copy</button>
+                        <span class="bank-value">OPay / Palmpay</span>
                     </div>
                 </div>
                 <div class="bank-row">
-                    <span class="bank-label">Account Name:</span>
-                    <span class="bank-value" style="font-family: inherit;">Apex Daily Odds</span>
+                    <span class="bank-label">Account No</span>
+                    <div class="bank-val-container">
+                        <span class="bank-value" id="accNumber">7012345678</span>
+                        <button class="copy-btn" onclick="copyToClipboard('accNumber')">COPY</button>
+                    </div>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">Account Name</span>
+                    <div class="bank-val-container">
+                        <span class="bank-value">APEX DAILY ODDS</span>
+                    </div>
                 </div>
             </div>
 
-            <form id="paymentForm" onsubmit="submitPayment(event)">
+            <form id="paymentForm" onsubmit="handlePaymentSubmit(event)">
                 <div class="form-group">
-                    <label for="txRef">Transaction Reference / Sender Name</label>
-                    <input type="text" id="txRef" placeholder="e.g. Ref No or Sender Full Name" required>
+                    <label for="senderName">Sender / Payer Name</label>
+                    <input type="text" id="senderName" placeholder="e.g. John Doe" required>
                 </div>
-                <button type="submit" class="btn-unlock">Submit Verification</button>
+                <div class="form-group">
+                    <label for="telegramUser">Telegram Username / Phone No</label>
+                    <input type="text" id="telegramUser" placeholder="e.g. @john_doe or 08012345678" required>
+                </div>
+                <button type="submit" class="btn-unlock">Submit Verification Request</button>
             </form>
 
             <div class="status-msg status-success" id="statusSuccess">
-                ✓ Payment details submitted! Open <a href="https://t.me/ApexTicketMaster_bot" target="_blank" style="color: var(--accent-gold); font-weight:700;">@ApexTicketMaster_bot</a> on Telegram to receive your code.
-            </div>
-            <div class="status-msg status-error" id="statusError">
-                ❌ Submission failed. Please enter a valid reference and try again.
+                ✓ Details Received! Please launch <strong>@ApexTicketMaster_bot</strong> on Telegram to claim your instant code.
             </div>
         </div>
     </div>
@@ -1064,45 +1082,85 @@
     <footer>
         <div class="footer-logo">APEX DAILY ODDS</div>
         <div class="footer-slogan">"ZERO GREED. MAXIMUM CASHOUT."</div>
-        <div class="footer-handle">Telegram Support: <a href="https://t.me/ApexTicketMaster_bot" target="_blank">@ApexTicketMaster_bot</a></div>
-        <div class="footer-disclaimer">
-            Disclaimer: Sports betting involves financial risk. Bet responsibly and only stake what you can afford to lose. Must be 18+ to participate.
-        </div>
+        <div class="footer-handle">Telegram Support: <a href="https://t.me/ApexTicketMaster_bot" target="_blank" rel="noopener">@ApexTicketMaster_bot</a></div>
+        <p class="footer-disclaimer">
+            Disclaimer: Sports betting involves financial risk. Apex Daily Odds provides research-driven analytical predictions for informational and strategy purposes. Bet responsibly and within your financial limits. 18+ only.
+        </p>
     </footer>
 
     <script>
-        // COUNTDOWN TIMER LOGIC
-        let totalSeconds = (1 * 3600) + (45 * 60) + 20; // 1 hour 45 min 20 sec
+        function updateCutoffCountdown() {
+            const now = new Date();
+            const target = new Date();
 
-        function updateTimerDisplay() {
-            const timerDisplay = document.getElementById('countdownTimer');
-            if (!timerDisplay) return;
+            // Set target cutoff time to 4:45 PM (16:45:00)
+            target.setHours(16, 45, 0, 0);
 
-            if (totalSeconds <= 0) {
-                timerDisplay.innerText = "00:00:00";
+            const display = document.getElementById('countdownTimer');
+            const bannerText = document.getElementById('bannerText');
+            const pulseDot = document.getElementById('bannerPulse');
+            const ticketStatusText = document.getElementById('ticketStatusText');
+            const freeBtn = document.getElementById('btnFreeTicket');
+
+            if (now >= target) {
+                // LOCKOUT STATE AFTER 4:45 PM
+                display.textContent = "LOCKED";
+                display.style.color = "#ff5252";
+                display.style.borderColor = "#ff5252";
+                display.style.background = "rgba(255, 82, 82, 0.15)";
+                
+                bannerText.textContent = "TODAY'S TICKETS ARE NOW LOCKED (CLOSED AT 4:45 PM)";
+                pulseDot.style.backgroundColor = "#ff5252";
+                pulseDot.style.boxShadow = "0 0 10px #ff5252";
+
+                if (ticketStatusText) {
+                    ticketStatusText.textContent = "LOCKED FOR TODAY";
+                    ticketStatusText.style.color = "#ff5252";
+                }
+
+                if (freeBtn) {
+                    freeBtn.textContent = "Free Code Locked Today";
+                    freeBtn.classList.add('btn-locked');
+                    freeBtn.removeAttribute('href');
+                }
                 return;
             }
 
-            const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-            const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-            const secs = String(totalSeconds % 60).padStart(2, '0');
+            // RUNNING COUNTDOWN BEFORE 4:45 PM
+            let diffSecs = Math.floor((target - now) / 1000);
 
-            timerDisplay.innerText = `${hrs}:${mins}:${secs}`;
-            totalSeconds--;
+            let hours = Math.floor(diffSecs / 3600);
+            let minutes = Math.floor((diffSecs % 3600) / 60);
+            let seconds = diffSecs % 60;
+
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = hours + ":" + minutes + ":" + seconds;
         }
 
-        // Initialize timer immediately on DOM load
-        document.addEventListener('DOMContentLoaded', () => {
-            updateTimerDisplay();
-            setInterval(updateTimerDisplay, 1000);
-        });
+        window.onload = function () {
+            updateCutoffCountdown();
+            setInterval(updateCutoffCountdown, 1000);
 
-        // MODAL UNLOCK / LOCKING LOGIC
-        function openPaymentModal(planName, price) {
-            document.getElementById('modalTierInfo').innerText = `Selected Plan: ${planName} (${price})`;
+            // Accordion FAQ logic
+            document.querySelectorAll('.faq-question').forEach(button => {
+                button.addEventListener('click', () => {
+                    const faqItem = button.parentElement;
+                    faqItem.classList.toggle('active');
+                });
+            });
+
+            // Trigger random live toast notifications
+            setInterval(showRandomToast, 12000);
+        };
+
+        // Modal control functions
+        function openPaymentModal(tierName, price) {
+            document.getElementById('modalTierBadge').innerText = tierName + ' - ' + price;
             document.getElementById('paymentModal').style.display = 'flex';
             document.getElementById('statusSuccess').style.display = 'none';
-            document.getElementById('statusError').style.display = 'none';
             document.getElementById('paymentForm').reset();
         }
 
@@ -1110,65 +1168,36 @@
             document.getElementById('paymentModal').style.display = 'none';
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('paymentModal');
-            if (event.target === modal) {
-                closePaymentModal();
-            }
-        };
-
-        // BANK COPY LOGIC
-        function copyAccountNo() {
-            const accNum = document.getElementById('accountNo').innerText;
-            navigator.clipboard.writeText(accNum).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                btn.innerText = 'Copied!';
-                setTimeout(() => btn.innerText = 'Copy', 2000);
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Account Number copied to clipboard!');
             });
         }
 
-        // FORM VERIFICATION LOGIC
-        function submitPayment(e) {
-            e.preventDefault();
-            const refInput = document.getElementById('txRef').value.trim();
-            if (refInput.length > 2) {
-                document.getElementById('statusSuccess').style.display = 'block';
-                document.getElementById('statusError').style.display = 'none';
-            } else {
-                document.getElementById('statusError').style.display = 'block';
-                document.getElementById('statusSuccess').style.display = 'none';
-            }
+        function handlePaymentSubmit(event) {
+            event.preventDefault();
+            document.getElementById('statusSuccess').style.display = 'block';
+            document.getElementById('paymentForm').style.display = 'none';
         }
 
-        // FAQ ACCORDION LOGIC
-        document.querySelectorAll('.faq-question').forEach(button => {
-            button.addEventListener('click', () => {
-                const faqItem = button.parentElement;
-                faqItem.classList.toggle('active');
-            });
-        });
+        // Live notification simulation
+        const fakeUsers = ['@Chidi_***', '0814***920', '@Tunde_VIP***', '@Ibrahim_***', '0903***118'];
+        const fakePlans = ['VIP Daily', 'Rollover 1-Week', 'VIP Monthly', 'Rollover + VIP (1-Month)'];
 
-        // LIVE PURCHASES POPUP
-        const samplePurchases = [
-            "<span>k***82</span> just unlocked Rollover Daily",
-            "<span>0814***901</span> just unlocked VIP Weekly",
-            "<span>@Sam_O***</span> just unlocked Rollover + VIP (1-Month)",
-            "<span>0903***214</span> just unlocked VIP Daily"
-        ];
-        const toastElement = document.getElementById('liveToast');
-        const toastMsg = document.getElementById('toastMsg');
+        function showRandomToast() {
+            const toast = document.getElementById('liveToast');
+            const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
+            const randomPlan = fakePlans[Math.floor(Math.random() * fakePlans.length)];
 
-        function triggerToast() {
-            if (!toastElement || !toastMsg) return;
-            const randomMsg = samplePurchases[Math.floor(Math.random() * samplePurchases.length)];
-            toastMsg.innerHTML = randomMsg;
-            toastElement.classList.add('show');
+            document.getElementById('toastUser').innerText = randomUser;
+            document.getElementById('toastPlan').innerText = randomPlan;
+
+            toast.classList.add('show');
             setTimeout(() => {
-                toastElement.classList.remove('show');
+                toast.classList.remove('show');
             }, 4000);
         }
-
-        setInterval(triggerToast, 12000);
     </script>
 </body>
 </html>
