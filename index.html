@@ -40,7 +40,6 @@
                 radial-gradient(circle at 50% 100%, rgba(17, 21, 30, 0.8) 0%, transparent 100%);
         }
 
-        /* Countdown Banner */
         .urgency-banner {
             width: 100%;
             background: rgba(255, 183, 3, 0.12);
@@ -181,7 +180,6 @@
             }
         }
 
-        /* Today's VIP Odds Preview Box */
         .odds-preview-card {
             background: var(--card-bg);
             border: 1px solid var(--accent-gold);
@@ -282,7 +280,6 @@
             text-transform: uppercase;
         }
 
-        /* Pricing Grid */
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -453,7 +450,6 @@
             box-shadow: 0 0 15px var(--glow-green);
         }
 
-        /* FAQ Accordion Section */
         .faq-container {
             width: 100%;
             max-width: 900px;
@@ -509,7 +505,6 @@
             padding: 0 20px 18px 20px;
         }
 
-        /* Toast */
         .live-toast {
             position: fixed;
             bottom: 20px;
@@ -561,7 +556,6 @@
             margin-top: 2px;
         }
 
-        /* Modal Structure */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -953,7 +947,7 @@
         </div>
 
         <div class="card popular">
-            <div class="badge-popular">BEST SALE • 2% OFF</div>
+            <div class="badge-popular">BEST VALUE</div>
             <h3 class="tier-title">Rollover + VIP (1-Month)</h3>
             <div class="tier-price">₦50,000 <span>/ month</span></div>
             <ul class="features-list">
@@ -1026,194 +1020,118 @@
                 </div>
             </div>
 
-            <form id="checkoutForm">
+            <form id="paymentForm" onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" name="name" placeholder="Enter your full name" required>
+                    <label for="senderName">Sender Account Name</label>
+                    <input type="text" id="senderName" placeholder="e.g. John Doe" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="telegramUser">Telegram Handle / Username</label>
-                    <input type="text" id="telegramUser" name="telegram" placeholder="@yourhandle" required>
+                    <label for="txRef">Transaction Reference / Session ID</label>
+                    <input type="text" id="txRef" placeholder="e.g. 100028..." required>
                 </div>
-
-                <div class="form-group">
-                    <label for="paymentRef">Payment Reference / Transaction ID</label>
-                    <input type="text" id="paymentRef" name="reference" placeholder="Paste bank transfer reference code" required>
-                </div>
-
-                <button type="submit" class="btn-unlock" id="submitBtn">Submit Verification</button>
+                <button type="submit" class="btn-unlock" style="margin-top: 10px;">Submit Verification</button>
             </form>
 
-            <div id="statusBox" class="status-msg" aria-live="polite"></div>
+            <div class="status-msg" id="statusMsg"></div>
         </div>
     </div>
 
     <footer>
         <div class="footer-logo">APEX DAILY ODDS</div>
-        <div class="footer-slogan">ZERO GREED. MAXIMUM CASHOUT.</div>
-        <div class="footer-handle">Official Channel: <a href="https://t.me/ApexDailyOddsHQ" target="_blank" rel="noopener">@ApexDailyOddsHQ</a></div>
-        <div class="footer-disclaimer">
-            © 2026 Apex Daily Odds. Built for disciplined bettors. Please gamble responsibly (18+).
-        </div>
+        <div class="footer-slogan">"ZERO GREED. MAXIMUM CASHOUT."</div>
+        <div class="footer-handle">Telegram Support: <a href="https://t.me/ApexTicketMaster_bot" target="_blank" rel="noopener">@ApexTicketMaster_bot</a></div>
+        <p class="footer-disclaimer">
+            Disclaimer: Sports betting involves financial risk. Please gamble responsibly and only stake what you can afford to lose.
+        </p>
     </footer>
 
     <script>
-        const BACKEND_URL = window.location.origin.includes('localhost') 
-            ? 'http://localhost:3000/api/checkout' 
-            : '/api/checkout';
-
-        let currentSelectedPlan = '';
-
-        /* FAQ Toggle Logic */
-        document.querySelectorAll('.faq-question').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const item = btn.parentElement;
-                item.classList.toggle('active');
-            });
-        });
-
-        /* Countdown Timer Script */
-        let timeInSeconds = 6320; // 1 hour 45 min countdown
-        setInterval(() => {
-            if (timeInSeconds > 0) {
-                timeInSeconds--;
-                const hours = Math.floor(timeInSeconds / 3600);
-                const minutes = Math.floor((timeInSeconds % 3600) / 60);
-                const seconds = timeInSeconds % 60;
-                document.getElementById('countdownTimer').innerText = 
-                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            }
-        }, 1000);
-
+        // Modal functions
         function openPaymentModal(planName, price) {
-            currentSelectedPlan = `${planName} (${price})`;
-            document.getElementById('modalTierInfo').innerText = `Selected Plan: ${currentSelectedPlan}`;
+            document.getElementById('modalTierInfo').innerText = `Selected Plan: ${planName} (${price})`;
             document.getElementById('paymentModal').style.display = 'flex';
         }
 
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
-            document.getElementById('statusBox').style.display = 'none';
+            document.getElementById('statusMsg').style.display = 'none';
+            document.getElementById('paymentForm').reset();
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('paymentModal');
-            if (event.target === modal) {
-                closePaymentModal();
+        // Copy functionality
+        function copyText(elementId, btnElement) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = 'Copied!';
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                }, 1500);
+            });
+        }
+
+        // Form Submission Logic
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const statusMsg = document.getElementById('statusMsg');
+            statusMsg.className = 'status-msg status-success';
+            statusMsg.innerHTML = 'Verification Submitted!<br>Please open <a href="https://t.me/ApexTicketMaster_bot" target="_blank" style="color:var(--accent-gold);">@ApexTicketMaster_bot</a> on Telegram and click <strong>START</strong> to receive your code.';
+            statusMsg.style.display = 'block';
+        }
+
+        // Accordion functionality
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const faqItem = button.parentElement;
+                faqItem.classList.toggle('active');
+            });
+        });
+
+        // Countdown Timer Logic
+        function startTimer(duration, display) {
+            let timer = duration, hours, minutes, seconds;
+            setInterval(function () {
+                hours = parseInt(timer / 3600, 10);
+                minutes = parseInt((timer % 3600) / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = hours + ":" + minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    timer = duration;
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            const countdownElement = document.getElementById('countdownTimer');
+            if (countdownElement) {
+                startTimer(6320, countdownElement);
             }
         };
 
-        window.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closePaymentModal();
-            }
-        });
+        // Live Toast Notifications
+        const toastUsers = ['k***91', 'm***04', 'a***88', 'e***12', 's***55'];
+        const toastPlans = ['VIP Daily', 'Rollover 1-Week', 'VIP Monthly', 'Rollover + VIP'];
 
-        async function copyText(elementId, btnElement) {
-            const textToCopy = document.getElementById(elementId).innerText;
-            try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(textToCopy);
-                } else {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = textToCopy;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                }
+        setInterval(() => {
+            const randomUser = toastUsers[Math.floor(Math.random() * toastUsers.length)];
+            const randomPlan = toastPlans[Math.floor(Math.random() * toastPlans.length)];
+            const toastElement = document.getElementById('liveToast');
+            const toastMsg = document.getElementById('toastMsg');
 
-                const originalText = btnElement.innerText;
-                btnElement.innerText = 'Copied!';
-                btnElement.style.background = 'var(--accent-gold)';
-                btnElement.style.color = '#000';
-                
+            if (toastElement && toastMsg) {
+                toastMsg.innerHTML = `<span>${randomUser}</span> just paid for ${randomPlan}`;
+                toastElement.classList.add('show');
                 setTimeout(() => {
-                    btnElement.innerText = originalText;
-                    btnElement.style.background = '';
-                    btnElement.style.color = '';
-                }, 1500);
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
+                    toastElement.classList.remove('show');
+                }, 4000);
             }
-        }
-
-        async function handleSubmission(e) {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('submitBtn');
-            const statusBox = document.getElementById('statusBox');
-
-            const fullName = document.getElementById('fullName').value.trim();
-            let telegramUser = document.getElementById('telegramUser').value.trim();
-            const paymentRef = document.getElementById('paymentRef').value.trim();
-
-            if (telegramUser && !telegramUser.startsWith('@')) {
-                telegramUser = '@' + telegramUser;
-            }
-
-            const payload = {
-                name: fullName,
-                telegram: telegramUser,
-                reference: paymentRef,
-                amount: currentSelectedPlan
-            };
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Sending...";
-
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    statusBox.className = "status-msg status-success";
-                    statusBox.innerHTML = "Verification sent! <br><br>👉 <a href='https://t.me/ApexTicketMaster_bot' target='_blank' style='color:#ffb703; font-weight:bold;'>Click Here to Start Our Telegram Bot (@ApexTicketMaster_bot)</a> to receive your booking code DM once approved.";
-                    statusBox.style.display = "block";
-                    document.getElementById('checkoutForm').reset();
-                } else {
-                    throw new Error(result.message || "Submission failed.");
-                }
-            } catch (err) {
-                statusBox.className = "status-msg status-error";
-                statusBox.innerText = err.message || "Error sending verification. Check backend server connection.";
-                statusBox.style.display = "block";
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Verification";
-            }
-        }
-
-        document.getElementById('checkoutForm').addEventListener('submit', handleSubmission);
-
-        /* Dynamic Notification Toast Script */
-        const mockUsers = ['d***34', 'k***89', 'm***12', '0803***91', 'a***07', '0814***22', 'e***45', '0902***11'];
-        const mockPlans = ['VIP Daily', 'VIP Weekly', 'Rollover Daily', 'Rollover + VIP (1-Month)', 'VIP Monthly', 'Rollover 1-Week'];
-
-        function schedulePaymentNotification() {
-            setTimeout(() => {
-                const toast = document.getElementById('liveToast');
-                const msg = document.getElementById('toastMsg');
-                const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
-                const randomPlan = mockPlans[Math.floor(Math.random() * mockPlans.length)];
-
-                msg.innerHTML = `<span>${randomUser}</span> just paid for ${randomPlan}`;
-                toast.classList.add('show');
-
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    schedulePaymentNotification();
-                }, 3500);
-            }, 8000);
-        }
-
-        schedulePaymentNotification();
+        }, 12000);
     </script>
 </body>
 </html>
