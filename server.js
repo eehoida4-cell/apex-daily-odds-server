@@ -17,11 +17,11 @@ const BANK_DETAILS = {
     accountName: process.env.ACCOUNT_NAME || "Blessings Eboh"
 };
 
-// Global Store
+// Global Memory Store
 const pendingPromptToOrder = {};
 const pendingCodesByUsername = {};
 
-// Delivery Helper
+// Delivery Helper Message Generator
 function buildDeliveryMessage(planName, bookingCode) {
     const cleanPlan = String(planName || '').toLowerCase();
 
@@ -40,7 +40,7 @@ function buildDeliveryMessage(planName, bookingCode) {
     }
 }
 
-// Telegram Helper API
+// Telegram API Helper
 async function sendTelegram(endpoint, payload) {
     try {
         const response = await fetch("https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/" + endpoint, {
@@ -59,7 +59,7 @@ async function sendTelegram(endpoint, payload) {
     }
 }
 
-// Health Verification Route for Webhook
+// Health Verification Routes for Webhooks
 app.get('/telegram-webhook', (req, res) => {
     res.status(200).send('Telegram Webhook Route is Active and Online!');
 });
@@ -122,12 +122,11 @@ const handleWebhook = async (req, res) => {
     if (!update) return;
 
     try {
-        // A. Handle Inline Keyboard Callbacks
+        // A. Handle Inline Keyboard Callbacks from Admin
         if (update.callback_query) {
             const callback = update.callback_query;
             const actionData = callback.data || '';
 
-            // Answer callback pop-up banner
             await sendTelegram('answerCallbackQuery', {
                 callback_query_id: callback.id,
                 text: actionData.startsWith('app:') ? 'Payment Approved!' : 'Payment Rejected!'
@@ -139,7 +138,6 @@ const handleWebhook = async (req, res) => {
                 const plan = parts[2] || 'VIP';
                 const customerTarget = parts[3] || null;
 
-                // Send admin prompt
                 const promptRes = await sendTelegram('sendMessage', {
                     chat_id: String(ADMIN_CHAT_ID).trim(),
                     text: "✅ PAYMENT APPROVED (" + plan + ")!\n\n👉 Reply directly to THIS message with the Booking Code for @" + username + "."
@@ -229,7 +227,7 @@ const handleWebhook = async (req, res) => {
                 if (isAfterKickoff) {
                     await sendTelegram('sendMessage', {
                         chat_id: chatId,
-                        text: "🔒 TODAY'S FREE TICKET IS NOW LOCKED!\n\nThe matches for today's free code have already kicked off (4:45 PM WAT).\n\n👑 VIP & Rollover tickets are still active! Get yours now: https://apex-daily-odds-server.onrender.com"
+                        text: "🔒 TODAY'S FREE TICKET IS NOW LOCKED!\n\nThe matches for today's free code have already kicked off (4:45 PM WAT).\n\n👑 VIP & Rollover tickets are still active! Get yours now on the website: https://apex-daily-odds-server.onrender.com"
                     });
                     return;
                 }
