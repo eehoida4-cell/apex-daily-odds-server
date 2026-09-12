@@ -34,15 +34,15 @@ function buildDeliveryMessage(planName, bookingCode) {
 
     if (cleanPlan.includes('rollover')) {
         return "🔥 ROLLOVER PAYMENT VERIFIED!\n\n" +
-               "Here is your Apex Daily Odds Rollover Booking Code: " + bookingCode + "\n\n" +
+               "Here is your Apex Daily Odds Rollover Access Code: " + bookingCode + "\n\n" +
                "Stick to the strategy, manage your stake, and let's build the streak! 🚀";
     } else if (cleanPlan.includes('combo')) {
         return "💥 COMBO PACK PAYMENT VERIFIED!\n\n" +
-               "Here is your Apex Daily Odds Combo Booking Code: " + bookingCode + "\n\n" +
+               "Here is your Apex Daily Odds Combo Access Code: " + bookingCode + "\n\n" +
                "Your multi-ticket combinations are locked and loaded. Best of luck today! 🏆";
     } else {
         return "🎉 PAYMENT VERIFIED & APPROVED!\n\n" +
-               "Here is your VIP Booking Code: " + bookingCode + "\n\n" +
+               "Here is your VIP Access Code: " + bookingCode + "\n\n" +
                "Welcome to Apex Daily Odds VIP! 🚀";
     }
 }
@@ -147,7 +147,7 @@ const handleWebhook = async (req, res) => {
 
                 const promptRes = await sendTelegram('sendMessage', {
                     chat_id: String(ADMIN_CHAT_ID).trim(),
-                    text: "✅ PAYMENT APPROVED (" + plan + ")!\n\n👉 Reply directly to THIS message with the Booking Code for @" + username + "."
+                    text: "✅ PAYMENT APPROVED (" + plan + ")!\n\n👉 Reply directly to THIS message with the Access Code for @" + username + "."
                 });
 
                 if (promptRes && promptRes.ok) {
@@ -206,7 +206,7 @@ const handleWebhook = async (req, res) => {
                 } else {
                     await sendTelegram('sendMessage', {
                         chat_id: String(ADMIN_CHAT_ID).trim(),
-                        text: "💾 CODE STORED FOR @" + username + "! (" + plan + ")\n\nWhen @" + username + " messages @" + BOT_USERNAME + ", the bot will automatically send them their booking code: " + codeTypedByAdmin + "."
+                        text: "💾 CODE STORED FOR @" + username + "! (" + plan + ")\n\nWhen @" + username + " messages @" + BOT_USERNAME + ", the bot will automatically send them their access code: " + codeTypedByAdmin + "."
                     });
                 }
 
@@ -221,7 +221,7 @@ const handleWebhook = async (req, res) => {
             const messageText = update.message.text.trim();
             const userUsername = update.message.from && update.message.from.username ? update.message.from.username.toLowerCase() : '';
 
-            // 1. User clicked "Get Free Code via Bot" button on website
+            // 1. User clicked "Get Free Tips" button on website
             if (messageText.startsWith('/start get_free_ticket')) {
                 // Precise WAT Time Check (UTC+1)
                 const now = new Date();
@@ -234,35 +234,32 @@ const handleWebhook = async (req, res) => {
                 if (isAfterKickoff) {
                     await sendTelegram('sendMessage', {
                         chat_id: chatId,
-                        text: "🔒 TODAY'S FREE TICKET IS NOW LOCKED!\n\nThe matches for today's free code have already kicked off (4:45 PM WAT).\n\n👑 VIP & Rollover tickets are still active! Get yours now on the website: https://apex-daily-odds-server.onrender.com"
+                        text: "🔒 TODAY'S FREE TIPS ARE NOW LOCKED!\n\nThe matches for today's free picks have already kicked off (4:45 PM WAT).\n\n👑 VIP & Rollover tips are still active! Get yours now on the website: https://apex-daily-odds-server.onrender.com"
                     });
                     return;
                 }
 
-                const sportyBetCode = "HE18VW";
-
-                const freeCodeMessage = 
-                    "☀️ GOOD DAY WINNER! TODAY'S FREE TICKET ☀️\n\n" +
-                    "🎫 Booking Code: " + sportyBetCode + "\n" +
-                    "📈 Target Strategy: Low-Risk Accumulator\n\n" +
-                    "📋 SELECTIONS:\n" +
-                    "1️⃣ Trelleborgs FF vs Hässleholms IF — Double Chance (12) (1.24)\n" +
-                    "2️⃣ WBA vs QPR — Over 2.0 Goals (1.43)\n" +
-                    "3️⃣ Sheffield Wed vs Wigan — Sheffield Wed (DNB) (1.27)\n" +
-                    "4️⃣ Ekenäs IF vs FC Haka — Over 2.5 Goals (1.57)\n" +
-                    "5️⃣ Eastleigh vs Boreham Wood — Over 2.0 Goals (1.23)\n" +
-                    "6️⃣ York City vs Swindon Town — Over 2.0 Goals (1.20)\n\n" +
+                const freeTipsMessage = 
+                    "☀️ GOOD DAY WINNER! TODAY'S FREE TIPS ☀️\n\n" +
+                    "📈 Strategy: Low-Risk Accumulator / Daily Picks\n\n" +
+                    "📋 MATCH PREDICTIONS:\n" +
+                    "1️⃣ Trelleborgs FF vs Hässleholms IF — Double Chance (12) @ 1.24\n" +
+                    "2️⃣ WBA vs QPR — Over 2.0 Goals @ 1.43\n" +
+                    "3️⃣ Sheffield Wed vs Wigan — Sheffield Wed (DNB) @ 1.27\n" +
+                    "4️⃣ Ekenäs IF vs FC Haka — Over 2.5 Goals @ 1.57\n" +
+                    "5️⃣ Eastleigh vs Boreham Wood — Over 2.0 Goals @ 1.23\n" +
+                    "6️⃣ York City vs Swindon Town — Over 2.0 Goals @ 1.20\n\n" +
                     "🎯 Recommended Stake: 10% - 20% of Bankroll\n" +
                     "⏱ Kick-off Cutoff: 4:45 PM WAT\n\n" +
                     "──────────────────────────────\n" +
-                    "👑 TODAY'S VIP & ROLLOVER TICKETS ARE ALSO READY!\n" +
+                    "👑 TODAY'S VIP & ROLLOVER ACCUMULATORS ARE READY!\n" +
                     "• VIP Target: High Odds 💣\n" +
                     "• Rollover Target: Low-Risk Streak 🛡️\n\n" +
                     "👉 Unlock your VIP access immediately on the website https://apex-daily-odds-server.onrender.com";
 
                 await sendTelegram('sendMessage', {
                     chat_id: chatId,
-                    text: freeCodeMessage
+                    text: freeTipsMessage
                 });
                 return;
             }
@@ -287,7 +284,7 @@ const handleWebhook = async (req, res) => {
                 // 3. General message fallback
                 await sendTelegram('sendMessage', {
                     chat_id: chatId,
-                    text: "⏳ Apex Daily Odds Verification\n\nYour request is being processed. As soon as your payment is approved by admin, your booking code will be sent right here!"
+                    text: "⏳ Apex Daily Odds Verification\n\nYour request is being processed. As soon as your payment is approved by admin, your access link will be sent right here!"
                 });
             }
         }
