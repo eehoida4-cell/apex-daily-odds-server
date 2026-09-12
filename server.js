@@ -1,7 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const helmet = require('helmet');
+
 const app = express();
 
+// Security and Middleware Setup
+app.use(helmet({
+    contentSecurityPolicy: false // Allows inline scripts for simple web setups
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
@@ -221,7 +228,7 @@ const handleWebhook = async (req, res) => {
                 const currentWatHours = (now.getUTCHours() + 1) % 24;
                 const currentWatMinutes = now.getUTCMinutes();
                 
-                // 4:45 PM WAT is 16:45 WAT
+                // Cutoff at 4:45 PM WAT (16:45)
                 const isAfterKickoff = currentWatHours > 16 || (currentWatHours === 16 && currentWatMinutes >= 45);
 
                 if (isAfterKickoff) {
@@ -235,18 +242,22 @@ const handleWebhook = async (req, res) => {
                 const sportyBetCode = "HE18VW";
 
                 const freeCodeMessage = 
-                    "☀️ GOOD DAY WINNER! TODAY'S FREE CODE ☀️\n\n" +
-                    "🎫 SportyBet Nigeria Code: " + sportyBetCode + "\n" +
-                    "📈 Total Odds: 2.28\n\n" +
+                    "☀️ GOOD DAY WINNER! TODAY'S FREE TICKET ☀️\n\n" +
+                    "🎫 Booking Code: " + sportyBetCode + "\n" +
+                    "📈 Target Strategy: Low-Risk Accumulator\n\n" +
                     "📋 SELECTIONS:\n" +
-                    "1️⃣ PSV Eindhoven vs Shakhtar D — Shakhtar D Over 0.5 (1.46)\n" +
-                    "2️⃣ Slavia Prague vs Lens — Both Teams to Score: Yes (1.56)\n\n" +
+                    "1️⃣ Trelleborgs FF vs Hässleholms IF — Double Chance (12) (1.24)\n" +
+                    "2️⃣ WBA vs QPR — Over 2.0 Goals (1.43)\n" +
+                    "3️⃣ Sheffield Wed vs Wigan — Sheffield Wed (DNB) (1.27)\n" +
+                    "4️⃣ Ekenäs IF vs FC Haka — Over 2.5 Goals (1.57)\n" +
+                    "5️⃣ Eastleigh vs Boreham Wood — Over 2.0 Goals (1.23)\n" +
+                    "6️⃣ York City vs Swindon Town — Over 2.0 Goals (1.20)\n\n" +
                     "🎯 Recommended Stake: 10% - 20% of Bankroll\n" +
-                    "⏱ Kick-off: 4:45 PM WAT\n\n" +
+                    "⏱ Kick-off Cutoff: 4:45 PM WAT\n\n" +
                     "──────────────────────────────\n" +
                     "👑 TODAY'S VIP & ROLLOVER TICKETS ARE ALSO READY!\n" +
-                    "• VIP Target: 10.50+ Odds 💣\n" +
-                    "• Rollover Target: 1.85 Odds 🛡️\n\n" +
+                    "• VIP Target: High Odds 💣\n" +
+                    "• Rollover Target: Low-Risk Streak 🛡️\n\n" +
                     "👉 Unlock your VIP access immediately on the website https://apex-daily-odds-server.onrender.com";
 
                 await sendTelegram('sendMessage', {
