@@ -13,292 +13,157 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8863246341';
-const BOT_USERNAME = process.env.BOT_USERNAME || 'ApexTicketMaster_bot';
+const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-// Bank Details
-const BANK_DETAILS = {
-    bankName: process.env.BANK_NAME || "PalmPay",
-    accountNumber: process.env.ACCOUNT_NUMBER || "9066989021",
-    accountName: process.env.ACCOUNT_NAME || "Blessings Eboh"
-};
-
-// Global Memory Store
-const pendingPromptToOrder = {};
-const pendingCodesByUsername = {};
-
-// Delivery Helper Message Generator
-function buildDeliveryMessage(planName, bookingCode) {
-    const cleanPlan = String(planName || '').toLowerCase();
-
-    if (cleanPlan.includes('rollover')) {
-        return "🔥 ROLLOVER PAYMENT VERIFIED!\n\n" +
-               "Here is your Apex Daily Odds Rollover Access Code: " + bookingCode + "\n\n" +
-               "Stick to the strategy, manage your stake, and let's build the streak! 🚀";
-    } else if (cleanPlan.includes('combo')) {
-        return "💥 COMBO PACK PAYMENT VERIFIED!\n\n" +
-               "Here is your Apex Daily Odds Combo Access Code: " + bookingCode + "\n\n" +
-               "Your multi-ticket combinations are locked and loaded. Best of luck today! 🏆";
-    } else {
-        return "🎉 PAYMENT VERIFIED & APPROVED!\n\n" +
-               "Here is your VIP Access Code: " + bookingCode + "\n\n" +
-               "Welcome to Apex Daily Odds VIP! 🚀";
-    }
-}
-
-// Telegram API Helper
-async function sendTelegram(endpoint, payload) {
-    try {
-        const response = await fetch("https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/" + endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const resJson = await response.json();
-        if (!resJson.ok) {
-            console.error(`Telegram API Error on [${endpoint}]:`, resJson);
-        }
-        return resJson;
-    } catch (err) {
-        console.error("Telegram Network Error:", err);
-        return { ok: false };
-    }
-}
-
-// Health Verification Routes for Webhooks
-app.get('/telegram-webhook', (req, res) => {
-    res.status(200).send('Telegram Webhook Route is Active and Online!');
-});
-app.get('/api/telegram-webhook', (req, res) => {
-    res.status(200).send('Telegram Webhook Route is Active and Online!');
+// Serve the frontend page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 1. CHECKOUT ROUTE
+// Endpoint to receive payment notification from frontend
 app.post('/api/checkout', async (req, res) => {
     try {
-        const { name, telegram, reference, amount, customerChatId } = req.body;
-        
-        // Sanitize incoming username
-        let rawTelegram = telegram ? String(telegram).trim().replace('@', '').toLowerCase() : '';
-        const formattedUsername = rawTelegram.length > 0 ? rawTelegram : 'NO_USERNAME_PROVIDED';
+        const { name, telegram, reference, amount } = req.body;
 
-        const plan = amount || 'VIP';
-        const targetChat = customerChatId || '';
+        const text = `🚨 *NEW PAYMENT CLAIM* 🚨\n\n` +
+                     `👤 *Name:* ${name || 'N/A'}\n` +
+                     `📱 *Contact:* ${telegram || 'N/A'}\n` +
+                     `💰 *Amount:* ₦${amount || '0'}\n` +
+                     `🧾 *Ref:* \`${reference || 'N/A'}\``;
 
-        const approveData = ("app:" + formattedUsername + ":" + plan + ":" + targetChat).slice(0, 64);
-        const rejectData = ("rej:" + formattedUsername).slice(0, 64);
-
-        const messageText = "⚡ NEW PAYMENT SUBMISSION ⚡\n\n" +
-            "👤 Name: " + (name || 'N/A') + "\n" +
-            "📱 Telegram: @" + formattedUsername + "\n" +
-            "💳 Plan: " + plan + "\n" +
-            "🧾 Ref: " + (reference || 'N/A') + "\n\n" +
-            "🏦 Account: " + BANK_DETAILS.bankName + " - " + BANK_DETAILS.accountNumber + " (" + BANK_DETAILS.accountName + ")\n\n" +
-            "👇 Verify transaction in your bank app, then select an action below:";
-
-        const data = await sendTelegram('sendMessage', {
-            chat_id: String(ADMIN_CHAT_ID).trim(),
-            text: messageText,
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        { text: '✅ Approve Payment', callback_data: approveData },
-                        { text: '❌ Reject Payment', callback_data: rejectData }
-                    ]
+        const keyboard = {
+            inline_keyboard: [
+                [
+                    { text: "✅ Release Access Code", callback_data: `release_${telegram}` }
                 ]
-            }
+            ]
+        };
+
+        const response = await fetch(`${TELEGRAM_API}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: ADMIN_CHAT_ID,
+                text: text,
+                parse_mode: 'Markdown',
+                reply_markup: keyboard
+            })
         });
 
-        if (data && data.ok) {
-            return res.status(200).json({ success: true, message: 'Submitted successfully!' });
+        const data = await response.json();
+
+        if (data.ok) {
+            return res.status(200).json({ success: true, message: 'Notification sent to admin' });
         } else {
-            return res.status(500).json({ success: false, message: 'Failed to notify admin on Telegram.' });
+            console.error('Telegram API error:', data);
+            return res.status(500).json({ success: false, message: 'Failed to notify admin' });
         }
     } catch (error) {
-        console.error("Checkout Handler Error:", error);
-        return res.status(500).json({ success: false, message: 'Server processing error.' });
+        console.error('Checkout error:', error);
+        return res.status(500).json({ success: false, message: 'Server processing error' });
     }
 });
 
-// 2. WEBHOOK HANDLER
-const handleWebhook = async (req, res) => {
+// Telegram Webhook Handler for Inline Buttons & Free Tips Trigger
+app.post('/telegram-webhook', async (req, res) => {
     res.sendStatus(200);
 
     const update = req.body;
     if (!update) return;
 
     try {
-        // A. Handle Inline Keyboard Callbacks from Admin
+        // Handle Inline Keyboards (Admin Callbacks)
         if (update.callback_query) {
-            const callback = update.callback_query;
-            const actionData = callback.data || '';
+            const callbackId = update.callback_query.id;
+            const callbackData = update.callback_query.data || '';
 
-            await sendTelegram('answerCallbackQuery', {
-                callback_query_id: callback.id,
-                text: actionData.startsWith('app:') ? 'Payment Approved!' : 'Payment Rejected!'
-            });
+            if (callbackData.startsWith('release_')) {
+                const userContact = callbackData.replace('release_', '');
 
-            if (actionData.startsWith('app:')) {
-                const parts = actionData.split(':');
-                const username = parts[1] || 'customer';
-                const plan = parts[2] || 'VIP';
-                const customerTarget = parts[3] || null;
-
-                const promptRes = await sendTelegram('sendMessage', {
-                    chat_id: String(ADMIN_CHAT_ID).trim(),
-                    text: "✅ PAYMENT APPROVED (" + plan + ")!\n\n👉 Reply directly to THIS message with the Access Code for @" + username + "."
+                await fetch(`${TELEGRAM_API}/answerCallbackQuery`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        callback_query_id: callbackId,
+                        text: "Code dispatch confirmation recorded!",
+                        show_alert: true
+                    })
                 });
 
-                if (promptRes && promptRes.ok) {
-                    pendingPromptToOrder[promptRes.result.message_id] = {
-                        username: username,
-                        plan: plan,
-                        customerTarget: customerTarget
-                    };
-                }
-            } else if (actionData.startsWith('rej:')) {
-                await sendTelegram('sendMessage', {
-                    chat_id: String(ADMIN_CHAT_ID).trim(),
-                    text: "❌ PAYMENT REJECTED! Transaction cancelled."
+                await fetch(`${TELEGRAM_API}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: ADMIN_CHAT_ID,
+                        text: `✅ Action complete for ${userContact}. Send the ticket access code directly to them now.`
+                    })
                 });
             }
             return;
         }
 
-        // B. Handle Admin Reply with Booking Code
-        if (update.message && update.message.text && update.message.reply_to_message && String(update.message.chat.id) === String(ADMIN_CHAT_ID)) {
-            const repliedMessageId = update.message.reply_to_message.message_id;
-            const order = pendingPromptToOrder[repliedMessageId];
-
-            if (order) {
-                const codeTypedByAdmin = update.message.text.trim();
-                const username = order.username;
-                const plan = order.plan || 'VIP';
-
-                pendingCodesByUsername[username] = { bookingCode: codeTypedByAdmin, plan: plan };
-
-                setTimeout(() => {
-                    if (pendingCodesByUsername[username]) {
-                        delete pendingCodesByUsername[username];
-                    }
-                }, 24 * 60 * 60 * 1000);
-
-                let directSent = false;
-
-                if (order.customerTarget) {
-                    const deliveryText = buildDeliveryMessage(plan, codeTypedByAdmin);
-                    const sendRes = await sendTelegram('sendMessage', {
-                        chat_id: order.customerTarget,
-                        text: deliveryText
-                    });
-                    if (sendRes && sendRes.ok) {
-                        directSent = true;
-                        delete pendingCodesByUsername[username];
-                    }
-                }
-
-                if (directSent) {
-                    await sendTelegram('sendMessage', {
-                        chat_id: String(ADMIN_CHAT_ID).trim(),
-                        text: "🚀 DIRECTLY DELIVERED! (" + plan + ") Code " + codeTypedByAdmin + " sent to @" + username + "."
-                    });
-                } else {
-                    await sendTelegram('sendMessage', {
-                        chat_id: String(ADMIN_CHAT_ID).trim(),
-                        text: "💾 CODE STORED FOR @" + username + "! (" + plan + ")\n\nWhen @" + username + " messages @" + BOT_USERNAME + ", the bot will automatically send them their access code: " + codeTypedByAdmin + "."
-                    });
-                }
-
-                delete pendingPromptToOrder[repliedMessageId];
-                return;
-            }
-        }
-
-        // C. Handle Direct Customer Messages & Free Code Link
-        if (update.message && update.message.text && String(update.message.chat.id) !== String(ADMIN_CHAT_ID)) {
+        // Handle User Messages (e.g., Free Tips Trigger)
+        if (update.message && update.message.text) {
             const chatId = update.message.chat.id;
             const messageText = update.message.text.trim();
-            const userUsername = update.message.from && update.message.from.username ? update.message.from.username.toLowerCase() : '';
 
-            // 1. User clicked "Get Free Tips" button on website
             if (messageText.startsWith('/start get_free_ticket')) {
-                // Precise WAT Time Check (UTC+1)
-                const now = new Date();
-                const currentWatHours = (now.getUTCHours() + 1) % 24;
-                const currentWatMinutes = now.getUTCMinutes();
-                
-                // Cutoff at 4:45 PM WAT (16:45)
-                const isAfterKickoff = currentWatHours > 16 || (currentWatHours === 16 && currentWatMinutes >= 45);
-
-                if (isAfterKickoff) {
-                    await sendTelegram('sendMessage', {
-                        chat_id: chatId,
-                        text: "🔒 TODAY'S FREE TIPS ARE NOW LOCKED!\n\nThe matches for today's free picks have already kicked off (4:45 PM WAT).\n\n👑 VIP & Rollover tips are still active! Get yours now on the website: https://apex-daily-odds-server.onrender.com"
-                    });
-                    return;
-                }
-
                 const freeTipsMessage = 
-                    "☀️ GOOD DAY WINNER! TODAY'S FREE TIPS ☀️\n\n" +
-                    "📈 Strategy: Low-Risk Accumulator / Daily Picks\n\n" +
-                    "📋 MATCH PREDICTIONS:\n" +
-                    "1️⃣ Trelleborgs FF vs Hässleholms IF — Double Chance (12) @ 1.24\n" +
-                    "2️⃣ WBA vs QPR — Over 2.0 Goals @ 1.43\n" +
-                    "3️⃣ Sheffield Wed vs Wigan — Sheffield Wed (DNB) @ 1.27\n" +
-                    "4️⃣ Ekenäs IF vs FC Haka — Over 2.5 Goals @ 1.57\n" +
-                    "5️⃣ Eastleigh vs Boreham Wood — Over 2.0 Goals @ 1.23\n" +
-                    "6️⃣ York City vs Swindon Town — Over 2.0 Goals @ 1.20\n\n" +
-                    "🎯 Recommended Stake: 10% - 20% of Bankroll\n" +
-                    "⏱ Kick-off Cutoff: 4:45 PM WAT\n\n" +
+                    "🏆 APEX PREDICTIONS FREE TIPS (MIDWEEK) 🏆\n\n" +
+                    "📅 TUESDAY 15.09.2026\n" +
+                    "• Liverpool (vs Bournemouth) — Over 0.5 [2UP]\n" +
+                    "• Real Madrid (vs Inter Milan) — Over 1.5 [2UP]\n" +
+                    "• Barcelona (vs Feyenoord) — Over 1.5 [2UP]\n" +
+                    "• Manchester City (vs FC Porto) — Over 1.5 [2UP]\n" +
+                    "• Ludogorets (vs Septemvri) — Over 1.5 [2UP]\n" +
+                    "• Gaziantep (vs Fenerbahce) — Over 0.5 [Away/Draw]\n" +
+                    "• Super Nova (vs Riga FC) — Over 0.5 [Away (2UP)]\n" +
+                    "• Al Ahly SC (vs Abo Qair Semads) — Over 0.5 [Home (2UP)]\n" +
+                    "• Ajax (vs Willem II) — Over 1.5 [Home (2UP)]\n" +
+                    "• Villarreal (vs Dortmund) — Over 0.5 [Away/Draw]\n\n" +
+                    "📅 WEDNESDAY 16.09.2026\n" +
+                    "• AC Milan (vs Benfica) — Over 0.5 [Away/Draw]\n" +
+                    "• Bayer Leverkusen (vs NK Celje) — Over 1.5 [Home (2UP)]\n" +
+                    "• Olympiacos (vs Jagiellonia) — Over 0.5 [Home/Draw]\n" +
+                    "• Lyon (vs RSC Anderlecht) — Over 0.5 [Home (2UP)]\n" +
+                    "• AZ Alkmaar (vs Sunderland) — Over 0.5 [Home (2UP)]\n" +
+                    "• Benfica (vs AC Milan) — Over 0.5 [Away/Draw]\n" +
+                    "• Torino vs Roma — Home/Draw\n" +
+                    "• Braga vs Estoril — Home/Draw\n" +
+                    "• Como vs Parma — Home (2UP)\n" +
+                    "• FK Auda vs Ogre Utd — Home/Draw\n\n" +
+                    "📅 THURSDAY 17.09.2026\n" +
+                    "• Manchester United (vs Sabah FK) — Over 0.5 [Away/Draw]\n" +
+                    "• Juventus (vs NEC Nijmegen) — Over 1.5 [Home (2UP)]\n" +
+                    "• Celtic (vs Ferencváros) — Over 0.5 [Away/Draw]\n" +
+                    "• Crystal Palace (vs Lech Poznań) — Over 0.5 [Away/Draw]\n" +
+                    "• Aston Villa (vs Club Brugge) — Over 0.5 [Home (2UP)]\n" +
+                    "• Beşiktaş (vs Marseille) — Over 0.5 [Away/Draw]\n" +
+                    "• Real Sociedad (vs Bournemouth) — Over 0.5 [Away/Draw]\n" +
+                    "• Marseille (vs Beşiktaş) — Over 0.5 [Home (2UP)]\n" +
+                    "• AEK Athens vs Panserraikos — Home (2UP)\n\n" +
                     "──────────────────────────────\n" +
-                    "👑 TODAY'S VIP & ROLLOVER ACCUMULATORS ARE READY!\n" +
-                    "• VIP Target: High Odds 💣\n" +
-                    "• Rollover Target: Low-Risk Streak 🛡️\n\n" +
-                    "👉 Unlock your VIP access immediately on the website https://apex-daily-odds-server.onrender.com";
+                    "👑 VIP & ROLLOVER ACCUMULATORS ARE ACTIVE!\n" +
+                    "👉 Unlock VIP access: https://apex-daily-odds-server.onrender.com";
 
-                await sendTelegram('sendMessage', {
-                    chat_id: chatId,
-                    text: freeTipsMessage
-                });
-                return;
-            }
-
-            // 2. User has a pending paid booking code from admin approval
-            if (userUsername && pendingCodesByUsername[userUsername]) {
-                const { bookingCode, plan } = pendingCodesByUsername[userUsername];
-                const deliveryText = buildDeliveryMessage(plan, bookingCode);
-
-                await sendTelegram('sendMessage', {
-                    chat_id: chatId,
-                    text: deliveryText
-                });
-
-                await sendTelegram('sendMessage', {
-                    chat_id: String(ADMIN_CHAT_ID).trim(),
-                    text: "🚀 DELIVERED! Code " + bookingCode + " claimed by @" + userUsername + "."
-                });
-
-                delete pendingCodesByUsername[userUsername];
-            } else {
-                // 3. General message fallback
-                await sendTelegram('sendMessage', {
-                    chat_id: chatId,
-                    text: "⏳ Apex Daily Odds Verification\n\nYour request is being processed. As soon as your payment is approved by admin, your access link will be sent right here!"
+                await fetch(`${TELEGRAM_API}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: freeTipsMessage
+                    })
                 });
             }
         }
     } catch (err) {
-        console.error("Webhook processing error:", err);
+        console.error("Webhook Error:", err);
     }
-};
-
-app.post('/telegram-webhook', handleWebhook);
-app.post('/api/telegram-webhook', handleWebhook);
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
