@@ -68,6 +68,7 @@ app.post('/api/checkout', async (req, res) => {
 
 // Telegram Webhook Handler for Inline Buttons & Free Tips Trigger
 app.post('/telegram-webhook', async (req, res) => {
+    // Always acknowledge Telegram webhook immediately
     res.sendStatus(200);
 
     const update = req.body;
@@ -107,9 +108,10 @@ app.post('/telegram-webhook', async (req, res) => {
         // Handle User Messages (e.g., Free Tips Trigger)
         if (update.message && update.message.text) {
             const chatId = update.message.chat.id;
-            const messageText = update.message.text.trim();
+            const messageText = update.message.text.trim().toLowerCase();
 
-            if (messageText.startsWith('/start get_free_ticket')) {
+            // Match both direct command or deep link parameter
+            if (messageText.includes('get_free_ticket') || messageText === '/free' || messageText === '/tips') {
                 const freeTipsMessage = 
                     "🏆 APEX PREDICTIONS FREE TIPS (MIDWEEK) 🏆\n\n" +
                     "📅 TUESDAY 15.09.2026\n" +
@@ -156,10 +158,27 @@ app.post('/telegram-webhook', async (req, res) => {
                         text: freeTipsMessage
                     })
                 });
+            } else if (messageText === '/start') {
+                // Fallback for default /start
+                const welcomeMessage = 
+                    "👋 Welcome to Apex Daily Odds Bot!\n\n" +
+                    "To view today's Midweek Free Selections, tap below or send /free:\n" +
+                    "👉 Get Free Tips: /start get_free_ticket\n\n" +
+                    "👑 To join VIP, visit our official portal:\n" +
+                    "https://apex-daily-odds-server.onrender.com";
+
+                await fetch(`${TELEGRAM_API}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: welcomeMessage
+                    })
+                });
             }
         }
     } catch (err) {
-        console.error("Webhook Error:", err);
+        console.error("Webhook Internal Processing Error:", err);
     }
 });
 
