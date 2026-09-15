@@ -7,7 +7,7 @@ const app = express();
 
 // Security and Middleware Setup
 app.use(helmet({
-    contentSecurityPolicy: false
+    contentSecurityPolicy: false // Allows inline scripts for simple web setups
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,11 +24,11 @@ const BANK_DETAILS = {
     accountName: process.env.ACCOUNT_NAME || "Blessings Eboh"
 };
 
-// Global Memory Store for Tracking Admin Approvals
+// Global Memory Store for Pending Orders and Codes
 const pendingPromptToOrder = {};
 const pendingCodesByUsername = {};
 
-// Message Delivery Generator
+// Delivery Helper Message Generator
 function buildDeliveryMessage(planName, bookingCode) {
     const cleanPlan = String(planName || '').toLowerCase();
 
@@ -47,7 +47,7 @@ function buildDeliveryMessage(planName, bookingCode) {
     }
 }
 
-// Telegram API Helper Method
+// Telegram API Helper
 async function sendTelegram(endpoint, payload) {
     try {
         const response = await fetch("https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/" + endpoint, {
@@ -66,12 +66,15 @@ async function sendTelegram(endpoint, payload) {
     }
 }
 
-// Frontend Serve Route
+// Health Verification Routes for Webhooks
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/telegram-webhook', (req, res) => {
+    res.status(200).send('Telegram Webhook Route is Active!');
+});
 
-// 1. CHECKOUT ENDPOINT (Includes Account Details Notice to Admin)
+// 1. CHECKOUT ROUTE
 app.post('/api/checkout', async (req, res) => {
     try {
         const { name, telegram, reference, amount, customerChatId } = req.body;
@@ -90,7 +93,7 @@ app.post('/api/checkout', async (req, res) => {
             "📱 Telegram: @" + formattedUsername + "\n" +
             "💳 Plan: " + plan + "\n" +
             "🧾 Ref: " + (reference || 'N/A') + "\n\n" +
-            "🏦 Account Verified: " + BANK_DETAILS.bankName + " - " + BANK_DETAILS.accountNumber + " (" + BANK_DETAILS.accountName + ")\n\n" +
+            "🏦 Account: " + BANK_DETAILS.bankName + " - " + BANK_DETAILS.accountNumber + " (" + BANK_DETAILS.accountName + ")\n\n" +
             "👇 Verify transaction in your bank app, then select an action below:";
 
         const data = await sendTelegram('sendMessage', {
@@ -117,7 +120,7 @@ app.post('/api/checkout', async (req, res) => {
     }
 });
 
-// 2. TELEGRAM WEBHOOK HANDLER
+// 2. WEBHOOK HANDLER
 app.post('/telegram-webhook', async (req, res) => {
     res.sendStatus(200);
 
@@ -125,7 +128,7 @@ app.post('/telegram-webhook', async (req, res) => {
     if (!update) return;
 
     try {
-        // A. Handle Admin Inline Buttons (Approve/Reject Payment)
+        // A. Handle Inline Keyboard Callbacks from Admin
         if (update.callback_query) {
             const callback = update.callback_query;
             const actionData = callback.data || '';
@@ -162,7 +165,7 @@ app.post('/telegram-webhook', async (req, res) => {
             return;
         }
 
-        // B. Handle Admin Replying with Booking Code
+        // B. Handle Admin Reply with Booking Code
         if (update.message && update.message.text && update.message.reply_to_message && String(update.message.chat.id) === String(ADMIN_CHAT_ID)) {
             const repliedMessageId = update.message.reply_to_message.message_id;
             const order = pendingPromptToOrder[repliedMessageId];
@@ -174,7 +177,14 @@ app.post('/telegram-webhook', async (req, res) => {
 
                 pendingCodesByUsername[username] = { bookingCode: codeTypedByAdmin, plan: plan };
 
+                setTimeout(() => {
+                    if (pendingCodesByUsername[username]) {
+                        delete pendingCodesByUsername[username];
+                    }
+                }, 24 * 60 * 60 * 1000);
+
                 let directSent = false;
+
                 if (order.customerTarget) {
                     const deliveryText = buildDeliveryMessage(plan, codeTypedByAdmin);
                     const sendRes = await sendTelegram('sendMessage', {
@@ -204,13 +214,13 @@ app.post('/telegram-webhook', async (req, res) => {
             }
         }
 
-        // C. Handle Customer Bot Commands & Direct Messages
+        // C. Handle Direct Customer Messages & Free Tips Request
         if (update.message && update.message.text && String(update.message.chat.id) !== String(ADMIN_CHAT_ID)) {
             const chatId = update.message.chat.id;
             const messageText = update.message.text.trim().toLowerCase();
             const userUsername = update.message.from && update.message.from.username ? update.message.from.username.toLowerCase() : '';
 
-            // 1. FREE TIPS TRIGGER (Clicking link or typing /free)
+            // 1. Free Tips Trigger
             if (messageText.includes('get_free_ticket') || messageText === '/free' || messageText === '/tips') {
                 const freeTipsMessage = 
                     "🏆 APEX PREDICTIONS FREE TIPS (MIDWEEK) 🏆\n\n" +
@@ -247,7 +257,7 @@ app.post('/telegram-webhook', async (req, res) => {
                     "• Marseille (vs Beşiktaş) — Over 0.5 [Home (2UP)]\n" +
                     "• AEK Athens vs Panserraikos — Home (2UP)\n\n" +
                     "──────────────────────────────\n" +
-                    "👑 VIP & ROLLOVER ACCUMULATORS ARE READY!\n" +
+                    "👑 VIP & ROLLOVER ACCUMULATORS ARE ACTIVE!\n" +
                     "👉 Unlock VIP access: https://apex-daily-odds-server.onrender.com";
 
                 await sendTelegram('sendMessage', {
@@ -257,7 +267,7 @@ app.post('/telegram-webhook', async (req, res) => {
                 return;
             }
 
-            // 2. CHECK PENDING PAID CODE FOR USER
+            // 2. Pending Paid Booking Code Check
             if (userUsername && pendingCodesByUsername[userUsername]) {
                 const { bookingCode, plan } = pendingCodesByUsername[userUsername];
                 const deliveryText = buildDeliveryMessage(plan, bookingCode);
@@ -273,23 +283,19 @@ app.post('/telegram-webhook', async (req, res) => {
                 });
 
                 delete pendingCodesByUsername[userUsername];
-                return;
+            } else {
+                // 3. Fallback Welcome Message
+                await sendTelegram('sendMessage', {
+                    chat_id: chatId,
+                    text: "👋 Welcome to Apex Daily Odds Bot!\n\n" +
+                          "• For Midweek Free Tips, send: /free\n" +
+                          "• To unlock VIP / Rollover tickets, make a submission on our website:\n" +
+                          "https://apex-daily-odds-server.onrender.com"
+                });
             }
-
-            // 3. DEFAULT WELCOME FALLBACK
-            const defaultMessage = 
-                "👋 Welcome to Apex Daily Odds Bot!\n\n" +
-                "• Send /free to view today's Midweek Free Tips.\n" +
-                "• If you completed payment on our website, your booking code will be sent right here automatically once approved!\n\n" +
-                "👑 Visit VIP Portal: https://apex-daily-odds-server.onrender.com";
-
-            await sendTelegram('sendMessage', {
-                chat_id: chatId,
-                text: defaultMessage
-            });
         }
     } catch (err) {
-        console.error("Webhook processing error:", err);
+        console.error("Webhook Internal Processing Error:", err);
     }
 });
 
