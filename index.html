@@ -6,187 +6,296 @@
   <title>Apex Daily Odds — Rule Every Prediction</title>
   <style>
     :root {
-      --bg-color: #050505;
-      --card-bg: #0d0d0d;
-      --accent-gold: #f5b800;
-      --gold-glow: rgba(245, 184, 0, 0.2);
-      --text-white: #ffffff;
-      --text-muted: #888888;
-      --border-dark: #1a1a1a;
-      --pill-bg: #141414;
+      --bg-dark: #050507;
+      --card-bg: #0e1017;
+      --accent-gold: #f3ba2f;
+      --gold-glow: 0 0 25px rgba(243, 186, 47, 0.3);
+      --gold-glow-soft: 0 0 15px rgba(243, 186, 47, 0.15);
+      --blue-glow: 0 0 20px rgba(0, 136, 204, 0.25);
+      --text-main: #ffffff;
+      --text-sub: #a0a5b5;
+      --border-color: #1a1e2b;
+      --sporty-red: #e41e36;
       --lock-blue: #0088cc;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-white); padding-bottom: 80px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); padding-bottom: 90px; -webkit-font-smoothing: antialiased; }
 
-    /* Top Nav Bar */
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-dark); }
-    .brand-title { font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
-    .brand-title span { color: var(--accent-gold); }
-    .brand-motto { font-size: 0.55rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
-    .menu-icon { font-size: 1.2rem; cursor: pointer; color: var(--text-white); }
+    /* Top Branding Bar */
+    header { text-align: center; padding: 22px 20px 15px 20px; border-bottom: 1px solid var(--border-color); background: radial-gradient(circle at top, #241d0b 0%, var(--bg-dark) 80%); }
+    .logo { font-size: 1.3rem; font-weight: 900; letter-spacing: 2px; color: #fff; text-transform: uppercase; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    .logo span { color: var(--accent-gold); text-shadow: 0 0 12px rgba(243, 186, 47, 0.5); }
+    .motto { font-size: 0.6rem; color: var(--accent-gold); letter-spacing: 3px; font-weight: 800; text-transform: uppercase; margin-top: 4px; opacity: 0.9; }
 
-    /* Central Gold Crest */
-    .crest-wrapper { text-align: center; margin: 30px 0 15px 0; }
-    .crest-circle { width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent-gold); display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; background: radial-gradient(circle, rgba(245,184,0,0.15) 0%, rgba(13,13,13,1) 80%); box-shadow: 0 0 30px var(--gold-glow); }
+    /* Central Glowing Crest */
+    .crest-wrapper { text-align: center; margin: 25px 0 15px 0; }
+    .crest-circle { width: 85px; height: 85px; border-radius: 50%; border: 2px solid var(--accent-gold); display: inline-flex; align-items: center; justify-content: center; font-size: 2.3rem; background: radial-gradient(circle, rgba(243,186,47,0.2) 0%, rgba(14,16,23,1) 85%); box-shadow: var(--gold-glow); }
 
-    /* Hero Headline */
-    .hero { text-align: center; padding: 0 20px; }
-    .hero-tag { font-size: 0.65rem; color: var(--accent-gold); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
-    .hero-title { font-size: 2.1rem; font-weight: 900; line-height: 1.1; margin-bottom: 12px; }
-    .hero-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; max-width: 320px; margin: 0 auto; }
+    /* Hero Text */
+    .hero { text-align: center; padding: 0 20px 20px 20px; }
+    .hero-badge { display: inline-block; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.65rem; padding: 4px 14px; border-radius: 20px; margin-bottom: 10px; font-weight: 800; letter-spacing: 1.5px; box-shadow: var(--gold-glow-soft); }
+    .hero h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .hero p { color: var(--text-sub); font-size: 0.8rem; max-width: 340px; margin: 0 auto; line-height: 1.4; }
 
-    /* Win Stats Grid */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin: 25px 0; }
-    .stat-card { background: var(--card-bg); border: 1px solid var(--border-dark); border-radius: 10px; padding: 15px 5px; text-align: center; }
-    .stat-num { font-size: 1.3rem; font-weight: 900; color: var(--accent-gold); }
-    .stat-label { font-size: 0.6rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; margin-top: 4px; }
+    /* Stat Cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; margin: 0 auto 25px auto; padding: 0 20px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 5px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .stat-num { font-size: 1.2rem; font-weight: 900; color: var(--accent-gold); text-shadow: 0 0 8px rgba(243, 186, 47, 0.4); }
+    .stat-label { font-size: 0.58rem; color: var(--text-sub); font-weight: 800; letter-spacing: 1px; margin-top: 2px; }
 
-    /* Category & Odds Filters */
-    .filter-group { padding: 0 20px; margin-bottom: 20px; }
-    .filter-heading { font-size: 0.65rem; color: var(--text-muted); font-weight: 800; letter-spacing: 1.5px; margin-bottom: 10px; text-transform: uppercase; }
-    .pills-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-    .pill { background: var(--pill-bg); border: 1px solid var(--border-dark); color: var(--text-white); padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
-    .pill.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); font-weight: 900; }
+    /* Filter Pills */
+    .filter-section { max-width: 420px; margin: 0 auto 20px auto; padding: 0 20px; }
+    .filter-heading { font-size: 0.65rem; color: var(--text-sub); font-weight: 800; letter-spacing: 1.5px; margin-bottom: 10px; text-transform: uppercase; }
+    .pills-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .pill { background: #131722; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .pill.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); font-weight: 900; box-shadow: var(--gold-glow); }
 
-    /* Main Lock Card */
-    .feed-container { padding: 0 20px; }
-    .lock-card { background: var(--card-bg); border: 1px solid var(--border-dark); border-radius: 16px; padding: 25px 20px; text-align: center; position: relative; margin-bottom: 30px; }
-    .badge-odds { position: absolute; top: 15px; left: 15px; background: rgba(0, 136, 204, 0.15); color: #0088cc; border: 1px solid rgba(0, 136, 204, 0.3); font-size: 0.65rem; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
+    /* Cards Container */
+    .tickets-container { max-width: 420px; margin: 0 auto; padding: 0 20px; }
 
-    .glow-lock-box { background: radial-gradient(circle, rgba(0,136,204,0.15) 0%, rgba(5,5,5,0) 70%); border: 1px solid rgba(0, 136, 204, 0.2); border-radius: 12px; padding: 30px 20px; margin: 25px 0 20px 0; }
-    .glow-lock-icon { font-size: 2rem; margin-bottom: 8px; }
-    .glow-lock-text { font-size: 0.65rem; color: var(--lock-blue); letter-spacing: 2px; font-weight: 800; }
+    /* Free Ticket Card */
+    .free-card { background: linear-gradient(135deg, #101c2b, #0e1017); border: 1px solid #1a2d47; border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 20px; box-shadow: var(--blue-glow); }
+    .btn-free { width: 100%; background: #0088cc; color: #fff; font-weight: 900; border: none; padding: 14px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4); }
 
-    .card-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
-    .card-date { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 15px; }
+    /* Main Ticket Lock Cards */
+    .ticket-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 22px; text-align: center; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.6); }
+    .card-badges { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .odds-badge { background: rgba(0, 136, 204, 0.15); color: #0088cc; border: 1px solid rgba(0, 136, 204, 0.3); font-size: 0.68rem; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
+    .bookie-badge { background: var(--sporty-red); color: #fff; font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(228, 30, 54, 0.4); }
+
+    .glow-lock-box { background: radial-gradient(circle, rgba(0,136,204,0.18) 0%, rgba(8,10,15,1) 80%); border: 1px solid rgba(0, 136, 204, 0.25); border-radius: 12px; padding: 22px; margin-bottom: 15px; box-shadow: var(--blue-glow); }
+    .glow-lock-icon { font-size: 2rem; margin-bottom: 6px; }
+    .glow-lock-text { font-size: 0.65rem; color: var(--lock-blue); letter-spacing: 1.5px; font-weight: 800; text-transform: uppercase; }
+
+    .ticket-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 4px; letter-spacing: -0.5px; }
+    .ticket-sub { color: var(--text-sub); font-size: 0.8rem; margin-bottom: 10px; font-weight: 600; }
+    .ticket-price { font-size: 1.4rem; font-weight: 900; color: var(--accent-gold); margin-bottom: 15px; text-shadow: 0 0 10px rgba(243, 186, 47, 0.3); }
+
+    .btn-unlock { width: 100%; background: var(--accent-gold); color: #000; font-weight: 900; border: none; padding: 15px; border-radius: 10px; font-size: 0.95rem; cursor: pointer; letter-spacing: 0.5px; box-shadow: var(--gold-glow); }
+    .btn-unlock:active { transform: scale(0.98); }
+
+    /* Why Trust Us */
+    .trust-section { max-width: 420px; margin: 35px auto 20px auto; padding: 0 20px; }
+    .trust-title { text-align: center; font-size: 1.2rem; font-weight: 900; margin-bottom: 15px; }
+    .trust-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+    .trust-icon { font-size: 1.3rem; color: var(--accent-gold); }
+    .trust-text h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 2px; }
+    .trust-text p { font-size: 0.75rem; color: var(--text-sub); line-height: 1.3; }
+
+    /* Floating Support Button */
+    .float-support { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0c0f17; border: 1px solid var(--accent-gold); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 0.8rem; font-weight: 800; text-decoration: none; box-shadow: 0 8px 25px rgba(0,0,0,0.8), var(--gold-glow-soft); z-index: 99; display: flex; align-items: center; gap: 8px; }
+
+    /* Payment Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(6px); }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--accent-gold); border-radius: 16px; width: 100%; max-width: 380px; padding: 25px; box-shadow: var(--gold-glow); }
+    .modal-title { color: var(--accent-gold); font-size: 1.3rem; font-weight: 900; text-align: center; margin-bottom: 15px; text-shadow: 0 0 10px rgba(243, 186, 47, 0.4); }
     
-    .btn-unlock { width: 100%; background: var(--accent-gold); color: #000; font-weight: 900; border: none; padding: 16px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: block; margin-bottom: 12px; box-shadow: 0 4px 15px var(--gold-glow); }
-    .btn-past { width: 100%; background: transparent; border: 1px solid var(--border-dark); color: var(--text-white); font-weight: 700; padding: 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: block; }
+    .bank-card { background: #07090e; border: 1px solid var(--border-color); padding: 14px; border-radius: 10px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.6; }
+    .bank-card strong { color: var(--accent-gold); }
 
-    /* Why Trust ONELORD Style */
-    .why-trust { padding: 20px; text-align: center; }
-    .why-tag { font-size: 0.65rem; color: var(--accent-gold); font-weight: 800; letter-spacing: 1.5px; margin-bottom: 6px; }
-    .why-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 8px; }
-    .why-sub { font-size: 0.8rem; color: var(--text-muted); max-width: 300px; margin: 0 auto 20px auto; line-height: 1.4; }
+    .form-group { margin-bottom: 12px; text-align: left; }
+    .form-group label { display: block; font-size: 0.7rem; color: var(--text-sub); font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+    .form-group input { width: 100%; background: #07090e; border: 1px solid var(--border-color); color: #fff; padding: 12px; border-radius: 8px; font-size: 0.85rem; outline: none; }
+    .form-group input:focus { border-color: var(--accent-gold); box-shadow: var(--gold-glow-soft); }
 
-    .feature-card { background: var(--card-bg); border: 1px solid var(--border-dark); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 12px; }
-    .feature-icon { font-size: 1.2rem; color: var(--accent-gold); margin-bottom: 8px; }
-    .feature-card h4 { font-size: 0.9rem; font-weight: 800; margin-bottom: 4px; }
-    .feature-card p { font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; }
-
-    /* Footer CTA */
-    .footer-cta { text-align: center; padding: 30px 20px 20px 20px; border-top: 1px solid var(--border-dark); margin-top: 20px; }
-    .btn-create { width: 100%; background: var(--accent-gold); color: #000; font-weight: 900; padding: 15px; border-radius: 8px; text-decoration: none; display: block; margin-bottom: 10px; font-size: 0.85rem; letter-spacing: 0.5px; }
-    .btn-record { width: 100%; background: transparent; border: 1px solid var(--border-dark); color: var(--text-white); font-weight: 800; padding: 15px; border-radius: 8px; text-decoration: none; display: block; font-size: 0.85rem; }
+    .btn-submit { width: 100%; background: var(--accent-gold); color: #000; font-weight: 900; border: none; padding: 14px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; margin-top: 10px; box-shadow: var(--gold-glow); }
+    .btn-cancel { width: 100%; background: transparent; color: var(--text-sub); border: none; padding: 10px; font-size: 0.8rem; cursor: pointer; margin-top: 5px; font-weight: 700; }
   </style>
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
-    <div>
-      <div class="brand-title">APEX <span>DAILY ODDS</span></div>
-      <div class="brand-motto">RULE EVERY PREDICTION</div>
-    </div>
-    <div class="menu-icon">☰</div>
-  </nav>
+  <!-- Header -->
+  <header>
+    <div class="logo">APEX <span>DAILY ODDS</span></div>
+    <div class="motto">RULE EVERY PREDICTION</div>
+  </header>
 
-  <!-- Central Crest -->
+  <!-- Crest -->
   <div class="crest-wrapper">
     <div class="crest-circle">👑</div>
   </div>
 
-  <!-- Hero Title -->
+  <!-- Hero -->
   <section class="hero">
-    <div class="hero-tag">PREMIUM FOOTBALL PREDICTIONS</div>
-    <h1 class="hero-title">This Week's Featured Tips</h1>
-    <p class="hero-sub">Unlock premium predictions with guaranteed odds. Expert analysis, verified results, instant access.</p>
+    <div class="hero-badge">PREMIUM FOOTBALL PREDICTIONS</div>
+    <h1>This Week's Featured Tips</h1>
+    <p>Unlock premium predictions with guaranteed odds. Expert analysis, verified results, instant access.</p>
   </section>
 
-  <!-- Stat Cards -->
+  <!-- Metrics Grid -->
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-num">100%</div><div class="stat-label">WIN RATE</div></div>
-    <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">PREDICTIONS</div></div>
+    <div class="stat-card"><div class="stat-num">2</div><div class="stat-label">PREDICTIONS</div></div>
     <div class="stat-card"><div class="stat-num">100%</div><div class="stat-label">VERIFIED</div></div>
   </div>
 
-  <!-- Categories & Odds Filter -->
-  <div class="filter-group">
+  <!-- Pill Filters -->
+  <div class="filter-section">
     <div class="filter-heading">VIP CATEGORY</div>
-    <div class="pills-row">
+    <div class="pills-group">
       <button class="pill active">ALL TIPS</button>
-      <button class="pill">VIP</button>
-      <button class="pill">DRAW VIP</button>
-      <button class="pill">CORRECT SCORE VIP</button>
-    </div>
-
-    <div class="filter-heading">FILTER BY ODDS</div>
-    <div class="pills-row">
-      <button class="pill active">ALL</button>
-      <button class="pill">2+ ODDS</button>
+      <button class="pill">100+ ODDS</button>
       <button class="pill">5+ ODDS</button>
-      <button class="pill">10+ ODDS</button>
-      <button class="pill">20+ ODDS</button>
     </div>
   </div>
 
-  <!-- Feed Cards -->
-  <div class="feed-container">
-    
-    <!-- Locked Card -->
-    <div class="lock-card">
-      <div class="badge-odds">20+ ODDS</div>
-      
+  <!-- Cards -->
+  <div class="tickets-container">
+
+    <!-- Free Ticket Card -->
+    <div class="free-card">
+      <h3 style="margin-bottom: 4px; font-size: 1.1rem; font-weight: 900;">⚽ Daily Free Ticket</h3>
+      <p style="font-size: 0.75rem; color: var(--text-sub);">Locks daily at 3:00 PM WAT. Get today's free selections on Telegram!</p>
+      <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-free">Get Free Ticket on Telegram</a>
+    </div>
+
+    <!-- 100+ Odds -->
+    <div class="ticket-card">
+      <div class="card-badges">
+        <span class="odds-badge">100+ ODDS</span>
+        <span class="bookie-badge">SPORTYBET CODE</span>
+      </div>
       <div class="glow-lock-box">
         <div class="glow-lock-icon">🔒</div>
         <div class="glow-lock-text">LOCKED — UNLOCK BELOW</div>
       </div>
+      <div class="ticket-title">100+ ODDS</div>
+      <div class="ticket-sub">VIP ACCUMULATOR</div>
+      <div class="ticket-price">₦ 5,000</div>
+      <button type="button" class="btn-unlock" onclick="openCheckout('100+ ODDS (VIP Slip)', '5000')">Unlock Prediction — ₦ 5,000</button>
+    </div>
 
-      <div class="card-title">CORRECT SCORE</div>
-      <div class="card-date">TODAY • Odds: 20+ odds</div>
-      
-      <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="btn-unlock">Unlock Prediction ➔</a>
-      <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="btn-past">View Past Results ➔</a>
+    <!-- 5+ Odds -->
+    <div class="ticket-card">
+      <div class="card-badges">
+        <span class="odds-badge">5+ ODDS</span>
+        <span class="bookie-badge">SPORTYBET CODE</span>
+      </div>
+      <div class="glow-lock-box">
+        <div class="glow-lock-icon">🔒</div>
+        <div class="glow-lock-text">LOCKED — UNLOCK BELOW</div>
+      </div>
+      <div class="ticket-title">5+ ODDS</div>
+      <div class="ticket-sub">ROLLOVER TICKET</div>
+      <div class="ticket-price">₦ 3,000</div>
+      <button type="button" class="btn-unlock" onclick="openCheckout('5+ ODDS (Rollover)', '3000')">Unlock Prediction — ₦ 3,000</button>
     </div>
 
   </div>
 
   <!-- Why Trust Us -->
-  <div class="why-trust">
-    <div class="why-tag">WHY US</div>
-    <div class="why-title">Why Trust APEX DAILY ODDS?</div>
-    <div class="why-sub">Expert-verified predictions. Real staked tickets. Instant delivery.</div>
-
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h4>Expert Analysis</h4>
-      <p>Statistic-driven predictions backed by deep match research and form data.</p>
+  <div class="trust-section">
+    <div class="trust-title">Why Trust APEX DAILY ODDS?</div>
+    <div class="trust-card">
+      <div class="trust-icon">📊</div>
+      <div class="trust-text">
+        <h4>Expert Analysis</h4>
+        <p>Statistic-driven predictions backed by deep match research and form data.</p>
+      </div>
     </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">✅</div>
-      <h4>Verified Tickets</h4>
-      <p>Every paid tip comes with the staked ticket and booking code.</p>
+    <div class="trust-card">
+      <div class="trust-icon">✅</div>
+      <div class="trust-text">
+        <h4>Verified Tickets</h4>
+        <p>Every paid tip comes with the staked ticket and SportyBet booking code.</p>
+      </div>
     </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h4>Instant Access</h4>
-      <p>Unlock your prediction immediately after payment — no delays.</p>
+    <div class="trust-card">
+      <div class="trust-icon">⚡</div>
+      <div class="trust-text">
+        <h4>Instant Access</h4>
+        <p>Unlock your prediction immediately via Telegram after payment verification.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Bottom CTA Footer -->
-  <div class="footer-cta">
-    <div class="why-tag" style="margin-bottom: 4px;">GET STARTED</div>
-    <div class="why-title" style="margin-bottom: 6px;">Ready to Bet With Confidence?</div>
-    <div class="why-sub" style="margin-bottom: 20px;">Join thousands of bettors winning consistently with expert APEX tips.</div>
+  <!-- Floating Direct Admin Button -->
+  <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="float-support">
+    💬 Questions? Chat Admin directly
+  </a>
 
-    <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="btn-create">JOIN TELEGRAM CHANNEL</a>
-    <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="btn-record">VIEW TRACK RECORD</a>
+  <!-- Payment Modal -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-content">
+      <div class="modal-title">Complete Payment</div>
+      
+      <div class="bank-card">
+        <strong>Bank Name:</strong> PalmPay<br>
+        <strong>Account No:</strong> 9066989021<br>
+        <strong>Account Name:</strong> Blessings Eboh
+      </div>
+
+      <form id="paymentForm">
+        <input type="hidden" id="selectedAmount" value="">
+        <input type="hidden" id="selectedPlan" value="">
+
+        <div class="form-group">
+          <label>Your Full Name</label>
+          <input type="text" id="userName" placeholder="e.g. John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label>Telegram Username or Phone Number</label>
+          <input type="text" id="userTelegram" placeholder="@yourusername or 08012345678" required>
+        </div>
+
+        <div class="form-group">
+          <label>Payment Reference / Session ID</label>
+          <input type="text" id="userRef" placeholder="Paste transfer reference here" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Claim to Admin</button>
+        <button type="button" class="btn-cancel" onclick="closeCheckout()">Cancel</button>
+      </form>
+    </div>
   </div>
 
+  <script>
+    function openCheckout(plan, price) {
+      document.getElementById('selectedPlan').value = plan;
+      document.getElementById('selectedAmount').value = price;
+      document.getElementById('checkoutModal').style.display = 'flex';
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkoutModal').style.display = 'none';
+    }
+
+    document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('userName').value;
+      const telegram = document.getElementById('userTelegram').value;
+      const reference = document.getElementById('userRef').value;
+      const amount = document.getElementById('selectedAmount').value;
+      const plan = document.getElementById('selectedPlan').value;
+
+      try {
+        const response = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            telegram: telegram,
+            reference: reference,
+            amount: `${amount} (${plan})`
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Claim submitted successfully! Check your Telegram shortly for your code.');
+          closeCheckout();
+          document.getElementById('paymentForm').reset();
+        } else {
+          alert('Failed to submit claim. Please try again.');
+        }
+      } catch (err) {
+        alert('An error occurred. Please check your connection.');
+      }
+    });
+  </script>
 </body>
 </html>
