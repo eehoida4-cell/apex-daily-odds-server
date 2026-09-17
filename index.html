@@ -1,1203 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEX DAILY ODDS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #080a0f;
-            --card-bg: #11151e;
-            --accent-gold: #ffb703;
-            --accent-gold-hover: #ffa000;
-            --accent-green: #00e676;
-            --accent-green-hover: #00c853;
-            --text-main: #ffffff;
-            --text-muted: #8e9bb0;
-            --border-color: #1e2638;
-            --glow-gold: rgba(255, 183, 3, 0.35);
-            --glow-green: rgba(0, 230, 118, 0.35);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 20px 50px 20px;
-            background-image: 
-                radial-gradient(circle at 50% 0%, rgba(255, 183, 3, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 50% 100%, rgba(17, 21, 30, 0.8) 0%, transparent 100%);
-        }
-
-        /* STICKY COUNTDOWN BANNER */
-        .urgency-banner {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            width: 100vw;
-            background: #0f1420;
-            border-bottom: 2px solid var(--accent-gold);
-            color: var(--text-main);
-            text-align: center;
-            padding: 12px 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #ff5252;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px #ff5252;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.3); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.7; }
-        }
-
-        .countdown-digits {
-            color: var(--accent-gold);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.1rem;
-            background: rgba(255, 183, 3, 0.15);
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 183, 3, 0.4);
-            letter-spacing: 1px;
-        }
-
-        header {
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px 0;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.6rem;
-            letter-spacing: 2px;
-            color: #ffffff;
-            text-transform: uppercase;
-        }
-
-        .hero-container {
-            text-align: center;
-            max-width: 900px;
-            margin-bottom: 40px;
-        }
-
-        .tag-pill {
-            display: inline-block;
-            background: rgba(255, 183, 3, 0.1);
-            border: 1px solid rgba(255, 183, 3, 0.4);
-            color: var(--accent-gold);
-            font-size: 0.75rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            padding: 6px 16px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .hero-title {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 2.8rem;
-            line-height: 1.2;
-            letter-spacing: 1px;
-            color: #ffffff;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .hero-subtitle {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: var(--accent-gold);
-            letter-spacing: 1.5px;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-        }
-
-        .hero-description {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            max-width: 650px;
-            margin: 0 auto 20px auto;
-        }
-
-        .stats-dashboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-card .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-        }
-
-        .stat-card .value.green {
-            color: var(--accent-green);
-        }
-
-        .middle-section-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 50px;
-        }
-
-        @media (max-width: 900px) {
-            .stats-dashboard, .middle-section-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .odds-preview-card {
-            background: var(--card-bg);
-            border: 1px solid var(--accent-gold);
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 0 20px var(--glow-gold);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .preview-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: var(--accent-gold);
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-        }
-
-        .odds-stat-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-color);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .odds-stat-box .lbl {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }
-
-        .odds-stat-box .val {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            color: var(--accent-green);
-        }
-
-        .winners-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 24px;
-        }
-
-        .winners-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: var(--text-main);
-            margin-bottom: 16px;
-            letter-spacing: 1px;
-        }
-
-        .winners-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .winner-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-color);
-            padding: 12px 16px;
-            border-radius: 8px;
-            border-left: 3px solid var(--accent-gold);
-        }
-
-        .winner-info .user {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-
-        .winner-info .plan {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .winner-amount {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            color: var(--accent-green);
-            font-size: 0.95rem;
-        }
-
-        .section-heading {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.4rem;
-            letter-spacing: 1.5px;
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 60px;
-        }
-
-        @media (max-width: 1024px) {
-            .pricing-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .hero-title {
-                font-size: 2.1rem;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .pricing-grid {
-                grid-template-columns: 1fr;
-            }
-            .hero-title {
-                font-size: 1.6rem;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 28px 20px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-        }
-
-        .card.free-tier {
-            border-color: var(--accent-green);
-            box-shadow: 0 0 20px var(--glow-green);
-        }
-
-        .badge-free {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-green);
-            color: #000;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 4px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            white-space: nowrap;
-        }
-
-        .card.popular {
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 25px var(--glow-gold);
-        }
-
-        .badge-popular {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-gold);
-            color: #000;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 4px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            white-space: nowrap;
-        }
-
-        .tier-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-            min-height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tier-price {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .tier-price.green-price {
-            color: var(--accent-green);
-        }
-
-        .tier-price span {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-        }
-
-        .features-list {
-            list-style: none;
-            margin-bottom: 30px;
-            flex-grow: 1;
-        }
-
-        .features-list li {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .features-list li::before {
-            content: "✓";
-            color: var(--accent-gold);
-            font-weight: bold;
-        }
-
-        .free-tier .features-list li::before {
-            color: var(--accent-green);
-        }
-
-        .btn-unlock {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent-gold);
-            color: #000;
-            font-weight: 700;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, box-shadow 0.2s;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-        }
-
-        .btn-unlock:hover {
-            background: var(--accent-gold-hover);
-            box-shadow: 0 0 15px var(--glow-gold);
-        }
-
-        .btn-unlock.btn-free {
-            background: var(--accent-green);
-        }
-
-        .btn-unlock.btn-free:hover {
-            background: var(--accent-green-hover);
-            box-shadow: 0 0 15px var(--glow-green);
-        }
-
-        .btn-locked {
-            background: #222a38 !important;
-            color: #5d6b82 !important;
-            cursor: not-allowed !important;
-            box-shadow: none !important;
-            pointer-events: none !important;
-        }
-
-        .faq-container {
-            width: 100%;
-            max-width: 900px;
-            margin-bottom: 60px;
-        }
-
-        .faq-item {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            margin-bottom: 12px;
-            overflow: hidden;
-        }
-
-        .faq-question {
-            width: 100%;
-            padding: 18px 20px;
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            font-weight: 700;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .faq-question::after {
-            content: '+';
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-gold);
-            font-size: 1.2rem;
-        }
-
-        .faq-item.active .faq-question::after {
-            content: '−';
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            padding: 0 20px;
-            color: var(--text-muted);
-            font-size: 0.88rem;
-            line-height: 1.5;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 200px;
-            padding: 0 20px 18px 20px;
-        }
-
-        .live-toast {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--accent-green);
-            border-radius: 10px;
-            padding: 12px 18px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 0 20px var(--glow-green);
-            z-index: 999;
-            transform: translateY(120%);
-            opacity: 0;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .live-toast.show {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .toast-icon {
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
-            flex-shrink: 0;
-        }
-
-        .toast-text {
-            font-size: 0.82rem;
-            color: var(--text-main);
-        }
-
-        .toast-text span {
-            font-weight: 700;
-            color: var(--accent-gold);
-        }
-
-        .toast-time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            display: block;
-            margin-top: 2px;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-card {
-            background: var(--card-bg);
-            border: 1px solid var(--accent-gold);
-            border-radius: 14px;
-            width: 90%;
-            max-width: 440px;
-            padding: 28px;
-            position: relative;
-            box-shadow: 0 0 30px var(--glow-gold);
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 22px;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
-            color: var(--text-main);
-        }
-
-        .modal-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            color: var(--accent-gold);
-            margin-bottom: 6px;
-        }
-
-        .tier-badge-modal {
-            background: rgba(255, 183, 3, 0.1);
-            color: var(--accent-gold);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            display: inline-block;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 183, 3, 0.3);
-        }
-
-        .bank-details-box {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 16px;
-        }
-
-        .bank-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .bank-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .bank-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .bank-val-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .bank-value {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-            font-family: monospace;
-        }
-
-        .copy-btn {
-            background: rgba(255, 183, 3, 0.15);
-            border: 1px solid var(--accent-gold);
-            color: var(--accent-gold);
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: var(--accent-gold);
-            color: #000;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .form-group input:focus {
-            border-color: var(--accent-gold);
-        }
-
-        .status-msg {
-            display: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-top: 16px;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .status-success {
-            background: rgba(255, 183, 3, 0.15);
-            color: var(--accent-gold);
-            border: 1px solid var(--accent-gold);
-        }
-
-        footer {
-            width: 100%;
-            max-width: 1200px;
-            text-align: center;
-            border-top: 1px solid var(--border-color);
-            padding-top: 40px;
-            margin-top: auto;
-        }
-
-        .footer-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.3rem;
-            color: #ffffff;
-            margin-bottom: 6px;
-            letter-spacing: 1px;
-        }
-
-        .footer-slogan {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            font-size: 0.9rem;
-            color: var(--accent-gold);
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-
-        .footer-handle {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        .footer-handle a {
-            color: var(--accent-gold);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .footer-disclaimer {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Daily Odds — Premium Football Predictions</title>
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: #12141c;
+      --accent-gold: #f3ba2f;
+      --text-main: #ffffff;
+      --text-sub: #a0a5b5;
+      --border-color: #222634;
+      --sporty-red: #e41e36;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; }
+
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid var(--border-color); }
+    .logo { font-weight: 800; font-size: 1.2rem; color: var(--text-main); letter-spacing: 1px; }
+    .logo span { color: var(--accent-gold); }
+
+    /* Hero Section */
+    .hero { text-align: center; padding: 25px 20px 15px 20px; }
+    .badge { display: inline-block; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; letter-spacing: 1px; font-weight: 600; }
+    .hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
+    .hero p { color: var(--text-sub); font-size: 0.85rem; max-width: 400px; margin: 0 auto 20px auto; line-height: 1.4; }
+
+    /* Proof / Recent Wins Strip */
+    .proof-strip { max-width: 420px; margin: 0 auto 20px auto; padding: 0 20px; }
+    .proof-card { background: #101a14; border: 1px solid #1e3a29; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.8rem; }
+    .proof-tag { background: #22c55e; color: #000; font-weight: 800; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; }
+
+    /* How It Works Section */
+    .how-it-works { max-width: 420px; margin: 0 auto 25px auto; padding: 15px 20px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); text-align: center; }
+    .how-title { font-size: 0.8rem; color: var(--accent-gold); font-weight: 800; letter-spacing: 1px; margin-bottom: 12px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .step-item { font-size: 0.7rem; color: var(--text-sub); line-height: 1.3; }
+    .step-num { color: var(--text-main); font-weight: 800; display: block; margin-bottom: 3px; font-size: 0.85rem; }
+
+    /* Ticket Cards */
+    .tickets-container { max-width: 420px; margin: 0 auto; padding: 0 20px; }
+    .ticket-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center; position: relative; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .odds-badge { background: #1c2234; color: #4da6ff; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: 700; }
+    .bookie-badge { background: var(--sporty-red); color: #fff; font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: 800; }
+    
+    .lock-box { background: #0e1017; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+    .lock-icon { font-size: 1.5rem; margin-bottom: 5px; }
+    .lock-text { font-size: 0.7rem; color: var(--text-sub); letter-spacing: 1px; font-weight: 700; }
+    .ticket-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
+    .ticket-date { color: var(--text-sub); font-size: 0.8rem; margin-bottom: 10px; }
+    .ticket-price { font-size: 1.3rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 15px; }
+    .btn-unlock { width: 100%; background: var(--accent-gold); color: #000; font-weight: 800; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
+
+    /* Free Tips CTA */
+    .free-tips-card { background: linear-gradient(135deg, #1c2234, #12141c); border: 1px solid #2a334d; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 20px; }
+    .btn-free { width: 100%; background: #0088cc; color: #fff; font-weight: 800; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 10px; }
+
+    /* Floating Support Button */
+    .float-support { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); background: #1c2234; border: 1px solid var(--accent-gold); color: #fff; padding: 10px 20px; border-radius: 25px; font-size: 0.8rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 99; display: flex; align-items: center; gap: 8px; }
+
+    /* Modal Styling */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--accent-gold); border-radius: 12px; width: 100%; max-width: 400px; padding: 25px; }
+    .modal h2 { color: var(--accent-gold); font-size: 1.2rem; margin-bottom: 15px; text-align: center; }
+    .bank-box { background: #0a0b0e; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.6; }
+    .bank-box strong { color: var(--accent-gold); }
+    .form-group { margin-bottom: 12px; text-align: left; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 5px; }
+    .form-group input { width: 100%; background: #0a0b0e; border: 1px solid var(--border-color); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
+    .btn-submit { width: 100%; background: var(--accent-gold); color: #000; font-weight: 800; border: none; padding: 12px; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+    .btn-close { width: 100%; background: transparent; color: var(--text-sub); border: none; padding: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 5px; }
+  </style>
 </head>
 <body>
 
-    <!-- Sticky Live VIP Countdown Banner -->
-    <div class="urgency-banner" id="bannerWrapper">
-        <span class="pulse-dot" id="bannerPulse"></span>
-        <span id="bannerText">TODAY'S VIP & FREE TICKET CLOSES IN:</span>
-        <span class="countdown-digits" id="countdownTimer">--:--:--</span>
+  <header>
+    <div class="logo">APEX <span>DAILY ODDS</span></div>
+  </header>
+
+  <section class="hero">
+    <div class="badge">PREMIUM FOOTBALL PREDICTIONS</div>
+    <h1>This Week's Featured Tips</h1>
+    <p>Verified SportyBet booking codes delivered directly to your Telegram.</p>
+  </section>
+
+  <!-- Recent Wins Proof Strip -->
+  <div class="proof-strip">
+    <div class="proof-card">
+      <span>Yesterday (5+ Rollover Slip)</span>
+      <div><span class="proof-tag">5.40 ODDS WON ✅</span></div>
+    </div>
+    <div class="proof-card">
+      <span>Previous (100+ VIP Slip)</span>
+      <div><span class="proof-tag">112.0 ODDS WON ✅</span></div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="how-it-works">
+    <div class="how-title">HOW TO GET YOUR CODE</div>
+    <div class="steps-grid">
+      <div class="step-item"><span class="step-num">1. SELECT</span>Choose 100+ or 5+ Odds</div>
+      <div class="step-item"><span class="step-num">2. PAY</span>Transfer to PalmPay</div>
+      <div class="step-item"><span class="step-num">3. RECEIVE</span>Get code on Telegram</div>
+    </div>
+  </div>
+
+  <div class="tickets-container">
+
+    <!-- Free Ticket Card (Bot Redirect) -->
+    <div class="free-tips-card">
+      <h3 style="margin-bottom: 4px; font-size: 1.1rem;">⚽ Daily Free Ticket</h3>
+      <p style="font-size: 0.75rem; color: var(--text-sub);">Locks daily at 3:00 PM WAT. Get today's free selections on Telegram!</p>
+      <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-free">Get Free Ticket on Telegram</a>
     </div>
 
-    <header>
-        <div class="brand-logo">
-            APEX DAILY ODDS
-        </div>
-    </header>
-
-    <div class="hero-container">
-        <div class="tag-pill">DATA-DRIVEN SPORTYBET PREDICTIONS</div>
-        <h1 class="hero-title">MAXIMIZE YOUR WINNING EDGE.</h1>
-        <div class="hero-subtitle">"ZERO GREED. MAXIMUM CASHOUT."</div>
-        <p class="hero-description">
-            No guesswork. Daily disciplined rollover runs, high-odds VIP tickets, and instant booking code unlocks.
-        </p>
+    <!-- 100+ Odds (VIP Slip) -->
+    <div class="ticket-card">
+      <div class="card-top">
+        <span class="odds-badge">100+ ODDS</span>
+        <span class="bookie-badge">SPORTYBET CODE</span>
+      </div>
+      <div class="lock-box">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-text">LOCKED — UNLOCK BELOW</div>
+      </div>
+      <div class="ticket-title">100+ ODDS</div>
+      <div class="ticket-date">VIP ACCUMULATOR</div>
+      <div class="ticket-price">₦ 5,000</div>
+      <button class="btn-unlock" onclick="openModal('100+ ODDS (VIP Slip)', '5000')">Unlock Code — ₦ 5,000</button>
     </div>
 
-    <div class="stats-dashboard">
-        <div class="stat-card">
-            <div class="label">Win Rate</div>
-            <div class="value green">88.4%</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">Total Revenue (This Month)</div>
-            <div class="value">₦14,850,000</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">Active VIP Members</div>
-            <div class="value">1,240+</div>
-        </div>
+    <!-- 5+ Odds (Rollover) -->
+    <div class="ticket-card">
+      <div class="card-top">
+        <span class="odds-badge">5+ ODDS</span>
+        <span class="bookie-badge">SPORTYBET CODE</span>
+      </div>
+      <div class="lock-box">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-text">LOCKED — UNLOCK BELOW</div>
+      </div>
+      <div class="ticket-title">5+ ODDS</div>
+      <div class="ticket-date">ROLLOVER TICKET</div>
+      <div class="ticket-price">₦ 3,000</div>
+      <button class="btn-unlock" onclick="openModal('5+ ODDS (Rollover)', '3000')">Unlock Code — ₦ 3,000</button>
     </div>
 
-    <div class="middle-section-grid">
-        <div class="odds-preview-card">
-            <div>
-                <div class="preview-title">TODAY'S TICKET PREVIEW</div>
-                <div class="odds-stat-box">
-                    <span class="lbl">Rollover Odds Target:</span>
-                    <span class="val">1.65 - 2.10 Odds</span>
-                </div>
-                <div class="odds-stat-box">
-                    <span class="lbl">VIP Mega Odds Target:</span>
-                    <span class="val">8.50 - 15.00 Odds</span>
-                </div>
-                <div class="odds-stat-box">
-                    <span class="lbl">Entry Cutoff Time:</span>
-                    <span class="val" style="color: var(--accent-gold);">4:45 PM DAILY</span>
-                </div>
-                <div class="odds-stat-box">
-                    <span class="lbl">VIP Code Status:</span>
-                    <span class="val" id="ticketStatusText" style="color: var(--accent-green);">OPEN NOW</span>
-                </div>
-            </div>
-            <a href="#pricing" class="btn-unlock" id="heroUnlockBtn" style="margin-top: 15px;">Unlock Today's Ticket</a>
+  </div>
+
+  <!-- Floating Direct Admin Button -->
+  <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="float-support">
+    💬 Questions? Chat Admin directly
+  </a>
+
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkoutModal">
+    <div class="modal-content">
+      <h2>Complete Payment</h2>
+      
+      <div class="bank-box">
+        <strong>Bank Name:</strong> PalmPay<br>
+        <strong>Account No:</strong> 9066989021<br>
+        <strong>Account Name:</strong> Blessings Eboh
+      </div>
+
+      <form id="paymentForm">
+        <input type="hidden" id="selectedAmount" value="">
+        <input type="hidden" id="selectedPlan" value="">
+
+        <div class="form-group">
+          <label>Your Full Name</label>
+          <input type="text" id="userName" placeholder="e.g. John Doe" required>
         </div>
 
-        <div class="winners-card">
-            <div class="winners-title">RECENT WINNERS</div>
-            <div class="winners-list">
-                <div class="winner-item">
-                    <div class="winner-info">
-                        <div class="user">@Dave_P*** (Telegram)</div>
-                        <div class="plan">VIP Monthly • SportyBet</div>
-                    </div>
-                    <div class="winner-amount">+₦450,000</div>
-                </div>
-                <div class="winner-item">
-                    <div class="winner-info">
-                        <div class="user">0803***492 (Telegram)</div>
-                        <div class="plan">Rollover 1-Week</div>
-                    </div>
-                    <div class="winner-amount">+₦120,500</div>
-                </div>
-                <div class="winner-item">
-                    <div class="winner-info">
-                        <div class="user">@Emeka_VIP***</div>
-                        <div class="plan">Rollover + VIP</div>
-                    </div>
-                    <div class="winner-amount">+₦890,000</div>
-                </div>
-            </div>
+        <div class="form-group">
+          <label>Telegram Username or Phone Number</label>
+          <input type="text" id="userTelegram" placeholder="@yourusername or 08012345678" required>
         </div>
+
+        <div class="form-group">
+          <label>Payment Reference / Transaction ID</label>
+          <input type="text" id="userRef" placeholder="Paste transfer reference here" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Claim to Admin</button>
+        <button type="button" class="btn-close" onclick="closeModal()">Cancel</button>
+      </form>
     </div>
+  </div>
 
-    <div class="section-heading" id="pricing">CHOOSE YOUR SUBSCRIPTION TIER</div>
+  <script>
+    function openModal(plan, price) {
+      document.getElementById('selectedPlan').value = plan;
+      document.getElementById('selectedAmount').value = price;
+      document.getElementById('checkoutModal').style.display = 'flex';
+    }
 
-    <div class="pricing-grid">
-        <div class="card free-tier">
-            <div class="badge-free">FREE ACCESS</div>
-            <h3 class="tier-title">Daily Free Ticket</h3>
-            <div class="tier-price green-price">₦0 <span>/ forever</span></div>
-            <ul class="features-list">
-                <li>1 Free Ticket Daily (1.50 - 2.00 Odds)</li>
-                <li>Direct DM via Telegram Bot</li>
-                <li>Instant SportyBet Booking Code</li>
-                <li>No Subscription Required</li>
-            </ul>
-            <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" rel="noopener" class="btn-unlock btn-free" id="btnFreeTicket">Get Free Code via Bot</a>
-        </div>
+    function closeModal() {
+      document.getElementById('checkoutModal').style.display = 'none';
+    }
 
-        <div class="card">
-            <h3 class="tier-title">Rollover Daily</h3>
-            <div class="tier-price">₦2,000 <span>/ day</span></div>
-            <ul class="features-list">
-                <li>Daily Rollover Target</li>
-                <li>Low-Risk Odds Strategy</li>
-                <li>Instant Code Release</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover Daily', '₦2,000')">Unlock Access</button>
-        </div>
+    document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-        <div class="card">
-            <h3 class="tier-title">VIP Daily</h3>
-            <div class="tier-price">₦3,000 <span>/ 24 hrs</span></div>
-            <ul class="features-list">
-                <li>High-Value VIP Ticket</li>
-                <li>Instant Code Release</li>
-                <li>Direct Telegram Support</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('VIP Daily', '₦3,000')">Unlock Access</button>
-        </div>
+      const name = document.getElementById('userName').value;
+      const telegram = document.getElementById('userTelegram').value;
+      const reference = document.getElementById('userRef').value;
+      const amount = document.getElementById('selectedAmount').value;
+      const plan = document.getElementById('selectedPlan').value;
 
-        <div class="card">
-            <h3 class="tier-title">VIP Weekly</h3>
-            <div class="tier-price">₦9,000 <span>/ 7 days</span></div>
-            <ul class="features-list">
-                <li>7 Days Full VIP Access</li>
-                <li>Daily High-Odds Tickets</li>
-                <li>Priority Code Drops</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('VIP Weekly', '₦9,000')">Unlock Access</button>
-        </div>
+      try {
+        const response = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            telegram: telegram,
+            reference: reference,
+            amount: `${amount} (${plan})`
+          })
+        });
 
-        <div class="card">
-            <h3 class="tier-title">VIP Monthly</h3>
-            <div class="tier-price">₦20,000 <span>/ month</span></div>
-            <ul class="features-list">
-                <li>30 Days Continuous VIP</li>
-                <li>Maximum Odds Strategy</li>
-                <li>Full VIP Channel Access</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('VIP Monthly', '₦20,000')">Unlock Access</button>
-        </div>
+        const data = await response.json();
 
-        <div class="card">
-            <h3 class="tier-title">Rollover 1-Week</h3>
-            <div class="tier-price">₦5,000 <span>/ 7 days</span></div>
-            <ul class="features-list">
-                <li>Safe Daily Rollover Odds</li>
-                <li>7 Days Consistent Runs</li>
-                <li>Instant SportyBet Codes</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover 1-Week', '₦5,000')">Unlock Access</button>
-        </div>
-
-        <div class="card">
-            <h3 class="tier-title">Rollover 1-Month</h3>
-            <div class="tier-price">₦10,000 <span>/ month</span></div>
-            <ul class="features-list">
-                <li>30 Days Rollover Access</li>
-                <li>Disciplined Profit Plan</li>
-                <li>Full Rollover Channel</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover 1-Month', '₦10,000')">Unlock Access</button>
-        </div>
-
-        <div class="card">
-            <h3 class="tier-title">Rollover + VIP (1-Week)</h3>
-            <div class="tier-price">₦20,000 <span>/ 7 days</span></div>
-            <ul class="features-list">
-                <li>Full VIP + Rollover Access</li>
-                <li>7 Days Both Channels</li>
-                <li>Combined Ticket Strategy</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover + VIP (1-Week)', '₦20,000')">Unlock Access</button>
-        </div>
-
-        <div class="card popular">
-            <div class="badge-popular">BEST VALUE</div>
-            <h3 class="tier-title">Rollover + VIP (1-Month)</h3>
-            <div class="tier-price">₦50,000 <span>/ month</span></div>
-            <ul class="features-list">
-                <li>Ultimate All-Access Pass</li>
-                <li>30 Days Full VIP & Rollover</li>
-                <li>Priority VIP Drops & Support</li>
-                <li>Best Value Savings</li>
-            </ul>
-            <button class="btn-unlock vip-btn" onclick="openPaymentModal('Rollover + VIP (1-Month)', '₦50,000')">Unlock Access</button>
-        </div>
-    </div>
-
-    <div class="section-heading">FREQUENTLY ASKED QUESTIONS</div>
-    <div class="faq-container">
-        <div class="faq-item">
-            <button class="faq-question">How quickly will I receive my booking code after payment?</button>
-            <div class="faq-answer">
-                As soon as you submit your payment reference on this site, open our Telegram bot (@ApexTicketMaster_bot) and press START. Your reference is auto-verified within 1 to 5 minutes, and your code drops right in your DMs.
-            </div>
-        </div>
-        <div class="faq-item">
-            <button class="faq-question">Which bookmakers are supported?</button>
-            <div class="faq-answer">
-                Our main booking codes are generated directly for SportyBet. However, we also provide selection details so you can convert them on 1xBet, Bet9ja, or MSport.
-            </div>
-        </div>
-        <div class="faq-item">
-            <button class="faq-question">What is the win rate of the Rollover plan?</button>
-            <div class="faq-answer">
-                Our Rollover strategy focuses on low-risk target odds (1.65 – 2.10) with an average historical win rate exceeding 88%, calculated over consistent monthly runs.
-            </div>
-        </div>
-        <div class="faq-item">
-            <button class="faq-question">Can I upgrade my tier later?</button>
-            <div class="faq-answer">
-                Yes! You can upgrade from Daily or Weekly plans to Monthly or Combined tiers at any point by selecting the desired tier above.
-            </div>
-        </div>
-    </div>
-
-    <!-- Live Toast Notification -->
-    <div class="live-toast" id="liveToast">
-        <div class="toast-icon"></div>
-        <div>
-            <div class="toast-text"><span id="toastUser">@Kelechi_***</span> unlocked <span id="toastPlan">VIP Monthly</span></div>
-            <span class="toast-time">Just now</span>
-        </div>
-    </div>
-
-    <!-- Modal Window for Manual Bank Transfer -->
-    <div class="modal-overlay" id="paymentModal">
-        <div class="modal-card">
-            <button class="close-btn" onclick="closePaymentModal()">&times;</button>
-            <div class="modal-title">UNLOCK TICKET ACCESS</div>
-            <div class="tier-badge-modal" id="modalTierBadge">VIP Daily - ₦3,000</div>
-            
-            <div class="bank-details-box">
-                <div class="bank-row">
-                    <span class="bank-label">Bank Name</span>
-                    <div class="bank-val-container">
-                        <span class="bank-value">OPay / Palmpay</span>
-                    </div>
-                </div>
-                <div class="bank-row">
-                    <span class="bank-label">Account No</span>
-                    <div class="bank-val-container">
-                        <span class="bank-value" id="accNumber">7012345678</span>
-                        <button class="copy-btn" onclick="copyToClipboard('accNumber')">COPY</button>
-                    </div>
-                </div>
-                <div class="bank-row">
-                    <span class="bank-label">Account Name</span>
-                    <div class="bank-val-container">
-                        <span class="bank-value">APEX DAILY ODDS</span>
-                    </div>
-                </div>
-            </div>
-
-            <form id="paymentForm" onsubmit="handlePaymentSubmit(event)">
-                <div class="form-group">
-                    <label for="senderName">Sender / Payer Name</label>
-                    <input type="text" id="senderName" placeholder="e.g. John Doe" required>
-                </div>
-                <div class="form-group">
-                    <label for="telegramUser">Telegram Username / Phone No</label>
-                    <input type="text" id="telegramUser" placeholder="e.g. @john_doe or 08012345678" required>
-                </div>
-                <button type="submit" class="btn-unlock">Submit Verification Request</button>
-            </form>
-
-            <div class="status-msg status-success" id="statusSuccess">
-                ✓ Details Received! Please launch <strong>@ApexTicketMaster_bot</strong> on Telegram to claim your instant code.
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <div class="footer-logo">APEX DAILY ODDS</div>
-        <div class="footer-slogan">"ZERO GREED. MAXIMUM CASHOUT."</div>
-        <div class="footer-handle">Telegram Support: <a href="https://t.me/ApexTicketMaster_bot" target="_blank" rel="noopener">@ApexTicketMaster_bot</a></div>
-        <p class="footer-disclaimer">
-            Disclaimer: Sports betting involves financial risk. Apex Daily Odds provides research-driven analytical predictions for informational and strategy purposes. Bet responsibly and within your financial limits. 18+ only.
-        </p>
-    </footer>
-
-    <script>
-        function updateCutoffCountdown() {
-            const now = new Date();
-            const target = new Date();
-
-            // Set target cutoff time to 4:45 PM (16:45:00)
-            target.setHours(16, 45, 0, 0);
-
-            const display = document.getElementById('countdownTimer');
-            const bannerText = document.getElementById('bannerText');
-            const pulseDot = document.getElementById('bannerPulse');
-            const ticketStatusText = document.getElementById('ticketStatusText');
-            const freeBtn = document.getElementById('btnFreeTicket');
-
-            if (now >= target) {
-                // LOCKOUT STATE AFTER 4:45 PM
-                display.textContent = "LOCKED";
-                display.style.color = "#ff5252";
-                display.style.borderColor = "#ff5252";
-                display.style.background = "rgba(255, 82, 82, 0.15)";
-                
-                bannerText.textContent = "TODAY'S TICKETS ARE NOW LOCKED (CLOSED AT 4:45 PM)";
-                pulseDot.style.backgroundColor = "#ff5252";
-                pulseDot.style.boxShadow = "0 0 10px #ff5252";
-
-                if (ticketStatusText) {
-                    ticketStatusText.textContent = "LOCKED FOR TODAY";
-                    ticketStatusText.style.color = "#ff5252";
-                }
-
-                if (freeBtn) {
-                    freeBtn.textContent = "Free Code Locked Today";
-                    freeBtn.classList.add('btn-locked');
-                    freeBtn.removeAttribute('href');
-                }
-                return;
-            }
-
-            // RUNNING COUNTDOWN BEFORE 4:45 PM
-            let diffSecs = Math.floor((target - now) / 1000);
-
-            let hours = Math.floor(diffSecs / 3600);
-            let minutes = Math.floor((diffSecs % 3600) / 60);
-            let seconds = diffSecs % 60;
-
-            hours = hours < 10 ? "0" + hours : hours;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-
-            display.textContent = hours + ":" + minutes + ":" + seconds;
+        if (data.success) {
+          alert('Claim submitted successfully! Check your Telegram shortly for your code.');
+          closeModal();
+          document.getElementById('paymentForm').reset();
+        } else {
+          alert('Failed to submit claim. Please try again.');
         }
-
-        window.onload = function () {
-            updateCutoffCountdown();
-            setInterval(updateCutoffCountdown, 1000);
-
-            // Accordion FAQ logic
-            document.querySelectorAll('.faq-question').forEach(button => {
-                button.addEventListener('click', () => {
-                    const faqItem = button.parentElement;
-                    faqItem.classList.toggle('active');
-                });
-            });
-
-            // Trigger random live toast notifications
-            setInterval(showRandomToast, 12000);
-        };
-
-        // Modal control functions
-        function openPaymentModal(tierName, price) {
-            document.getElementById('modalTierBadge').innerText = tierName + ' - ' + price;
-            document.getElementById('paymentModal').style.display = 'flex';
-            document.getElementById('statusSuccess').style.display = 'none';
-            document.getElementById('paymentForm').reset();
-        }
-
-        function closePaymentModal() {
-            document.getElementById('paymentModal').style.display = 'none';
-        }
-
-        function copyToClipboard(elementId) {
-            const text = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Account Number copied to clipboard!');
-            });
-        }
-
-        function handlePaymentSubmit(event) {
-            event.preventDefault();
-            document.getElementById('statusSuccess').style.display = 'block';
-            document.getElementById('paymentForm').style.display = 'none';
-        }
-
-        // Live notification simulation
-        const fakeUsers = ['@Chidi_***', '0814***920', '@Tunde_VIP***', '@Ibrahim_***', '0903***118'];
-        const fakePlans = ['VIP Daily', 'Rollover 1-Week', 'VIP Monthly', 'Rollover + VIP (1-Month)'];
-
-        function showRandomToast() {
-            const toast = document.getElementById('liveToast');
-            const randomUser = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-            const randomPlan = fakePlans[Math.floor(Math.random() * fakePlans.length)];
-
-            document.getElementById('toastUser').innerText = randomUser;
-            document.getElementById('toastPlan').innerText = randomPlan;
-
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
-    </script>
+      } catch (err) {
+        alert('An error occurred. Please check your connection.');
+      }
+    });
+  </script>
 </body>
 </html>
