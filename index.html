@@ -19,71 +19,83 @@
     body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 80px; }
 
     /* Header */
-    header { text-align: center; padding: 20px; border-bottom: 1px solid var(--border-color); }
-    .logo { font-weight: 800; font-size: 1.3rem; color: var(--text-main); letter-spacing: 1px; }
+    header { text-align: center; padding: 25px 20px; border-bottom: 1px solid var(--border-color); }
+    .logo { font-weight: 900; font-size: 1.4rem; color: var(--text-main); letter-spacing: 1px; }
     .logo span { color: var(--accent-gold); }
-    .motto { font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2px; font-weight: 700; margin-top: 4px; text-transform: uppercase; }
+    .motto { font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 2.5px; font-weight: 700; margin-top: 5px; text-transform: uppercase; }
 
-    /* Hero Section */
-    .hero { text-align: center; padding: 25px 20px 15px 20px; }
-    .badge { display: inline-block; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; letter-spacing: 1px; font-weight: 600; }
-    .hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
-    .hero p { color: var(--text-sub); font-size: 0.85rem; max-width: 400px; margin: 0 auto 20px auto; line-height: 1.4; }
+    /* Hero */
+    .hero { text-align: center; padding: 30px 20px 20px 20px; }
+    .badge { display: inline-block; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; font-weight: 600; }
+    .hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .hero p { color: var(--text-sub); font-size: 0.85rem; max-width: 380px; margin: 0 auto; line-height: 1.4; }
 
-    /* Ticket Cards */
-    .tickets-container { max-width: 420px; margin: 0 auto; padding: 0 20px; }
-    .ticket-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center; position: relative; }
+    /* Main Container */
+    .container { max-width: 420px; margin: 0 auto; padding: 20px; }
+
+    /* Free Ticket Card */
+    .free-card { background: #161b26; border: 1px solid #28324a; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px; }
+    .free-card h3 { font-size: 1.1rem; margin-bottom: 6px; font-weight: 800; }
+    .free-card p { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px; }
+    .btn-free { display: block; width: 100%; background: #0088cc; color: #fff; font-weight: 800; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; text-decoration: none; }
+
+    /* Premium Ticket Cards */
+    .ticket-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center; }
     .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .odds-badge { background: #1c2234; color: #4da6ff; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: 700; }
     .bookie-badge { background: var(--sporty-red); color: #fff; font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: 800; }
-    
-    .lock-box { background: #0e1017; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-    .lock-icon { font-size: 1.5rem; margin-bottom: 5px; }
-    .lock-text { font-size: 0.7rem; color: var(--text-sub); letter-spacing: 1px; font-weight: 700; }
-    .ticket-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
-    .ticket-date { color: var(--text-sub); font-size: 0.8rem; margin-bottom: 10px; }
-    .ticket-price { font-size: 1.3rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 15px; }
-    .btn-unlock { width: 100%; background: var(--accent-gold); color: #000; font-weight: 800; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
 
-    /* Free Tips CTA */
-    .free-tips-card { background: linear-gradient(135deg, #1c2234, #12141c); border: 1px solid #2a334d; border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 20px; }
-    .btn-free { width: 100%; background: #0088cc; color: #fff; font-weight: 800; border: none; padding: 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 10px; }
+    .lock-box { background: #0a0b0e; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+    .lock-icon { font-size: 1.6rem; margin-bottom: 4px; }
+    .lock-text { font-size: 0.7rem; color: var(--text-sub); letter-spacing: 1px; font-weight: 700; }
+
+    .ticket-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+    .ticket-sub { color: var(--text-sub); font-size: 0.8rem; margin-bottom: 12px; }
+    .ticket-price { font-size: 1.3rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 15px; }
+
+    .btn-unlock { width: 100%; background: var(--accent-gold); color: #000; font-weight: 800; border: none; padding: 14px; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
 
     /* Floating Support Button */
     .float-support { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); background: #1c2234; border: 1px solid var(--accent-gold); color: #fff; padding: 10px 20px; border-radius: 25px; font-size: 0.8rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 99; display: flex; align-items: center; gap: 8px; }
 
-    /* Modal Styling */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-    .modal-content { background: var(--card-bg); border: 1px solid var(--accent-gold); border-radius: 12px; width: 100%; max-width: 400px; padding: 25px; }
-    .modal h2 { color: var(--accent-gold); font-size: 1.2rem; margin-bottom: 15px; text-align: center; }
-    .bank-box { background: #0a0b0e; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.6; }
-    .bank-box strong { color: var(--accent-gold); }
+    /* Payment Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--accent-gold); border-radius: 12px; width: 100%; max-width: 380px; padding: 25px; }
+    .modal-title { color: var(--accent-gold); font-size: 1.2rem; font-weight: 800; text-align: center; margin-bottom: 15px; }
+
+    .bank-card { background: #0a0b0e; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.6; }
+    .bank-card strong { color: var(--accent-gold); }
+
     .form-group { margin-bottom: 12px; text-align: left; }
     .form-group label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 5px; }
     .form-group input { width: 100%; background: #0a0b0e; border: 1px solid var(--border-color); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
-    .btn-submit { width: 100%; background: var(--accent-gold); color: #000; font-weight: 800; border: none; padding: 12px; border-radius: 6px; cursor: pointer; margin-top: 10px; }
-    .btn-close { width: 100%; background: transparent; color: var(--text-sub); border: none; padding: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 5px; }
+
+    .btn-submit { width: 100%; background: var(--accent-gold); color: #000; font-weight: 800; border: none; padding: 12px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; margin-top: 10px; }
+    .btn-cancel { width: 100%; background: transparent; color: var(--text-sub); border: none; padding: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 5px; font-weight: 700; }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
     <div class="logo">APEX <span>DAILY ODDS</span></div>
     <div class="motto">RULE EVERY PREDICTION</div>
   </header>
 
+  <!-- Hero -->
   <section class="hero">
     <div class="badge">PREMIUM FOOTBALL PREDICTIONS</div>
-    <h1>This Week's Featured Tips</h1>
-    <p>Verified SportyBet booking codes delivered directly to your Telegram.</p>
+    <h1>Daily Match Predictions</h1>
+    <p>Get verified SportyBet booking codes instantly after payment confirmation.</p>
   </section>
 
-  <div class="tickets-container">
+  <!-- Container -->
+  <div class="container">
 
-    <!-- Free Ticket Card -->
-    <div class="free-tips-card">
-      <h3 style="margin-bottom: 4px; font-size: 1.1rem;">⚽ Daily Free Ticket</h3>
-      <p style="font-size: 0.75rem; color: var(--text-sub);">Locks daily at 3:00 PM WAT. Get today's free selections on Telegram!</p>
+    <!-- Free Card -->
+    <div class="free-card">
+      <h3>⚽ Free Daily Ticket</h3>
+      <p>Get today's free community selections on Telegram!</p>
       <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-free">Get Free Ticket on Telegram</a>
     </div>
 
@@ -98,9 +110,9 @@
         <div class="lock-text">LOCKED — UNLOCK BELOW</div>
       </div>
       <div class="ticket-title">100+ ODDS</div>
-      <div class="ticket-date">VIP ACCUMULATOR</div>
+      <div class="ticket-sub">VIP ACCUMULATOR</div>
       <div class="ticket-price">₦ 5,000</div>
-      <button type="button" class="btn-unlock" onclick="openModal('100+ ODDS (VIP Slip)', '5000')">Unlock Code — ₦ 5,000</button>
+      <button type="button" class="btn-unlock" onclick="openCheckout('100+ ODDS (VIP Slip)', '5000')">Unlock Code — ₦ 5,000</button>
     </div>
 
     <!-- 5+ Odds -->
@@ -114,24 +126,24 @@
         <div class="lock-text">LOCKED — UNLOCK BELOW</div>
       </div>
       <div class="ticket-title">5+ ODDS</div>
-      <div class="ticket-date">ROLLOVER TICKET</div>
+      <div class="ticket-sub">ROLLOVER TICKET</div>
       <div class="ticket-price">₦ 3,000</div>
-      <button type="button" class="btn-unlock" onclick="openModal('5+ ODDS (Rollover)', '3000')">Unlock Code — ₦ 3,000</button>
+      <button type="button" class="btn-unlock" onclick="openCheckout('5+ ODDS (Rollover)', '3000')">Unlock Code — ₦ 3,000</button>
     </div>
 
   </div>
 
-  <!-- Floating Direct Admin Button -->
+  <!-- Floating Admin Button -->
   <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="float-support">
     💬 Questions? Chat Admin directly
   </a>
 
   <!-- Payment Modal -->
-  <div class="modal" id="checkoutModal">
+  <div class="modal-overlay" id="checkoutModal">
     <div class="modal-content">
-      <h2>Complete Payment</h2>
+      <div class="modal-title">Complete Payment</div>
       
-      <div class="bank-box">
+      <div class="bank-card">
         <strong>Bank Name:</strong> PalmPay<br>
         <strong>Account No:</strong> 9066989021<br>
         <strong>Account Name:</strong> Blessings Eboh
@@ -157,19 +169,19 @@
         </div>
 
         <button type="submit" class="btn-submit">Submit Claim to Admin</button>
-        <button type="button" class="btn-close" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn-cancel" onclick="closeCheckout()">Cancel</button>
       </form>
     </div>
   </div>
 
   <script>
-    function openModal(plan, price) {
+    function openCheckout(plan, price) {
       document.getElementById('selectedPlan').value = plan;
       document.getElementById('selectedAmount').value = price;
       document.getElementById('checkoutModal').style.display = 'flex';
     }
 
-    function closeModal() {
+    function closeCheckout() {
       document.getElementById('checkoutModal').style.display = 'none';
     }
 
@@ -198,7 +210,7 @@
 
         if (data.success) {
           alert('Claim submitted successfully! Check your Telegram shortly for your code.');
-          closeModal();
+          closeCheckout();
           document.getElementById('paymentForm').reset();
         } else {
           alert('Failed to submit claim. Please try again.');
