@@ -49,6 +49,18 @@
     /* Container */
     .main-wrapper { max-width: 440px; margin: 0 auto; padding: 20px 16px; }
 
+    /* Countdown Banner */
+    .timer-banner {
+      background: rgba(228, 30, 54, 0.12);
+      border: 1px solid rgba(228, 30, 54, 0.3);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .timer-title { font-size: 0.72rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
+    .timer-display { font-size: 1.2rem; font-weight: 900; color: var(--sporty-red); letter-spacing: 1px; margin-top: 2px; }
+
     /* Category Filter Tabs */
     .tabs-group {
       display: flex;
@@ -132,6 +144,95 @@
     .btn-whatsapp { background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); color: #fff; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.25); margin-top: 8px; }
     .btn-snapchat { background: linear-gradient(135deg, #fffc00 0%, #d4d100 100%); color: #000; box-shadow: 0 4px 20px rgba(255, 252, 0, 0.25); margin-top: 8px; }
 
+    /* Section Headings */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--neon-cyan);
+      margin: 30px 0 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* History Table */
+    .history-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-date { font-size: 0.72rem; color: var(--text-sub); }
+    .history-type { font-size: 0.82rem; font-weight: 800; }
+    .history-status {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--win-green);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 900;
+    }
+
+    /* FAQ Accordion */
+    .faq-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .faq-item { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q {
+      padding: 12px 0;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-a {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+      padding-bottom: 12px;
+      display: none;
+    }
+
+    /* Social Proof Toast */
+    .proof-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #0f172a;
+      border: 1px solid var(--win-green);
+      padding: 10px 16px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      z-index: 2000;
+      transition: transform 0.5s ease;
+    }
+    .proof-toast.show { transform: translateX(-50%) translateY(0); }
+
     /* Floating Support Anchor */
     .float-support {
       position: fixed;
@@ -189,6 +290,18 @@
     }
     .bank-card strong { color: var(--accent-gold); }
 
+    .btn-copy {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--neon-cyan);
+      border: 1px solid var(--neon-cyan);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
     .form-group { margin-bottom: 12px; text-align: left; }
     .form-group label { display: block; font-size: 0.72rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
     .form-group input {
@@ -214,6 +327,11 @@
 </head>
 <body>
 
+  <!-- Social Proof Toast -->
+  <div class="proof-toast" id="proofToast">
+    <span>🔥</span> <span id="proofText">John from Lagos just unlocked 100+ Odds VIP!</span>
+  </div>
+
   <!-- Top Live Ticker -->
   <div class="ticker-bar">
     <div class="ticker-live"><div class="pulse-dot"></div> LIVE VERIFIED SLIPS</div>
@@ -228,6 +346,12 @@
 
   <!-- Container -->
   <div class="main-wrapper">
+
+    <!-- Match Lock Countdown -->
+    <div class="timer-banner">
+      <div class="timer-title">⏰ Today's VIP Codes Lock In</div>
+      <div class="timer-display" id="countdownTimer">02h : 45m : 12s</div>
+    </div>
 
     <!-- Category Tabs -->
     <div class="tabs-group">
@@ -314,6 +438,49 @@
       <button type="button" class="btn-action" onclick="openCheckout('5+ Odds Rollover', '3000')">Unlock Code — ₦ 3,000</button>
     </div>
 
+    <!-- Past Performance Archive -->
+    <div class="section-title">🏆 Recent Winning History</div>
+    <div class="history-card">
+      <div class="history-item">
+        <div>
+          <div class="history-type">118.40 Odds VIP Slip</div>
+          <div class="history-date">Yesterday • SportyBet</div>
+        </div>
+        <span class="history-status">WON ✅</span>
+      </div>
+      <div class="history-item">
+        <div>
+          <div class="history-type">5.80 Odds Safe Rollover</div>
+          <div class="history-date">Yesterday • SportyBet</div>
+        </div>
+        <span class="history-status">WON ✅</span>
+      </div>
+      <div class="history-item">
+        <div>
+          <div class="history-type">94.20 Odds VIP Slip</div>
+          <div class="history-date">2 Days Ago • SportyBet</div>
+        </div>
+        <span class="history-status">WON ✅</span>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="section-title">❓ Frequently Asked Questions</div>
+    <div class="faq-card">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I receive my booking code? <span>+</span></div>
+        <div class="faq-a">After making payment, submit your transfer reference inside the claim modal. Click WhatsApp, Telegram, or Snapchat to send your claim to Admin, and your booking code will be delivered instantly.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Which betting site are these codes for? <span>+</span></div>
+        <div class="faq-a">Our codes are fully formatted and tested for SportyBet.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What if I need help with payment? <span>+</span></div>
+        <div class="faq-a">Click the floating chat button at the bottom of the screen to chat directly with Admin on WhatsApp.</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Floating Support Button -->
@@ -328,8 +495,9 @@
       
       <div class="bank-card">
         <strong>Bank Name:</strong> PalmPay<br>
-        <strong>Account No:</strong> 9066989021<br>
-        <strong>Account Name:</strong> Blessings Eboh
+        <strong>Account No:</strong> <span id="accNum">9066989021</span><br>
+        <strong>Account Name:</strong> Blessings Eboh<br>
+        <button type="button" class="btn-copy" onclick="copyAccount()">📋 Copy Account Number</button>
       </div>
 
       <form id="paymentForm">
@@ -365,11 +533,12 @@
   </div>
 
   <script>
-    // YOUR EXACT SOCIAL LINKS
+    // SOCIAL LINKS
     const WHATSAPP_LINK = "https://wa.me/qr/SOSZSCNBJSZ4K1";
     const TELEGRAM_HANDLE = "ApexDailyOddsHQ";
     const SNAPCHAT_LINK = "https://www.snapchat.com/add/apex_prediction?share_id=tu917l6LlM4&locale=en-GB";
 
+    // Category Filtering
     function filterCategory(category, e) {
       const tabs = document.querySelectorAll('.tab-btn');
       const cards = document.querySelectorAll('.ticket-card');
@@ -388,6 +557,7 @@
       });
     }
 
+    // Modal Controls
     function openCheckout(plan, price) {
       document.getElementById('selectedPlan').value = plan;
       document.getElementById('selectedAmount').value = price;
@@ -398,6 +568,15 @@
       document.getElementById('checkoutModal').style.display = 'none';
     }
 
+    // Copy Account Number
+    function copyAccount() {
+      const acc = document.getElementById('accNum').innerText;
+      navigator.clipboard.writeText(acc).then(() => {
+        alert("Account number copied: " + acc);
+      });
+    }
+
+    // Submission Handler
     function submitToPlatform(platform) {
       const name = document.getElementById('userName').value.trim();
       const contact = document.getElementById('userContact').value.trim();
@@ -410,7 +589,6 @@
         return;
       }
 
-      // Format clean message
       const message = `Hello Admin, I have made payment for ${plan} (₦${amount}).\n\n` +
                       `👤 Name: ${name}\n` +
                       `📱 Contact: ${contact}\n` +
@@ -420,7 +598,6 @@
       const encodedMessage = encodeURIComponent(message);
 
       if (platform === 'whatsapp') {
-        // Copies claim message to clipboard and opens exact WhatsApp QR link
         navigator.clipboard.writeText(message).then(() => {
           alert("Payment details copied to clipboard! Opening WhatsApp...");
           window.open(WHATSAPP_LINK, '_blank');
@@ -430,7 +607,6 @@
       } else if (platform === 'telegram') {
         window.open(`https://t.me/${TELEGRAM_HANDLE}?text=${encodedMessage}`, '_blank');
       } else if (platform === 'snapchat') {
-        // Copies claim message to clipboard and opens exact Snapchat link
         navigator.clipboard.writeText(message).then(() => {
           alert("Payment claim copied to clipboard! Paste it into Snapchat chat with Admin.");
           window.open(SNAPCHAT_LINK, '_blank');
@@ -442,6 +618,58 @@
       closeCheckout();
       document.getElementById('paymentForm').reset();
     }
+
+    // Toggle FAQ
+    function toggleFaq(element) {
+      const answer = element.nextElementSibling;
+      const span = element.querySelector('span');
+      if (answer.style.display === 'block') {
+        answer.style.display = 'none';
+        span.innerText = '+';
+      } else {
+        answer.style.display = 'block';
+        span.innerText = '−';
+      }
+    }
+
+    // Dynamic Countdown Timer
+    function startCountdown() {
+      let seconds = 9912; // ~2h 45m
+      const timerElement = document.getElementById('countdownTimer');
+      setInterval(() => {
+        seconds--;
+        if (seconds <= 0) seconds = 10800;
+        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        timerElement.innerText = `${hrs}h : ${mins}m : ${secs}s`;
+      }, 1000);
+    }
+    startCountdown();
+
+    // Social Proof Toast Notifications
+    const proofMessages = [
+      "David from Abuja just unlocked 100+ Odds VIP!",
+      "Emeka from Port Harcourt got the Safe Rollover Slip!",
+      "Chidi from Lagos unlocked 100+ Odds VIP!",
+      "Blessing from Benin unlocked Safe Rollover Slip!"
+    ];
+
+    function showSocialProof() {
+      const toast = document.getElementById('proofToast');
+      const text = document.getElementById('proofText');
+      
+      setInterval(() => {
+        const randomMsg = proofMessages[Math.floor(Math.random() * proofMessages.length)];
+        text.innerText = randomMsg;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 4000);
+      }, 12000);
+    }
+    showSocialProof();
   </script>
 </body>
 </html>
