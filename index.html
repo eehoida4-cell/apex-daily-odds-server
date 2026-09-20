@@ -101,8 +101,8 @@
       text-align: center;
     }
     .m-lbl { font-size: 0.62rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
-    .m-val { font-size: 0.88rem; font-weight: 900; color: #fff; margin-top: 3px; }
-    .m-val.green { color: var(--win-green); }
+    .val { font-size: 0.88rem; font-weight: 900; color: #fff; margin-top: 3px; }
+    .val.green { color: var(--win-green); }
 
     .ticket-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 4px; }
     .ticket-sub { color: var(--text-sub); font-size: 0.78rem; margin-bottom: 16px; line-height: 1.4; }
@@ -223,9 +223,9 @@
 
     <!-- Category Tabs -->
     <div class="tabs-group">
-      <button class="tab-btn active" onclick="filterCategory('all')">ALL SLIPS</button>
-      <button class="tab-btn" onclick="filterCategory('vip')">VIP ACCUMULATORS</button>
-      <button class="tab-btn" onclick="filterCategory('free')">FREE TICKETS</button>
+      <button class="tab-btn active" onclick="filterCategory('all', event)">ALL SLIPS</button>
+      <button class="tab-btn" onclick="filterCategory('vip', event)">VIP ACCUMULATORS</button>
+      <button class="tab-btn" onclick="filterCategory('free', event)">FREE TICKETS</button>
     </div>
 
     <!-- Free Ticket Card -->
@@ -349,12 +349,14 @@
   </div>
 
   <script>
-    function filterCategory(category) {
+    function filterCategory(category, e) {
       const tabs = document.querySelectorAll('.tab-btn');
       const cards = document.querySelectorAll('.ticket-card');
 
       tabs.forEach(tab => tab.classList.remove('active'));
-      event.target.classList.add('active');
+      if (e && e.target) {
+        e.target.classList.add('active');
+      }
 
       cards.forEach(card => {
         if (category === 'all' || card.dataset.cat === category) {
@@ -375,12 +377,8 @@
       document.getElementById('checkoutModal').style.display = 'none';
     }
 
-    document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
       e.preventDefault();
-
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = 'Submitting...';
-      btn.disabled = true;
 
       const name = document.getElementById('userName').value;
       const telegram = document.getElementById('userTelegram').value;
@@ -388,33 +386,21 @@
       const amount = document.getElementById('selectedAmount').value;
       const plan = document.getElementById('selectedPlan').value;
 
-      try {
-        const response = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name,
-            telegram: telegram,
-            reference: reference,
-            amount: `₦${amount} (${plan})`
-          })
-        });
+      // Format clean message for Telegram
+      const message = `Hello Admin, I have made payment for ${plan} (₦${amount}).\n\n` +
+                      `👤 Name: ${name}\n` +
+                      `📱 Telegram/Phone: ${telegram}\n` +
+                      `💳 Payment Ref/Session ID: ${reference}\n\n` +
+                      `Please verify and send me my SportyBet booking code!`;
 
-        const data = await response.json();
+      // Encode for URL query
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Redirect directly to your Telegram handle
+      window.open(`https://t.me/ApexDailyOddsHQ?text=${encodedMessage}`, '_blank');
 
-        if (data.success) {
-          alert('Claim submitted successfully! Check your Telegram shortly for your code.');
-          closeCheckout();
-          document.getElementById('paymentForm').reset();
-        } else {
-          alert('Failed to submit claim. Please try again.');
-        }
-      } catch (err) {
-        alert('An error occurred. Please check your connection.');
-      } finally {
-        btn.innerText = 'Submit Claim to Admin';
-        btn.disabled = false;
-      }
+      closeCheckout();
+      document.getElementById('paymentForm').reset();
     });
   </script>
 </body>
