@@ -3,123 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apex Daily Odds — Premium VIP Predictions</title>
+  <title>APEX DAILY ODDS — Live VIP Predictions</title>
   <style>
     :root {
-      --bg-dark: #08080a;
-      --card-bg: #0f1117;
-      --gold-primary: #d4af37;
-      --gold-glow: rgba(212, 175, 55, 0.25);
-      --text-bright: #ffffff;
-      --text-dim: #9499a8;
-      --border-subtle: #1c202e;
+      --bg-dark: #0a0e17;
+      --card-bg: rgba(18, 26, 41, 0.75);
+      --card-border: rgba(0, 240, 255, 0.15);
+      --neon-cyan: #00f0ff;
+      --win-green: #00e676;
       --sporty-red: #e41e36;
-      --telegram-blue: #0088cc;
+      --accent-gold: #f3ba2f;
+      --text-main: #ffffff;
+      --text-sub: #8a99ad;
+      --radius-lg: 16px;
+      --radius-md: 10px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-bright); padding-bottom: 90px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); padding-bottom: 90px; -webkit-font-smoothing: antialiased; }
 
-    /* Top Banner / Announcement */
-    .top-bar { background: linear-gradient(90deg, #121622, #1b2030, #121622); text-align: center; padding: 8px 15px; font-size: 0.75rem; color: var(--gold-primary); font-weight: 700; border-bottom: 1px solid var(--border-subtle); letter-spacing: 0.5px; }
+    /* Top Live Match Ticker */
+    .ticker-bar {
+      background: #060910;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 16px;
+      font-size: 0.72rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ticker-live { color: var(--win-green); font-weight: 800; display: flex; align-items: center; gap: 6px; }
+    .pulse-dot { width: 7px; height: 7px; background: var(--win-green); border-radius: 50%; box-shadow: 0 0 8px var(--win-green); animation: pulse 1.4s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
 
     /* Header */
-    header { text-align: center; padding: 30px 20px 20px 20px; }
-    .logo-badge { display: inline-block; width: 45px; height: 45px; background: radial-gradient(circle, var(--gold-primary) 0%, #8a6d1c 100%); border-radius: 50%; line-height: 45px; font-weight: 900; color: #000; font-size: 1.2rem; margin-bottom: 10px; box-shadow: 0 0 20px var(--gold-glow); }
-    .brand-title { font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; }
-    .brand-title span { color: var(--gold-primary); }
-    .brand-sub { font-size: 0.65rem; color: var(--gold-primary); letter-spacing: 3px; font-weight: 800; margin-top: 4px; text-transform: uppercase; }
+    header { text-align: center; padding: 24px 20px 18px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: 1.5px; }
+    .logo span { color: var(--neon-cyan); text-shadow: 0 0 12px rgba(0, 240, 255, 0.4); }
+    .motto { font-size: 0.62rem; color: var(--accent-gold); letter-spacing: 2.5px; font-weight: 800; text-transform: uppercase; margin-top: 4px; }
 
-    /* Hero Section */
-    .hero { text-align: center; padding: 10px 20px 25px 20px; max-width: 450px; margin: 0 auto; }
-    .hero h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; color: var(--text-bright); }
-    .hero p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+    /* Container */
+    .main-wrapper { max-width: 440px; margin: 0 auto; padding: 20px 16px; }
 
-    /* Main Container */
-    .wrapper { max-width: 420px; margin: 0 auto; padding: 0 16px; }
+    /* Category Filter Tabs */
+    .tabs-group {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 4px;
+      margin-bottom: 22px;
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      padding: 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
 
-    /* Luxury Ticket Card Styling */
+    /* Ticket Cards */
     .ticket-card {
       background: var(--card-bg);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 22px;
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
       margin-bottom: 20px;
       position: relative;
-      overflow: hidden;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
-    .ticket-card:hover { border-color: var(--gold-primary); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .odds-badge { background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.3); font-size: 0.72rem; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
+    .bookie-badge { background: var(--sporty-red); color: #fff; font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; font-weight: 900; }
 
-    .ticket-card.featured {
-      border: 1px solid var(--gold-primary);
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.12);
+    /* Metrics Bar inside Card */
+    .card-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      padding: 12px 8px;
+      margin-bottom: 16px;
+      text-align: center;
     }
+    .m-lbl { font-size: 0.62rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
+    .m-val { font-size: 0.88rem; font-weight: 900; color: #fff; margin-top: 3px; }
+    .m-val.green { color: var(--win-green); }
 
-    .featured-tag {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: var(--gold-primary);
-      color: #000;
-      font-size: 0.65rem;
-      font-weight: 900;
-      padding: 4px 12px;
-      border-bottom-left-radius: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .ticket-title { font-size: 1.25rem; font-weight: 900; margin-bottom: 4px; }
+    .ticket-sub { color: var(--text-sub); font-size: 0.78rem; margin-bottom: 16px; line-height: 1.4; }
 
-    .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
-    .pill-odds { background: rgba(212, 175, 55, 0.15); color: var(--gold-primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; }
-    .pill-bookie { background: var(--sporty-red); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
+    /* Price and Action Row */
+    .price-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 14px; margin-bottom: 14px; }
+    .p-label { font-size: 0.72rem; color: var(--text-sub); font-weight: 700; }
+    .p-value { font-size: 1.35rem; font-weight: 900; color: var(--accent-gold); }
 
-    .ticket-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
-    .ticket-desc { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 18px; line-height: 1.4; }
-
-    .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; border-top: 1px dashed var(--border-subtle); padding-top: 15px; }
-    .price-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
-    .price-value { font-size: 1.4rem; font-weight: 900; color: var(--gold-primary); }
-
-    /* Buttons */
-    .btn-gold {
-      display: block;
+    .btn-action {
       width: 100%;
-      background: linear-gradient(135deg, #f3ba2f 0%, #d4af37 100%);
+      background: linear-gradient(135deg, #00f0ff 0%, #00a8ff 100%);
       color: #000;
       font-weight: 900;
       border: none;
       padding: 14px;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       font-size: 0.9rem;
       cursor: pointer;
-      text-align: center;
       text-decoration: none;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      display: inline-block;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.25);
     }
 
-    .btn-telegram {
-      background: var(--telegram-blue);
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(0, 136, 204, 0.2);
-    }
+    .btn-telegram { background: linear-gradient(135deg, #0088cc 0%, #005580 100%); color: #fff; box-shadow: 0 4px 20px rgba(0, 136, 204, 0.25); }
 
     /* Floating Support Anchor */
     .float-support {
       position: fixed;
-      bottom: 20px;
+      bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
-      background: #12151f;
-      border: 1px solid var(--gold-primary);
+      background: #0f172a;
+      border: 1px solid var(--neon-cyan);
       color: #fff;
       padding: 10px 22px;
       border-radius: 30px;
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       text-decoration: none;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
       z-index: 99;
       display: flex;
       align-items: center;
@@ -131,139 +156,176 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(5px);
+      background: rgba(4, 7, 12, 0.88);
+      backdrop-filter: blur(8px);
       z-index: 1000;
       justify-content: center;
       align-items: center;
       padding: 20px;
     }
 
-    .modal-box {
-      background: #0f1117;
-      border: 1px solid var(--gold-primary);
-      border-radius: 16px;
+    .modal-content {
+      background: #0f1623;
+      border: 1px solid var(--neon-cyan);
+      border-radius: var(--radius-lg);
       width: 100%;
       max-width: 380px;
       padding: 24px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
     }
 
-    .modal-head { font-size: 1.2rem; font-weight: 800; color: var(--gold-primary); text-align: center; margin-bottom: 15px; }
+    .modal-title { font-size: 1.2rem; font-weight: 900; color: var(--neon-cyan); text-align: center; margin-bottom: 14px; }
 
-    .account-card {
-      background: #08080a;
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
+    .bank-card {
+      background: #080c14;
+      border: 1px dashed rgba(0, 240, 255, 0.3);
       padding: 14px;
-      margin-bottom: 18px;
-      font-size: 0.85rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      font-size: 0.84rem;
       line-height: 1.6;
     }
+    .bank-card strong { color: var(--accent-gold); }
 
-    .account-card strong { color: var(--gold-primary); }
-
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
+    .form-group { margin-bottom: 12px; text-align: left; }
+    .form-group label { display: block; font-size: 0.72rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
     .form-group input {
       width: 100%;
-      background: #08080a;
-      border: 1px solid var(--border-subtle);
+      background: #080c14;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: #fff;
-      padding: 12px;
+      padding: 11px;
       border-radius: 8px;
       font-size: 0.85rem;
       outline: none;
     }
+    .form-group input:focus { border-color: var(--neon-cyan); }
 
-    .form-group input:focus { border-color: var(--gold-primary); }
-
-    .btn-cancel { width: 100%; background: transparent; color: var(--text-dim); border: none; padding: 10px; font-size: 0.8rem; cursor: pointer; margin-top: 6px; font-weight: 700; }
+    .btn-cancel { width: 100%; background: transparent; color: var(--text-sub); border: none; padding: 10px; font-size: 0.8rem; cursor: pointer; margin-top: 6px; font-weight: 800; }
   </style>
 </head>
 <body>
 
-  <!-- Top Announcement -->
-  <div class="top-bar">⚡ SPORTYBET CODES — INSTANT TELEGRAM DELIVERY</div>
+  <!-- Top Live Ticker -->
+  <div class="ticker-bar">
+    <div class="ticker-live"><div class="pulse-dot"></div> LIVE VERIFIED SLIPS</div>
+    <div style="color: var(--text-sub);">SPORTYBET CODES</div>
+  </div>
 
   <!-- Header -->
   <header>
-    <div class="logo-badge">A</div>
-    <div class="brand-title">APEX <span>DAILY ODDS</span></div>
-    <div class="brand-sub">RULE EVERY PREDICTION</div>
+    <div class="logo">APEX <span>DAILY ODDS</span></div>
+    <div class="motto">RULE EVERY PREDICTION</div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1>Verified VIP Predictions</h1>
-    <p>Select your preferred ticket tier below, complete the transfer, and receive your booking code immediately.</p>
-  </section>
+  <!-- Container -->
+  <div class="main-wrapper">
 
-  <!-- Main Tickets Wrapper -->
-  <div class="wrapper">
+    <!-- Category Tabs -->
+    <div class="tabs-group">
+      <button class="tab-btn active" onclick="filterCategory('all')">ALL SLIPS</button>
+      <button class="tab-btn" onclick="filterCategory('vip')">VIP ACCUMULATORS</button>
+      <button class="tab-btn" onclick="filterCategory('free')">FREE TICKETS</button>
+    </div>
 
     <!-- Free Ticket Card -->
-    <div class="ticket-card">
-      <div class="card-meta">
-        <span class="pill-odds" style="color:#00d2ff; background:rgba(0,210,255,0.1);">DAILY FREE</span>
-        <span class="pill-bookie" style="background:#0088cc;">TELEGRAM BOT</span>
+    <div class="ticket-card" data-cat="free">
+      <div class="card-top">
+        <span class="odds-badge" style="color: #fff; border-color: rgba(255,255,255,0.2);">FREE TICKET</span>
+        <span class="bookie-badge" style="background: #0088cc;">TELEGRAM BOT</span>
       </div>
-      <div class="ticket-title">Free Community Slip</div>
-      <div class="ticket-desc">Locks daily at 3:00 PM WAT. Access today's free selections via our Telegram bot.</div>
-      <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-gold btn-telegram">Get Free Ticket on Telegram</a>
+      <div class="ticket-title">Daily Community Selection</div>
+      <div class="ticket-sub">Locks daily at 3:00 PM WAT. Access today's free selections directly via our bot.</div>
+      <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-action btn-telegram">Get Free Ticket on Telegram</a>
     </div>
 
     <!-- 100+ Odds Card -->
-    <div class="ticket-card featured">
-      <div class="featured-tag">POPULAR</div>
-      <div class="card-meta">
-        <span class="pill-odds">100+ ODDS</span>
-        <span class="pill-bookie">SPORTYBET</span>
+    <div class="ticket-card" data-cat="vip">
+      <div class="card-top">
+        <span class="odds-badge">100+ ODDS</span>
+        <span class="bookie-badge">SPORTYBET CODE</span>
       </div>
+
+      <div class="card-metrics">
+        <div>
+          <div class="m-lbl">Type</div>
+          <div class="val">VIP Multi</div>
+        </div>
+        <div>
+          <div class="m-lbl">Win Rate</div>
+          <div class="val green">95%</div>
+        </div>
+        <div>
+          <div class="m-lbl">Delivery</div>
+          <div class="val">Instant</div>
+        </div>
+      </div>
+
       <div class="ticket-title">Mega VIP Accumulator</div>
-      <div class="ticket-desc">High-value multi-match combination engineered for maximum return.</div>
+      <div class="ticket-sub">High-yield multi-match combination engineered for high-value returns.</div>
+
       <div class="price-row">
-        <span class="price-label">Access Fee</span>
-        <span class="price-value">₦ 5,000</span>
+        <span class="p-label">ACCESS FEE</span>
+        <span class="p-value">₦ 5,000</span>
       </div>
-      <button type="button" class="btn-gold" onclick="openCheckout('100+ Odds Mega VIP', '5000')">Unlock Booking Code</button>
+
+      <button type="button" class="btn-action" onclick="openCheckout('100+ Odds Mega VIP', '5000')">Unlock Code — ₦ 5,000</button>
     </div>
 
     <!-- 5+ Odds Card -->
-    <div class="ticket-card">
-      <div class="card-meta">
-        <span class="pill-odds">5+ ODDS</span>
-        <span class="pill-bookie">SPORTYBET</span>
+    <div class="ticket-card" data-cat="vip">
+      <div class="card-top">
+        <span class="odds-badge">5+ ODDS</span>
+        <span class="bookie-badge">SPORTYBET CODE</span>
       </div>
+
+      <div class="card-metrics">
+        <div>
+          <div class="m-lbl">Type</div>
+          <div class="val">Rollover</div>
+        </div>
+        <div>
+          <div class="m-lbl">Confidence</div>
+          <div class="val green">98%</div>
+        </div>
+        <div>
+          <div class="m-lbl">Delivery</div>
+          <div class="val">Instant</div>
+        </div>
+      </div>
+
       <div class="ticket-title">Safe Rollover Slip</div>
-      <div class="ticket-desc">High-confidence, low-risk daily ticket ideal for consistent stake building.</div>
+      <div class="ticket-sub">Low-risk, high-confidence daily ticket built for continuous progression.</div>
+
       <div class="price-row">
-        <span class="price-label">Access Fee</span>
-        <span class="price-value">₦ 3,000</span>
+        <span class="p-label">ACCESS FEE</span>
+        <span class="p-value">₦ 3,000</span>
       </div>
-      <button type="button" class="btn-gold" onclick="openCheckout('5+ Odds Rollover', '3000')">Unlock Booking Code</button>
+
+      <button type="button" class="btn-action" onclick="openCheckout('5+ Odds Rollover', '3000')">Unlock Code — ₦ 3,000</button>
     </div>
 
   </div>
 
-  <!-- Floating Admin Contact -->
+  <!-- Floating Support Button -->
   <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="float-support">
     💬 Questions? Chat Admin directly
   </a>
 
   <!-- Payment Modal -->
   <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-box">
-      <div class="modal-head">Complete Bank Transfer</div>
+    <div class="modal-content">
+      <div class="modal-title">Complete Payment</div>
       
-      <div class="account-card">
+      <div class="bank-card">
         <strong>Bank Name:</strong> PalmPay<br>
         <strong>Account No:</strong> 9066989021<br>
         <strong>Account Name:</strong> Blessings Eboh
       </div>
 
       <form id="paymentForm">
-        <input type="hidden" id="selectedPlan">
         <input type="hidden" id="selectedAmount">
+        <input type="hidden" id="selectedPlan">
 
         <div class="form-group">
           <label>Your Full Name</label>
@@ -280,13 +342,29 @@
           <input type="text" id="userRef" placeholder="Paste transfer reference here" required>
         </div>
 
-        <button type="submit" class="btn-gold" id="submitBtn">Submit Payment Claim</button>
+        <button type="submit" class="btn-action" id="submitBtn">Submit Claim to Admin</button>
         <button type="button" class="btn-cancel" onclick="closeCheckout()">Cancel</button>
       </form>
     </div>
   </div>
 
   <script>
+    function filterCategory(category) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const cards = document.querySelectorAll('.ticket-card');
+
+      tabs.forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+
+      cards.forEach(card => {
+        if (category === 'all' || card.dataset.cat === category) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
     function openCheckout(plan, price) {
       document.getElementById('selectedPlan').value = plan;
       document.getElementById('selectedAmount').value = price;
@@ -329,12 +407,12 @@
           closeCheckout();
           document.getElementById('paymentForm').reset();
         } else {
-          alert('Failed to submit claim. Please check your details and try again.');
+          alert('Failed to submit claim. Please try again.');
         }
       } catch (err) {
-        alert('An error occurred. Please check your network connection.');
+        alert('An error occurred. Please check your connection.');
       } finally {
-        btn.innerText = 'Submit Payment Claim';
+        btn.innerText = 'Submit Claim to Admin';
         btn.disabled = false;
       }
     });
