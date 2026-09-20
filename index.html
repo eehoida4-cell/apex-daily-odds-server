@@ -3,560 +3,339 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apex Daily Odds — Premium Betting Analytics</title>
+  <title>Apex Daily Odds — Premium VIP Predictions</title>
   <style>
-    /* CSS Custom Properties & Design System */
     :root {
-      --bg-gradient: radial-gradient(circle at top, #141923 0%, #090a0f 100%);
-      --card-glass: rgba(22, 27, 38, 0.7);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent-gold: #f3ba2f;
-      --accent-cyan: #00d2ff;
+      --bg-dark: #08080a;
+      --card-bg: #0f1117;
+      --gold-primary: #d4af37;
+      --gold-glow: rgba(212, 175, 55, 0.25);
+      --text-bright: #ffffff;
+      --text-dim: #9499a8;
+      --border-subtle: #1c202e;
       --sporty-red: #e41e36;
-      --text-main: #f0f2f5;
-      --text-muted: #8e96a5;
-      --radius-lg: 16px;
-      --radius-md: 10px;
-      --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --telegram-blue: #0088cc;
     }
 
-    /* Base Reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-bright); padding-bottom: 90px; }
+
+    /* Top Banner / Announcement */
+    .top-bar { background: linear-gradient(90deg, #121622, #1b2030, #121622); text-align: center; padding: 8px 15px; font-size: 0.75rem; color: var(--gold-primary); font-weight: 700; border-bottom: 1px solid var(--border-subtle); letter-spacing: 0.5px; }
+
+    /* Header */
+    header { text-align: center; padding: 30px 20px 20px 20px; }
+    .logo-badge { display: inline-block; width: 45px; height: 45px; background: radial-gradient(circle, var(--gold-primary) 0%, #8a6d1c 100%); border-radius: 50%; line-height: 45px; font-weight: 900; color: #000; font-size: 1.2rem; margin-bottom: 10px; box-shadow: 0 0 20px var(--gold-glow); }
+    .brand-title { font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; }
+    .brand-title span { color: var(--gold-primary); }
+    .brand-sub { font-size: 0.65rem; color: var(--gold-primary); letter-spacing: 3px; font-weight: 800; margin-top: 4px; text-transform: uppercase; }
+
+    /* Hero Section */
+    .hero { text-align: center; padding: 10px 20px 25px 20px; max-width: 450px; margin: 0 auto; }
+    .hero h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; color: var(--text-bright); }
+    .hero p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+
+    /* Main Container */
+    .wrapper { max-width: 420px; margin: 0 auto; padding: 0 16px; }
+
+    /* Luxury Ticket Card Styling */
+    .ticket-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    body {
-      background: var(--bg-gradient);
-      background-attachment: fixed;
-      color: var(--text-main);
-      min-height: 100vh;
-      padding-bottom: 90px;
+    .ticket-card:hover { border-color: var(--gold-primary); }
+
+    .ticket-card.featured {
+      border: 1px solid var(--gold-primary);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.12);
     }
 
-    /* Top Navigation Bar */
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 24px;
-      border-bottom: 1px solid var(--card-border);
-      background: rgba(9, 10, 15, 0.8);
-      backdrop-filter: blur(12px);
-      position: sticky;
+    .featured-tag {
+      position: absolute;
       top: 0;
-      z-index: 100;
-    }
-
-    .brand {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .brand-name {
-      font-size: 1.1rem;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-    }
-
-    .brand-name span { color: var(--accent-gold); }
-    .brand-tagline { font-size: 0.6rem; color: var(--accent-gold); letter-spacing: 2px; font-weight: 700; margin-top: 2px; }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0, 210, 255, 0.1);
-      border: 1px solid rgba(0, 210, 255, 0.2);
-      color: var(--accent-cyan);
-      font-size: 0.72rem;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .pulse-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent-cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent-cyan);
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    /* Layout Wrapper */
-    .app-layout {
-      max-width: 440px;
-      margin: 0 auto;
-      padding: 24px 16px;
-    }
-
-    /* Tab Filter Switcher */
-    .tab-switcher {
-      display: flex;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 4px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--card-border);
-      margin-bottom: 24px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 10px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: var(--transition-smooth);
-    }
-
-    .tab-btn.active {
-      background: var(--accent-gold);
+      right: 0;
+      background: var(--gold-primary);
       color: #000;
-    }
-
-    /* Glass Cards */
-    .card {
-      background: var(--card-glass);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      margin-bottom: 18px;
-      transition: var(--transition-smooth);
-    }
-
-    .card:hover {
-      border-color: rgba(243, 186, 47, 0.3);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .badge-odds {
-      background: rgba(0, 210, 255, 0.15);
-      color: var(--accent-cyan);
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
-
-    .badge-bookie {
-      background: var(--sporty-red);
-      color: #fff;
       font-size: 0.65rem;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-bottom-left-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* Card Metrics Grid */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.25);
-      padding: 12px;
-      border-radius: var(--radius-md);
-      margin-bottom: 16px;
-      text-align: center;
-    }
+    .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+    .pill-odds { background: rgba(212, 175, 55, 0.15); color: var(--gold-primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; }
+    .pill-bookie { background: var(--sporty-red); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
 
-    .metric-item .lbl { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-    .metric-item .val { font-size: 0.85rem; font-weight: 800; color: #fff; margin-top: 2px; }
+    .ticket-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+    .ticket-desc { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 18px; line-height: 1.4; }
 
-    .card-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; }
-    .card-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px; }
+    .price-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; border-top: 1px dashed var(--border-subtle); padding-top: 15px; }
+    .price-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+    .price-value { font-size: 1.4rem; font-weight: 900; color: var(--gold-primary); }
 
-    /* Action Buttons */
-    .btn-action {
+    /* Buttons */
+    .btn-gold {
+      display: block;
       width: 100%;
-      background: var(--accent-gold);
+      background: linear-gradient(135deg, #f3ba2f 0%, #d4af37 100%);
       color: #000;
-      font-weight: 800;
+      font-weight: 900;
       border: none;
       padding: 14px;
-      border-radius: var(--radius-md);
+      border-radius: 10px;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: var(--transition-smooth);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-action:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
     }
 
     .btn-telegram {
-      background: #0088cc;
+      background: var(--telegram-blue);
       color: #fff;
-      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0, 136, 204, 0.2);
     }
 
     /* Floating Support Anchor */
-    .floating-bar {
+    .float-support {
       position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(18, 20, 28, 0.9);
-      border: 1px solid var(--accent-gold);
-      padding: 10px 20px;
+      background: #12151f;
+      border: 1px solid var(--gold-primary);
+      color: #fff;
+      padding: 10px 22px;
       border-radius: 30px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      z-index: 90;
-    }
-
-    .floating-bar a {
-      color: var(--text-main);
-      text-decoration: none;
       font-size: 0.8rem;
       font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      z-index: 99;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     /* Modal System */
-    .modal-backdrop {
+    .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
       z-index: 1000;
-      align-items: center;
       justify-content: center;
-      padding: 16px;
+      align-items: center;
+      padding: 20px;
     }
 
-    .modal-backdrop.active { display: flex; }
-
-    .modal-window {
-      background: #12151e;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
+    .modal-box {
+      background: #0f1117;
+      border: 1px solid var(--gold-primary);
+      border-radius: 16px;
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      position: relative;
     }
 
-    .modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; color: var(--accent-gold); }
+    .modal-head { font-size: 1.2rem; font-weight: 800; color: var(--gold-primary); text-align: center; margin-bottom: 15px; }
 
-    .bank-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px dashed var(--accent-gold);
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      margin-bottom: 16px;
-      font-size: 0.82rem;
+    .account-card {
+      background: #08080a;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 18px;
+      font-size: 0.85rem;
       line-height: 1.6;
     }
 
-    .form-group { margin-bottom: 12px; text-align: left; }
-    .form-group label { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    .account-card strong { color: var(--gold-primary); }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
     .form-group input {
       width: 100%;
-      background: #090a0f;
-      border: 1px solid var(--card-border);
+      background: #08080a;
+      border: 1px solid var(--border-subtle);
       color: #fff;
       padding: 12px;
       border-radius: 8px;
       font-size: 0.85rem;
       outline: none;
-      transition: var(--transition-smooth);
     }
 
-    .form-group input:focus { border-color: var(--accent-gold); }
+    .form-group input:focus { border-color: var(--gold-primary); }
 
-    .btn-close {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    /* Toast Notification System */
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 2000;
-    }
-
-    .toast {
-      background: #1c2234;
-      border-left: 4px solid var(--accent-gold);
-      color: #fff;
-      padding: 12px 18px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-      display: none;
-    }
-
-    .toast.active { display: block; animation: fadeIn 0.3s forwards; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .btn-cancel { width: 100%; background: transparent; color: var(--text-dim); border: none; padding: 10px; font-size: 0.8rem; cursor: pointer; margin-top: 6px; font-weight: 700; }
   </style>
 </head>
 <body>
 
-  <!-- App Header -->
-  <header class="navbar">
-    <div class="brand">
-      <div class="brand-name">APEX <span>DAILY ODDS</span></div>
-      <div class="brand-tagline">RULE EVERY PREDICTION</div>
-    </div>
-    <div class="status-badge">
-      <div class="pulse-dot"></div> LIVE SLIPS
-    </div>
+  <!-- Top Announcement -->
+  <div class="top-bar">⚡ SPORTYBET CODES — INSTANT TELEGRAM DELIVERY</div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-badge">A</div>
+    <div class="brand-title">APEX <span>DAILY ODDS</span></div>
+    <div class="brand-sub">RULE EVERY PREDICTION</div>
   </header>
 
-  <!-- Layout Wrapper -->
-  <main class="app-layout">
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Verified VIP Predictions</h1>
+    <p>Select your preferred ticket tier below, complete the transfer, and receive your booking code immediately.</p>
+  </section>
 
-    <!-- Tab Switcher -->
-    <div class="tab-switcher">
-      <button class="tab-btn active" onclick="switchTab('all')">All Tickets</button>
-      <button class="tab-btn" onclick="switchTab('vip')">VIP Slips</button>
-      <button class="tab-btn" onclick="switchTab('free')">Free Tips</button>
-    </div>
+  <!-- Main Tickets Wrapper -->
+  <div class="wrapper">
 
     <!-- Free Ticket Card -->
-    <div class="card ticket-item" data-category="free">
-      <div class="card-header">
-        <span class="badge-odds">FREE DAILY</span>
-        <span class="badge-bookie">TELEGRAM BOT</span>
+    <div class="ticket-card">
+      <div class="card-meta">
+        <span class="pill-odds" style="color:#00d2ff; background:rgba(0,210,255,0.1);">DAILY FREE</span>
+        <span class="pill-bookie" style="background:#0088cc;">TELEGRAM BOT</span>
       </div>
-      <div class="card-title">Community Selections</div>
-      <div class="card-desc">Daily free match projections released every afternoon.</div>
-      <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-action btn-telegram">
-        Get Today's Free Ticket
-      </a>
+      <div class="ticket-title">Free Community Slip</div>
+      <div class="ticket-desc">Locks daily at 3:00 PM WAT. Access today's free selections via our Telegram bot.</div>
+      <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-gold btn-telegram">Get Free Ticket on Telegram</a>
     </div>
 
-    <!-- VIP 100+ Odds -->
-    <div class="card ticket-item" data-category="vip">
-      <div class="card-header">
-        <span class="badge-odds">100+ ODDS</span>
-        <span class="badge-bookie">SPORTYBET</span>
+    <!-- 100+ Odds Card -->
+    <div class="ticket-card featured">
+      <div class="featured-tag">POPULAR</div>
+      <div class="card-meta">
+        <span class="pill-odds">100+ ODDS</span>
+        <span class="pill-bookie">SPORTYBET</span>
       </div>
-      
-      <div class="metrics-grid">
-        <div class="metric-item">
-          <div class="lbl">Format</div>
-          <div class="val">Accumulator</div>
-        </div>
-        <div class="metric-item">
-          <div class="lbl">Risk Factor</div>
-          <div class="val">High Return</div>
-        </div>
-        <div class="metric-item">
-          <div class="lbl">Delivery</div>
-          <div class="val">Instant</div>
-        </div>
+      <div class="ticket-title">Mega VIP Accumulator</div>
+      <div class="ticket-desc">High-value multi-match combination engineered for maximum return.</div>
+      <div class="price-row">
+        <span class="price-label">Access Fee</span>
+        <span class="price-value">₦ 5,000</span>
       </div>
-
-      <div class="card-title">VIP Mega Ticket</div>
-      <div class="card-desc">High-yield multi-match accumulator booking code.</div>
-      <button class="btn-action" onclick="handleCheckout('100+ Odds Mega VIP', '5000')">
-        Unlock Ticket — ₦ 5,000
-      </button>
+      <button type="button" class="btn-gold" onclick="openCheckout('100+ Odds Mega VIP', '5000')">Unlock Booking Code</button>
     </div>
 
-    <!-- VIP 5+ Odds -->
-    <div class="card ticket-item" data-category="vip">
-      <div class="card-header">
-        <span class="badge-odds">5+ ODDS</span>
-        <span class="badge-bookie">SPORTYBET</span>
+    <!-- 5+ Odds Card -->
+    <div class="ticket-card">
+      <div class="card-meta">
+        <span class="pill-odds">5+ ODDS</span>
+        <span class="pill-bookie">SPORTYBET</span>
       </div>
-
-      <div class="metrics-grid">
-        <div class="metric-item">
-          <div class="lbl">Format</div>
-          <div class="val">Rollover</div>
-        </div>
-        <div class="metric-item">
-          <div class="lbl">Confidence</div>
-          <div class="val">92%</div>
-        </div>
-        <div class="metric-item">
-          <div class="lbl">Delivery</div>
-          <div class="val">Instant</div>
-        </div>
+      <div class="ticket-title">Safe Rollover Slip</div>
+      <div class="ticket-desc">High-confidence, low-risk daily ticket ideal for consistent stake building.</div>
+      <div class="price-row">
+        <span class="price-label">Access Fee</span>
+        <span class="price-value">₦ 3,000</span>
       </div>
-
-      <div class="card-title">Safe Rollover Slip</div>
-      <div class="card-desc">Low-risk steady growth combination for daily progression.</div>
-      <button class="btn-action" onclick="handleCheckout('5+ Odds Rollover', '3000')">
-        Unlock Ticket — ₦ 3,000
-      </button>
+      <button type="button" class="btn-gold" onclick="openCheckout('5+ Odds Rollover', '3000')">Unlock Booking Code</button>
     </div>
 
-  </main>
-
-  <!-- Support Bar -->
-  <div class="floating-bar">
-    <a href="https://t.me/ApexDailyOddsHQ" target="_blank">
-      💬 Have Questions? Contact Support
-    </a>
   </div>
 
-  <!-- Checkout Modal Backdrop -->
-  <div class="modal-backdrop" id="paymentModal">
-    <div class="modal-window">
-      <div class="modal-title">Complete Payment Claim</div>
+  <!-- Floating Admin Contact -->
+  <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="float-support">
+    💬 Questions? Chat Admin directly
+  </a>
+
+  <!-- Payment Modal -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-box">
+      <div class="modal-head">Complete Bank Transfer</div>
       
-      <div class="bank-card">
+      <div class="account-card">
         <strong>Bank Name:</strong> PalmPay<br>
         <strong>Account No:</strong> 9066989021<br>
         <strong>Account Name:</strong> Blessings Eboh
       </div>
 
-      <form id="checkoutForm">
+      <form id="paymentForm">
         <input type="hidden" id="selectedPlan">
-        <input type="hidden" id="selectedPrice">
+        <input type="hidden" id="selectedAmount">
 
         <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="custName" placeholder="Enter full name" required>
+          <label>Your Full Name</label>
+          <input type="text" id="userName" placeholder="e.g. John Doe" required>
         </div>
 
         <div class="form-group">
-          <label>Telegram Handle or Phone</label>
-          <input type="text" id="custContact" placeholder="@username or 080..." required>
+          <label>Telegram Username or Phone Number</label>
+          <input type="text" id="userTelegram" placeholder="@yourusername or 080..." required>
         </div>
 
         <div class="form-group">
-          <label>Transaction Session ID / Reference</label>
-          <input type="text" id="custRef" placeholder="Paste payment reference" required>
+          <label>Payment Reference / Session ID</label>
+          <input type="text" id="userRef" placeholder="Paste transfer reference here" required>
         </div>
 
-        <button type="submit" class="btn-action" style="margin-top: 10px;" id="submitBtn">
-          Submit Claim
-        </button>
-        <button type="button" class="btn-close" onclick="closeCheckout()">Cancel</button>
+        <button type="submit" class="btn-gold" id="submitBtn">Submit Payment Claim</button>
+        <button type="button" class="btn-cancel" onclick="closeCheckout()">Cancel</button>
       </form>
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
-  <div class="toast-container">
-    <div class="toast" id="appToast">Notification message here</div>
-  </div>
-
-  <!-- Application Logic -->
   <script>
-    // Tab Switching Mechanism
-    function switchTab(category) {
-      const buttons = document.querySelectorAll('.tab-btn');
-      const items = document.querySelectorAll('.ticket-item');
-
-      buttons.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-
-      items.forEach(item => {
-        if (category === 'all' || item.dataset.category === category) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-    }
-
-    // Modal Operations
-    function handleCheckout(planName, price) {
-      document.getElementById('selectedPlan').value = planName;
-      document.getElementById('selectedPrice').value = price;
-      document.getElementById('paymentModal').classList.add('active');
+    function openCheckout(plan, price) {
+      document.getElementById('selectedPlan').value = plan;
+      document.getElementById('selectedAmount').value = price;
+      document.getElementById('checkoutModal').style.display = 'flex';
     }
 
     function closeCheckout() {
-      document.getElementById('paymentModal').classList.remove('active');
+      document.getElementById('checkoutModal').style.display = 'none';
     }
 
-    // Toast Alert Helper
-    function triggerToast(message) {
-      const toast = document.getElementById('appToast');
-      toast.innerText = message;
-      toast.classList.add('active');
-      setTimeout(() => toast.classList.remove('active'), 4000);
-    }
-
-    // Form Processing Handler
-    document.getElementById('checkoutForm').addEventListener('submit', async function(e) {
+    document.getElementById('paymentForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.innerText = 'Verifying...';
-      submitBtn.disabled = true;
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = 'Submitting...';
+      btn.disabled = true;
 
-      const payload = {
-        name: document.getElementById('custName').value,
-        telegram: document.getElementById('custContact').value,
-        reference: document.getElementById('custRef').value,
-        plan: document.getElementById('selectedPlan').value,
-        price: document.getElementById('selectedPrice').value
-      };
+      const name = document.getElementById('userName').value;
+      const telegram = document.getElementById('userTelegram').value;
+      const reference = document.getElementById('userRef').value;
+      const amount = document.getElementById('selectedAmount').value;
+      const plan = document.getElementById('selectedPlan').value;
 
       try {
-        const res = await fetch('/api/checkout', {
+        const response = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: payload.name,
-            telegram: payload.telegram,
-            reference: payload.reference,
-            amount: `₦${payload.price} (${payload.plan})`
+            name: name,
+            telegram: telegram,
+            reference: reference,
+            amount: `₦${amount} (${plan})`
           })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
         if (data.success) {
-          triggerToast('Claim submitted! Verification in progress.');
+          alert('Claim submitted successfully! Check your Telegram shortly for your code.');
           closeCheckout();
-          document.getElementById('checkoutForm').reset();
+          document.getElementById('paymentForm').reset();
         } else {
-          triggerToast('Submission error. Please verify input details.');
+          alert('Failed to submit claim. Please check your details and try again.');
         }
-      } catch (error) {
-        triggerToast('Network issue encountered. Retry request.');
+      } catch (err) {
+        alert('An error occurred. Please check your network connection.');
       } finally {
-        submitBtn.innerText = 'Submit Claim';
-        submitBtn.disabled = false;
+        btn.innerText = 'Submit Payment Claim';
+        btn.disabled = false;
       }
     });
   </script>
