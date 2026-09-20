@@ -129,6 +129,8 @@
     }
 
     .btn-telegram { background: linear-gradient(135deg, #0088cc 0%, #005580 100%); color: #fff; box-shadow: 0 4px 20px rgba(0, 136, 204, 0.25); }
+    .btn-whatsapp { background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); color: #fff; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.25); margin-top: 8px; }
+    .btn-snapchat { background: linear-gradient(135deg, #fffc00 0%, #d4d100 100%); color: #000; box-shadow: 0 4px 20px rgba(255, 252, 0, 0.25); margin-top: 8px; }
 
     /* Floating Support Anchor */
     .float-support {
@@ -201,6 +203,12 @@
     }
     .form-group input:focus { border-color: var(--neon-cyan); }
 
+    .platform-selector {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 14px;
+    }
+
     .btn-cancel { width: 100%; background: transparent; color: var(--text-sub); border: none; padding: 10px; font-size: 0.8rem; cursor: pointer; margin-top: 6px; font-weight: 800; }
   </style>
 </head>
@@ -232,11 +240,12 @@
     <div class="ticket-card" data-cat="free">
       <div class="card-top">
         <span class="odds-badge" style="color: #fff; border-color: rgba(255,255,255,0.2);">FREE TICKET</span>
-        <span class="bookie-badge" style="background: #0088cc;">TELEGRAM BOT</span>
+        <span class="bookie-badge" style="background: #0088cc;">FREE ACCESS</span>
       </div>
       <div class="ticket-title">Daily Community Selection</div>
-      <div class="ticket-sub">Locks daily at 3:00 PM WAT. Access today's free selections directly via our bot.</div>
+      <div class="ticket-sub">Locks daily at 3:00 PM WAT. Access today's free selections via Telegram or WhatsApp.</div>
       <a href="https://t.me/ApexTicketMaster_bot?start=get_free_ticket" target="_blank" class="btn-action btn-telegram">Get Free Ticket on Telegram</a>
+      <a href="https://wa.me/qr/SOSZSCNBJSZ4K1" target="_blank" class="btn-action btn-whatsapp">Get Free Ticket on WhatsApp</a>
     </div>
 
     <!-- 100+ Odds Card -->
@@ -308,8 +317,8 @@
   </div>
 
   <!-- Floating Support Button -->
-  <a href="https://t.me/ApexDailyOddsHQ" target="_blank" class="float-support">
-    💬 Questions? Chat Admin directly
+  <a href="https://wa.me/qr/SOSZSCNBJSZ4K1" target="_blank" class="float-support">
+    💬 Questions? Chat Admin on WhatsApp
   </a>
 
   <!-- Payment Modal -->
@@ -333,8 +342,8 @@
         </div>
 
         <div class="form-group">
-          <label>Telegram Username or Phone Number</label>
-          <input type="text" id="userTelegram" placeholder="@yourusername or 080..." required>
+          <label>Your Contact Handle / Phone Number</label>
+          <input type="text" id="userContact" placeholder="e.g. 09066989021 or @snapusername" required>
         </div>
 
         <div class="form-group">
@@ -342,13 +351,25 @@
           <input type="text" id="userRef" placeholder="Paste transfer reference here" required>
         </div>
 
-        <button type="submit" class="btn-action" id="submitBtn">Submit Claim to Admin</button>
+        <div class="platform-selector">
+          <label style="display:block; font-size:0.72rem; color:var(--text-sub); font-weight:700; margin-bottom:8px; text-transform:uppercase;">Select Where to Send Claim:</label>
+          
+          <button type="button" class="btn-action btn-whatsapp" onclick="submitToPlatform('whatsapp')">Send Claim via WhatsApp</button>
+          <button type="button" class="btn-action btn-telegram" style="margin-top:8px;" onclick="submitToPlatform('telegram')">Send Claim via Telegram</button>
+          <button type="button" class="btn-action btn-snapchat" onclick="submitToPlatform('snapchat')">Send Claim via Snapchat</button>
+        </div>
+
         <button type="button" class="btn-cancel" onclick="closeCheckout()">Cancel</button>
       </form>
     </div>
   </div>
 
   <script>
+    // YOUR EXACT SOCIAL LINKS
+    const WHATSAPP_LINK = "https://wa.me/qr/SOSZSCNBJSZ4K1";
+    const TELEGRAM_HANDLE = "ApexDailyOddsHQ";
+    const SNAPCHAT_LINK = "https://www.snapchat.com/add/apex_prediction?share_id=tu917l6LlM4&locale=en-GB";
+
     function filterCategory(category, e) {
       const tabs = document.querySelectorAll('.tab-btn');
       const cards = document.querySelectorAll('.ticket-card');
@@ -377,31 +398,50 @@
       document.getElementById('checkoutModal').style.display = 'none';
     }
 
-    document.getElementById('paymentForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const name = document.getElementById('userName').value;
-      const telegram = document.getElementById('userTelegram').value;
-      const reference = document.getElementById('userRef').value;
+    function submitToPlatform(platform) {
+      const name = document.getElementById('userName').value.trim();
+      const contact = document.getElementById('userContact').value.trim();
+      const reference = document.getElementById('userRef').value.trim();
       const amount = document.getElementById('selectedAmount').value;
       const plan = document.getElementById('selectedPlan').value;
 
-      // Format clean message for Telegram
+      if (!name || !contact || !reference) {
+        alert("Please fill in your Name, Contact, and Payment Reference before submitting.");
+        return;
+      }
+
+      // Format clean message
       const message = `Hello Admin, I have made payment for ${plan} (₦${amount}).\n\n` +
                       `👤 Name: ${name}\n` +
-                      `📱 Telegram/Phone: ${telegram}\n` +
+                      `📱 Contact: ${contact}\n` +
                       `💳 Payment Ref/Session ID: ${reference}\n\n` +
                       `Please verify and send me my SportyBet booking code!`;
 
-      // Encode for URL query
       const encodedMessage = encodeURIComponent(message);
-      
-      // Redirect directly to your Telegram handle
-      window.open(`https://t.me/ApexDailyOddsHQ?text=${encodedMessage}`, '_blank');
+
+      if (platform === 'whatsapp') {
+        // Copies claim message to clipboard and opens exact WhatsApp QR link
+        navigator.clipboard.writeText(message).then(() => {
+          alert("Payment details copied to clipboard! Opening WhatsApp...");
+          window.open(WHATSAPP_LINK, '_blank');
+        }).catch(() => {
+          window.open(WHATSAPP_LINK, '_blank');
+        });
+      } else if (platform === 'telegram') {
+        window.open(`https://t.me/${TELEGRAM_HANDLE}?text=${encodedMessage}`, '_blank');
+      } else if (platform === 'snapchat') {
+        // Copies claim message to clipboard and opens exact Snapchat link
+        navigator.clipboard.writeText(message).then(() => {
+          alert("Payment claim copied to clipboard! Paste it into Snapchat chat with Admin.");
+          window.open(SNAPCHAT_LINK, '_blank');
+        }).catch(() => {
+          window.open(SNAPCHAT_LINK, '_blank');
+        });
+      }
 
       closeCheckout();
       document.getElementById('paymentForm').reset();
-    });
+    }
   </script>
 </body>
 </html>
