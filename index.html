@@ -61,6 +61,22 @@
     .timer-title { font-size: 0.72rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
     .timer-display { font-size: 1.2rem; font-weight: 900; color: var(--sporty-red); letter-spacing: 1px; margin-top: 2px; }
 
+    /* Winning Tickets Horizontal Carousel */
+    .proof-section { margin-bottom: 22px; }
+    .proof-title { font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .proof-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+    .proof-card {
+      min-width: 130px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .win-badge { display: inline-block; background: var(--win-green); color: #000; font-size: 0.65rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; }
+    .code-preview { font-size: 0.72rem; color: var(--text-sub); font-family: monospace; }
+
     /* Category Filter Tabs */
     .tabs-group {
       display: flex;
@@ -275,6 +291,8 @@
       max-width: 380px;
       padding: 24px;
       box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .modal-title { font-size: 1.2rem; font-weight: 900; color: var(--neon-cyan); text-align: center; margin-bottom: 14px; }
@@ -284,22 +302,32 @@
       border: 1px dashed rgba(0, 240, 255, 0.3);
       padding: 14px;
       border-radius: var(--radius-md);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 0.84rem;
       line-height: 1.6;
     }
     .bank-card strong { color: var(--accent-gold); }
 
+    .ussd-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      padding: 10px;
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+    }
+    .ussd-label { display: block; font-size: 0.68rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+    .ussd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
     .btn-copy {
       background: rgba(0, 240, 255, 0.15);
       color: var(--neon-cyan);
       border: 1px solid var(--neon-cyan);
-      padding: 4px 10px;
+      padding: 5px 8px;
       border-radius: 6px;
       font-size: 0.7rem;
       font-weight: 800;
       cursor: pointer;
-      margin-top: 6px;
+      transition: all 0.2s;
     }
 
     .form-group { margin-bottom: 12px; text-align: left; }
@@ -351,6 +379,25 @@
     <div class="timer-banner">
       <div class="timer-title">⏰ Today's VIP Codes Lock In</div>
       <div class="timer-display" id="countdownTimer">02h : 45m : 12s</div>
+    </div>
+
+    <!-- Winning Tickets Proof Scroll -->
+    <div class="proof-section">
+      <div class="proof-title">🏆 Recent Winning Tickets</div>
+      <div class="proof-scroll">
+        <div class="proof-card">
+          <span class="win-badge">WON 118.4 ODDS</span>
+          <div class="code-preview">SportyBet: BC82...</div>
+        </div>
+        <div class="proof-card">
+          <span class="win-badge">WON 5.8 ODDS</span>
+          <div class="code-preview">SportyBet: SB91...</div>
+        </div>
+        <div class="proof-card">
+          <span class="win-badge">WON 94.2 ODDS</span>
+          <div class="code-preview">SportyBet: AP77...</div>
+        </div>
+      </div>
     </div>
 
     <!-- Category Tabs -->
@@ -491,13 +538,32 @@
   <!-- Payment Modal -->
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal-content">
-      <div class="modal-title">Complete Payment</div>
+      <div class="modal-title">Complete Payment 🇳🇬</div>
       
+      <!-- Bank Card with Copy Account -->
       <div class="bank-card">
-        <strong>Bank Name:</strong> PalmPay<br>
-        <strong>Account No:</strong> <span id="accNum">9066989021</span><br>
-        <strong>Account Name:</strong> Blessings Eboh<br>
-        <button type="button" class="btn-copy" onclick="copyAccount()">📋 Copy Account Number</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span><strong>Bank Name:</strong> PalmPay</span>
+          <span style="font-size: 0.65rem; background: var(--win-green); color: #000; font-weight: 900; padding: 2px 6px; border-radius: 4px;">INSTANT</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span><strong>Account No:</strong> <span id="accNum">9066989021</span></span>
+          <button type="button" class="btn-copy" onclick="copyAccount()">📋 Copy</button>
+        </div>
+        <div><strong>Account Name:</strong> Blessings Eboh</div>
+      </div>
+
+      <!-- USSD Quick-Pay Helper 🇳🇬 -->
+      <div class="ussd-box">
+        <label class="ussd-label">⚡ Fast Transfer via USSD:</label>
+        <div class="ussd-grid">
+          <button type="button" class="btn-copy" style="width:100%; text-align:center;" onclick="generateUSSD('GTB')">GTBank</button>
+          <button type="button" class="btn-copy" style="width:100%; text-align:center;" onclick="generateUSSD('Zenith')">Zenith</button>
+          <button type="button" class="btn-copy" style="width:100%; text-align:center;" onclick="generateUSSD('Access')">Access</button>
+          <button type="button" class="btn-copy" style="width:100%; text-align:center;" onclick="generateUSSD('UBA')">UBA</button>
+          <button type="button" class="btn-copy" style="width:100%; text-align:center;" onclick="generateUSSD('FirstBank')">FirstBank</button>
+          <button type="button" class="btn-copy" style="width:100%; text-align:center;" onclick="generateUSSD('Other')">Other/App</button>
+        </div>
       </div>
 
       <form id="paymentForm">
@@ -517,6 +583,12 @@
         <div class="form-group">
           <label>Payment Reference / Session ID</label>
           <input type="text" id="userRef" placeholder="Paste transfer reference here" required>
+        </div>
+
+        <!-- Payment Proof Screenshot Uploader -->
+        <div class="form-group">
+          <label>Attach Payment Receipt / Screenshot</label>
+          <input type="file" id="paymentProof" accept="image/*" style="padding: 8px; font-size: 0.75rem;">
         </div>
 
         <div class="platform-selector">
@@ -558,9 +630,9 @@
     }
 
     // Modal Controls
-    function openCheckout(plan, price) {
-      document.getElementById('selectedPlan').value = plan;
-      document.getElementById('selectedAmount').value = price;
+    function openCheckout(planName, amount) {
+      document.getElementById('selectedPlan').value = planName;
+      document.getElementById('selectedAmount').value = amount;
       document.getElementById('checkoutModal').style.display = 'flex';
     }
 
@@ -570,106 +642,121 @@
 
     // Copy Account Number
     function copyAccount() {
-      const acc = document.getElementById('accNum').innerText;
-      navigator.clipboard.writeText(acc).then(() => {
-        alert("Account number copied: " + acc);
+      const accNum = document.getElementById('accNum').innerText;
+      navigator.clipboard.writeText(accNum).then(() => {
+        alert("Account number copied: " + accNum);
       });
     }
 
-    // Submission Handler
+    // USSD Dial String Helper 🇳🇬
+    function generateUSSD(bank) {
+      const accNum = document.getElementById('accNum').innerText;
+      const amount = document.getElementById('selectedAmount').value || "5000";
+      
+      let ussdCode = "";
+      switch(bank) {
+        case 'GTB': ussdCode = `*737*2*${amount}*${accNum}#`; break;
+        case 'Zenith': ussdCode = `*966*${amount}*${accNum}#`; break;
+        case 'Access': ussdCode = `*901*2*${amount}*${accNum}#`; break;
+        case 'UBA': ussdCode = `*919*3*${accNum}*${amount}#`; break;
+        case 'FirstBank': ussdCode = `*894*${amount}*${accNum}#`; break;
+        default: 
+          copyAccount();
+          alert("Account number copied! Paste it into your banking app to transfer."); 
+          return;
+      }
+      
+      window.location.href = `tel:${encodeURIComponent(ussdCode)}`;
+    }
+
+    // FAQ Accordion Toggle
+    function toggleFaq(el) {
+      const ans = el.nextElementSibling;
+      const icon = el.querySelector('span');
+      if (ans.style.display === 'block') {
+        ans.style.display = 'none';
+        icon.innerText = '+';
+      } else {
+        ans.style.display = 'block';
+        icon.innerText = '-';
+      }
+    }
+
+    // Claim Submission Routing
     function submitToPlatform(platform) {
+      const plan = document.getElementById('selectedPlan').value;
+      const amount = document.getElementById('selectedAmount').value;
       const name = document.getElementById('userName').value.trim();
       const contact = document.getElementById('userContact').value.trim();
-      const reference = document.getElementById('userRef').value.trim();
-      const amount = document.getElementById('selectedAmount').value;
-      const plan = document.getElementById('selectedPlan').value;
+      const ref = document.getElementById('userRef').value.trim();
+      const proofInput = document.getElementById('paymentProof');
+      const hasProof = proofInput && proofInput.files.length > 0 ? "Yes (Attached in device)" : "Not attached";
 
-      if (!name || !contact || !reference) {
-        alert("Please fill in your Name, Contact, and Payment Reference before submitting.");
+      if (!name || !contact || !ref) {
+        alert("Please fill in all fields before sending your claim.");
         return;
       }
 
-      const message = `Hello Admin, I have made payment for ${plan} (₦${amount}).\n\n` +
-                      `👤 Name: ${name}\n` +
-                      `📱 Contact: ${contact}\n` +
-                      `💳 Payment Ref/Session ID: ${reference}\n\n` +
-                      `Please verify and send me my SportyBet booking code!`;
-
-      const encodedMessage = encodeURIComponent(message);
+      const message = `Hello Admin, I have paid ₦${amount} for ${plan}.\n\nName: ${name}\nContact: ${contact}\nRef/Session ID: ${ref}\nReceipt Screenshot: ${hasProof}\n\nPlease send my SportyBet booking code!`;
 
       if (platform === 'whatsapp') {
-        navigator.clipboard.writeText(message).then(() => {
-          alert("Payment details copied to clipboard! Opening WhatsApp...");
-          window.open(WHATSAPP_LINK, '_blank');
-        }).catch(() => {
-          window.open(WHATSAPP_LINK, '_blank');
-        });
+        const encoded = encodeURIComponent(message);
+        window.open(`${WHATSAPP_LINK}?text=${encoded}`, '_blank');
       } else if (platform === 'telegram') {
-        window.open(`https://t.me/${TELEGRAM_HANDLE}?text=${encodedMessage}`, '_blank');
+        window.open(`https://t.me/${TELEGRAM_HANDLE}`, '_blank');
       } else if (platform === 'snapchat') {
-        navigator.clipboard.writeText(message).then(() => {
-          alert("Payment claim copied to clipboard! Paste it into Snapchat chat with Admin.");
-          window.open(SNAPCHAT_LINK, '_blank');
-        }).catch(() => {
-          window.open(SNAPCHAT_LINK, '_blank');
-        });
+        window.open(SNAPCHAT_LINK, '_blank');
       }
 
       closeCheckout();
-      document.getElementById('paymentForm').reset();
     }
 
-    // Toggle FAQ
-    function toggleFaq(element) {
-      const answer = element.nextElementSibling;
-      const span = element.querySelector('span');
-      if (answer.style.display === 'block') {
-        answer.style.display = 'none';
-        span.innerText = '+';
-      } else {
-        answer.style.display = 'block';
-        span.innerText = '−';
-      }
-    }
-
-    // Dynamic Countdown Timer
-    function startCountdown() {
-      let seconds = 9912; // ~2h 45m
-      const timerElement = document.getElementById('countdownTimer');
-      setInterval(() => {
-        seconds--;
-        if (seconds <= 0) seconds = 10800;
-        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-        const secs = String(seconds % 60).padStart(2, '0');
-        timerElement.innerText = `${hrs}h : ${mins}m : ${secs}s`;
-      }, 1000);
-    }
-    startCountdown();
-
-    // Social Proof Toast Notifications
-    const proofMessages = [
-      "David from Abuja just unlocked 100+ Odds VIP!",
-      "Emeka from Port Harcourt got the Safe Rollover Slip!",
-      "Chidi from Lagos unlocked 100+ Odds VIP!",
-      "Blessing from Benin unlocked Safe Rollover Slip!"
+    // Social Proof Toast Notification Cycle
+    const socialProofs = [
+      "John from Lagos just unlocked 100+ Odds VIP!",
+      "Kwame from Accra unlocked 5+ Safe Rollover!",
+      "Emmanuel from Abuja verified payment for 100+ VIP!",
+      "David from Port Harcourt received SportyBet VIP Code!",
+      "Seyi from Ibadan unlocked Daily Rollover Ticket!"
     ];
+    let proofIndex = 0;
 
-    function showSocialProof() {
+    function showNextProof() {
       const toast = document.getElementById('proofToast');
       const text = document.getElementById('proofText');
       
-      setInterval(() => {
-        const randomMsg = proofMessages[Math.floor(Math.random() * proofMessages.length)];
-        text.innerText = randomMsg;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-          toast.classList.remove('show');
-        }, 4000);
-      }, 12000);
+      text.innerText = socialProofs[proofIndex];
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+
+      proofIndex = (proofIndex + 1) % socialProofs.length;
     }
-    showSocialProof();
+
+    setInterval(showNextProof, 12000);
+
+    // Countdown Timer Loop
+    function startCountdown() {
+      let duration = 2 * 3600 + 45 * 60 + 12; // 02h 45m 12s
+      const timerDisplay = document.getElementById('countdownTimer');
+
+      setInterval(() => {
+        if (duration <= 0) duration = 3 * 3600; // Reset loop
+        
+        const hours = Math.floor(duration / 3600);
+        const minutes = Math.floor((duration % 3600) / 60);
+        const seconds = duration % 60;
+
+        timerDisplay.innerText = 
+          `${String(hours).padStart(2, '0')}h : ${String(minutes).padStart(2, '0')}m : ${String(seconds).padStart(2, '0')}s`;
+
+        duration--;
+      }, 1000);
+    }
+
+    startCountdown();
   </script>
 </body>
 </html>
