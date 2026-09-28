@@ -1,10 +1,37 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+const FormData = require('form-data');
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
+
+// Ensure 'uploads' directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure Multer Storage for Uploaded Receipts
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname) || '.png';
+        cb(null, `receipt-${uniqueSuffix}${ext}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 const BOT_TOKEN = '8557858552:AAFkjy5dRa-EePWF4bHrxL2y1_B6gdcq12Y';
 const ADMIN_CHAT_ID = '8863246341';
@@ -27,8 +54,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Endpoint to receive payment notification from frontend
-app.post('/api/checkout', async (req, res) => {
+// Endpoint to receive payment notification and uploaded receipt file from frontend
+app.post('/api/checkout', upload.single('paymentProof'), async (req, res) => {
     const { name, telegram, reference, amount } = req.body;
 
     let cleanTelegram = telegram ? String(telegram).trim().replace(/^@/, '') : '';
@@ -63,12 +90,28 @@ app.post('/api/checkout', async (req, res) => {
     };
 
     try {
-        await axios.post(`${TELEGRAM_API}/sendMessage`, {
-            chat_id: ADMIN_CHAT_ID,
-            text: text,
-            parse_mode: 'Markdown',
-            reply_markup: keyboard
-        });
+        // Check if user uploaded a screenshot receipt file
+        if (req.file) {
+            const formData = new FormData();
+            formData.append('chat_id', ADMIN_CHAT_ID);
+            formData.append('caption', text);
+            formData.append('parse_mode', 'Markdown');
+            formData.append('reply_markup', JSON.stringify(keyboard));
+            formData.append('photo', fs.createReadStream(req.file.path));
+
+            await axios.post(`${TELEGRAM_API}/sendPhoto`, formData, {
+                headers: formData.getHeaders()
+            });
+        } else {
+            // Send regular text message if no file was uploaded
+            await axios.post(`${TELEGRAM_API}/sendMessage`, {
+                chat_id: ADMIN_CHAT_ID,
+                text: text,
+                parse_mode: 'Markdown',
+                reply_markup: keyboard
+            });
+        }
+
         res.status(200).json({ success: true, message: 'Notification sent to admin' });
     } catch (error) {
         console.error('Telegram API error:', error.response ? error.response.data : error.message);
