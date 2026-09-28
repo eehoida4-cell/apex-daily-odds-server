@@ -56,35 +56,49 @@ app.get('/', (req, res) => {
 
 // Endpoint to receive payment notification and uploaded receipt file from frontend
 app.post('/api/checkout', upload.single('paymentProof'), async (req, res) => {
-    const { name, telegram, reference, amount } = req.body;
+    const { name, telegram, whatsapp, snapchat, reference, amount } = req.body;
 
     let cleanTelegram = telegram ? String(telegram).trim().replace(/^@/, '') : '';
-    const userLink = cleanTelegram ? `https://t.me/${cleanTelegram}` : null;
+    let cleanWhatsApp = whatsapp ? String(whatsapp).trim().replace(/[^0-9]/g, '') : '';
+    let cleanSnapchat = snapchat ? String(snapchat).trim().replace(/^@/, '') : '';
+
+    const userTgLink = cleanTelegram ? `https://t.me/${cleanTelegram}` : null;
+    const userWaLink = cleanWhatsApp ? `https://wa.me/${cleanWhatsApp}` : null;
+    const userSnapLink = cleanSnapchat ? `https://snapchat.com/add/${cleanSnapchat}` : null;
 
     const safeName = escapeMarkdown(name || 'N/A');
-    const safeContact = cleanTelegram ? `@${cleanTelegram}` : 'N/A';
     const safeRef = String(reference || 'N/A').replace(/`/g, '');
     const safeAmount = escapeMarkdown(amount || '0');
 
     const text = `🚨 *NEW PAYMENT CLAIM* 🚨\n\n` +
                  `👤 *Name:* ${safeName}\n` +
-                 `📱 *Contact:* ${safeContact}\n` +
+                 `📱 *Telegram:* ${cleanTelegram ? '@' + escapeMarkdown(cleanTelegram) : 'N/A'}\n` +
+                 `🟢 *WhatsApp:* ${cleanWhatsApp ? '+' + escapeMarkdown(cleanWhatsApp) : 'N/A'}\n` +
+                 `👻 *Snapchat:* ${cleanSnapchat ? escapeMarkdown(cleanSnapchat) : 'N/A'}\n` +
                  `💰 *Amount / Plan:* ₦${safeAmount}\n` +
                  `🧾 *Ref:* \`${safeRef}\` \n\n` +
                  `🏦 *Account Details:* ${BANK_DETAILS.bankName} | ${BANK_DETAILS.accountNumber} (${BANK_DETAILS.accountName})`;
 
-    // Build inline keyboard with direct chat link button + confirm button
+    // Build inline action buttons for Admin
     const inlineButtons = [];
-    
-    if (userLink) {
-        inlineButtons.push({ text: "💬 Message Customer on Telegram", url: userLink });
+
+    if (userTgLink) {
+        inlineButtons.push({ text: "💬 Telegram", url: userTgLink });
     }
-    
+    if (userWaLink) {
+        inlineButtons.push({ text: "🟢 WhatsApp", url: userWaLink });
+    }
+    if (userSnapLink) {
+        inlineButtons.push({ text: "👻 Snapchat", url: userSnapLink });
+    }
+
+    const primaryContact = cleanTelegram || cleanWhatsApp || cleanSnapchat || 'Customer';
+
     const keyboard = {
         inline_keyboard: [
             inlineButtons,
             [
-                { text: "✅ Confirm Payment Received", callback_data: `release_${cleanTelegram}` }
+                { text: "✅ Confirm Payment Received", callback_data: `release_${primaryContact}` }
             ]
         ]
     };
@@ -137,13 +151,13 @@ app.post('/telegram-webhook', async (req, res) => {
 
                 await axios.post(`${TELEGRAM_API}/answerCallbackQuery`, {
                     callback_query_id: callbackId,
-                    text: "Payment Confirmed! Message the user directly with their VIP/Rollover code.",
+                    text: "Payment Confirmed! Tap one of the contact buttons above to deliver the VIP/Rollover code.",
                     show_alert: true
                 });
 
                 await axios.post(`${TELEGRAM_API}/sendMessage`, {
                     chat_id: ADMIN_CHAT_ID,
-                    text: `✅ *Payment Verified for @${userContact}*\n\nTap "Message Customer on Telegram" above or message @${userContact} directly to deliver their VIP or Rollover code.`,
+                    text: `✅ *Payment Verified for ${userContact}*\n\nTap on the Telegram, WhatsApp, or Snapchat button above to send their VIP/Rollover ticket directly.`,
                     parse_mode: 'Markdown'
                 });
             }
