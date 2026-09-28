@@ -56,55 +56,59 @@ app.get('/', (req, res) => {
 
 // Endpoint to receive payment notification and uploaded receipt file from frontend
 app.post('/api/checkout', upload.single('paymentProof'), async (req, res) => {
-    const { name, telegram, whatsapp, snapchat, reference, amount } = req.body;
-
-    let cleanTelegram = telegram ? String(telegram).trim().replace(/^@/, '') : '';
-    let cleanWhatsApp = whatsapp ? String(whatsapp).trim().replace(/[^0-9]/g, '') : '';
-    let cleanSnapchat = snapchat ? String(snapchat).trim().replace(/^@/, '') : '';
-
-    const userTgLink = cleanTelegram ? `https://t.me/${cleanTelegram}` : null;
-    const userWaLink = cleanWhatsApp ? `https://wa.me/${cleanWhatsApp}` : null;
-    const userSnapLink = cleanSnapchat ? `https://snapchat.com/add/${cleanSnapchat}` : null;
-
-    const safeName = escapeMarkdown(name || 'N/A');
-    const safeRef = String(reference || 'N/A').replace(/`/g, '');
-    const safeAmount = escapeMarkdown(amount || '0');
-
-    const text = `🚨 *NEW PAYMENT CLAIM* 🚨\n\n` +
-                 `👤 *Name:* ${safeName}\n` +
-                 `📱 *Telegram:* ${cleanTelegram ? '@' + escapeMarkdown(cleanTelegram) : 'N/A'}\n` +
-                 `🟢 *WhatsApp:* ${cleanWhatsApp ? '+' + escapeMarkdown(cleanWhatsApp) : 'N/A'}\n` +
-                 `👻 *Snapchat:* ${cleanSnapchat ? escapeMarkdown(cleanSnapchat) : 'N/A'}\n` +
-                 `💰 *Amount / Plan:* ₦${safeAmount}\n` +
-                 `🧾 *Ref:* \`${safeRef}\` \n\n` +
-                 `🏦 *Account Details:* ${BANK_DETAILS.bankName} | ${BANK_DETAILS.accountNumber} (${BANK_DETAILS.accountName})`;
-
-    // Build inline action buttons for Admin
-    const inlineButtons = [];
-
-    if (userTgLink) {
-        inlineButtons.push({ text: "💬 Telegram", url: userTgLink });
-    }
-    if (userWaLink) {
-        inlineButtons.push({ text: "🟢 WhatsApp", url: userWaLink });
-    }
-    if (userSnapLink) {
-        inlineButtons.push({ text: "👻 Snapchat", url: userSnapLink });
-    }
-
-    const primaryContact = cleanTelegram || cleanWhatsApp || cleanSnapchat || 'Customer';
-
-    const keyboard = {
-        inline_keyboard: [
-            inlineButtons,
-            [
-                { text: "✅ Confirm Payment Received", callback_data: `release_${primaryContact}` }
-            ]
-        ]
-    };
-
     try {
-        // Check if user uploaded a screenshot receipt file
+        const { name, telegram, whatsapp, snapchat, reference, amount } = req.body;
+
+        // Clean user inputs
+        let cleanTelegram = telegram ? String(telegram).trim().replace(/^@/, '') : '';
+        let cleanWhatsApp = whatsapp ? String(whatsapp).trim().replace(/[^0-9]/g, '') : '';
+        let cleanSnapchat = snapchat ? String(snapchat).trim().replace(/^@/, '') : '';
+
+        // Validate URLs to prevent Telegram 400 errors on empty inputs
+        const userTgLink = cleanTelegram.length > 0 ? `https://t.me/${cleanTelegram}` : null;
+        const userWaLink = cleanWhatsApp.length > 6 ? `https://wa.me/${cleanWhatsApp}` : null;
+        const userSnapLink = cleanSnapchat.length > 0 ? `https://snapchat.com/add/${cleanSnapchat}` : null;
+
+        const safeName = escapeMarkdown(name || 'N/A');
+        const safeRef = String(reference || 'N/A').replace(/`/g, '');
+        const safeAmount = escapeMarkdown(amount || '0');
+
+        const text = `🚨 *NEW PAYMENT CLAIM* 🚨\n\n` +
+                     `👤 *Name:* ${safeName}\n` +
+                     `📱 *Telegram:* ${cleanTelegram ? '@' + escapeMarkdown(cleanTelegram) : 'N/A'}\n` +
+                     `🟢 *WhatsApp:* ${cleanWhatsApp ? '+' + escapeMarkdown(cleanWhatsApp) : 'N/A'}\n` +
+                     `👻 *Snapchat:* ${cleanSnapchat ? escapeMarkdown(cleanSnapchat) : 'N/A'}\n` +
+                     `💰 *Amount / Plan:* ₦${safeAmount}\n` +
+                     `🧾 *Ref:* \`${safeRef}\` \n\n` +
+                     `🏦 *Account Details:* ${BANK_DETAILS.bankName} | ${BANK_DETAILS.accountNumber} (${BANK_DETAILS.accountName})`;
+
+        // Dynamically build inline action buttons ONLY for provided contact handles
+        const inlineButtons = [];
+
+        if (userTgLink) {
+            inlineButtons.push({ text: "💬 Telegram", url: userTgLink });
+        }
+        if (userWaLink) {
+            inlineButtons.push({ text: "🟢 WhatsApp", url: userWaLink });
+        }
+        if (userSnapLink) {
+            inlineButtons.push({ text: "👻 Snapchat", url: userSnapLink });
+        }
+
+        const primaryContact = cleanTelegram || cleanWhatsApp || cleanSnapchat || 'Customer';
+
+        // Construct rows for Telegram Keyboard
+        const keyboardRows = [];
+        if (inlineButtons.length > 0) {
+            keyboardRows.push(inlineButtons);
+        }
+        keyboardRows.push([
+            { text: "✅ Confirm Payment Received", callback_data: `release_${primaryContact.substring(0, 30)}` }
+        ]);
+
+        const keyboard = { inline_keyboard: keyboardRows };
+
+        // Send to Telegram
         if (req.file) {
             const formData = new FormData();
             formData.append('chat_id', ADMIN_CHAT_ID);
@@ -116,8 +120,12 @@ app.post('/api/checkout', upload.single('paymentProof'), async (req, res) => {
             await axios.post(`${TELEGRAM_API}/sendPhoto`, formData, {
                 headers: formData.getHeaders()
             });
+
+            // Clean up temporary uploaded file from server disk
+            fs.unlink(req.file.path, (err) => {
+                if (err) console.error('Failed to delete temporary file:', err);
+            });
         } else {
-            // Send regular text message if no file was uploaded
             await axios.post(`${TELEGRAM_API}/sendMessage`, {
                 chat_id: ADMIN_CHAT_ID,
                 text: text,
@@ -126,16 +134,21 @@ app.post('/api/checkout', upload.single('paymentProof'), async (req, res) => {
             });
         }
 
-        res.status(200).json({ success: true, message: 'Notification sent to admin' });
+        return res.status(200).json({ success: true, message: 'Notification sent to admin' });
     } catch (error) {
         console.error('Telegram API error:', error.response ? error.response.data : error.message);
-        res.status(500).json({ success: false, message: 'Failed to notify admin' });
+        
+        // Clean up file if error occurred during upload
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+
+        return res.status(500).json({ success: false, message: 'Failed to notify admin' });
     }
 });
 
 // Telegram Webhook Handler (Handles Inline Buttons & Timed Free Tips Messages)
 app.post('/telegram-webhook', async (req, res) => {
-    // Immediately send 200 OK to Telegram so it doesn't retry requests
     res.sendStatus(200);
 
     const { callback_query, message } = req.body;
@@ -157,7 +170,7 @@ app.post('/telegram-webhook', async (req, res) => {
 
                 await axios.post(`${TELEGRAM_API}/sendMessage`, {
                     chat_id: ADMIN_CHAT_ID,
-                    text: `✅ *Payment Verified for ${userContact}*\n\nTap on the Telegram, WhatsApp, or Snapchat button above to send their VIP/Rollover ticket directly.`,
+                    text: `✅ *Payment Verified for ${escapeMarkdown(userContact)}*\n\nTap on the Telegram, WhatsApp, or Snapchat button above to send their VIP/Rollover ticket directly.`,
                     parse_mode: 'Markdown'
                 });
             }
@@ -170,7 +183,6 @@ app.post('/telegram-webhook', async (req, res) => {
 
             if (userText.includes('get_free_ticket') || userText === '/free' || userText === '/start' || userText === '/tips') {
                 
-                // Get current West Africa Time (WAT - UTC+1) hour using Intl API
                 const currentWatHour = parseInt(
                     new Intl.DateTimeFormat('en-US', {
                         timeZone: 'Africa/Lagos',
@@ -180,7 +192,6 @@ app.post('/telegram-webhook', async (req, res) => {
                     10
                 );
 
-                // If it is 3:00 PM WAT (15:00) or later, lock free tips
                 if (currentWatHour >= 15) {
                     const lockedMessage = 
                         "🔒 *TODAY'S FREE TIPS ARE LOCKED*\n\n" +
@@ -194,7 +205,6 @@ app.post('/telegram-webhook', async (req, res) => {
                         parse_mode: 'Markdown'
                     });
                 } else {
-                    // Before 3:00 PM WAT — Deliver full free tips schedule
                     const freeTipsMessage = 
                         "🏆 APEX PREDICTIONS FREE TIPS (MIDWEEK) 🏆\n\n" +
                         "📅 TUESDAY 15.09.2026\n" +
